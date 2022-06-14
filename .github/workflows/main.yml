@@ -21,7 +21,8 @@ jobs:
 
       - name: Install deps
         run: |
-          sudo apt-get meson g++-12 ninja-build
+          sudo apt-get update
+          sudo apt-get install meson g++-12 ninja-build
 
       - name: Cache subprojects
         id: meson-cache
