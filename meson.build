@@ -11,6 +11,8 @@ cpp_compiler = meson.get_compiler('cpp')
 cpp_compiler.has_header_symbol('version', '__cpp_lib_filesystem', required: true)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_string_view', required: true)
 
+libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
+
 libxmlpp_dep = dependency('libxml++-5.0',
                           version : '>=5.0.0',
                           fallback: ['libxmlpp'],
