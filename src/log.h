@@ -1,0 +1,83 @@
+#pragma once
+
+#include <iostream>
+#include "args.h"
+template <typename T>
+concept is_optional =
+    std::same_as<T, std::optional<typename std::pointer_traits<T>::element_type>>;
+
+template <typename T>
+void _log_helper(std::ostream& out, bool autonl, T t)
+{
+    if constexpr (is_optional<T>) {
+        if (t)
+            out << *t;
+        if (autonl)
+            out << '\n';
+        return;
+    }
+
+    if constexpr (std::is_same_v<std::remove_cvref_t<T>, char>) {
+        if (!autonl || '\n' == t) {
+            out << t;
+        } else {
+            out << t << '\n';
+        }
+    } else if constexpr (std::is_same_v<std::remove_cvref_t<T>, char*>) {
+        std::string_view sv {t};
+        if (!autonl || (!sv.empty() && '\n' == sv.back())) {
+            out << sv;
+        } else {
+            out << sv << '\n';
+        }
+        if (0 != strcmp("\n", t)) {
+            out << t;
+            if (autonl)
+                out << '\n';
+        } else if (autonl) {
+            out << '\n';
+        }
+    } else {
+        out << t;
+        if (autonl)
+            out << '\n';
+    }
+}
+
+template <typename T, typename... Args>
+void _log_helper(std::ostream& out, bool autonl, T t, Args... argz)
+{
+    if constexpr(is_optional<T>) {
+        if (t)
+            out << *t;
+    } else {
+        out << t;
+    }
+    _log_helper(out, autonl, argz...);
+}
+
+template<typename... Args>
+void log_error(Args... argz) {
+    std::clog << "Error: ";
+    _log_helper(std::clog, true, argz...);
+}
+
+template<typename... Args>
+void log_info(Args... argz) {
+    _log_helper(std::cout, true, argz...);
+}
+
+
+template<typename... Args>
+void log_verbose_ml(Args... argz) {
+    if (options.verbose) {
+        _log_helper(std::cout, false, argz...);
+    }
+}
+
+template<typename... Args>
+void log_verbose(Args... argz) {
+    if (options.verbose) {
+        _log_helper(std::cout, true, argz...);
+    }
+}
