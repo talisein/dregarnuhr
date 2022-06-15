@@ -6,7 +6,7 @@
 #include "args.h"
 #include "epub.h"
 #include "volumes.h"
-
+#include "log.h"
 
 namespace fs = std::filesystem;
 
@@ -15,14 +15,32 @@ void print_books(const fs::path& input_dir)
     const fs::path epub_ext{".epub"};
     std::map<volume, std::unique_ptr<epub::book_reader>> book_readers;
     std::map<volume, epub::book> books;
+    log_verbose("Info: Looking for epubs in ", input_dir.string());
     for (auto const &dir_entry : fs::directory_iterator{input_dir}) {
-        if (!dir_entry.is_regular_file()) continue;
-        if (dir_entry.path().extension() == epub_ext) {
+        log_verbose("Info: considering ", dir_entry.path().string());
+        if (!dir_entry.is_regular_file()) {
+            log_verbose("Info: Not a regular file: ", dir_entry.path().string());
+            continue;
+        }
+        if (dir_entry.path().extension() != epub_ext) {
+            log_verbose("Info: ", std::quoted(dir_entry.path().string()),
+                        " extension ", std::quoted(dir_entry.path().extension().string()),
+                        " is not matching ", epub_ext.string());
+            continue;
+        } else {
             auto reader = std::make_unique<epub::book_reader>(dir_entry);
             auto book = reader->dump();
-            if (book.has_failure()) continue;
+            if (book.has_failure()) {
+                log_verbose("Info: Dump error for ", std::quoted(dir_entry.path().string()), ": ", book.error().message());
+                continue;
+            }
             auto vol = identify_volume(book.value().manifest.toc.dtb_uid);
-            if (vol.has_failure()) continue;
+            if (vol.has_failure()) {
+                log_verbose("Info: Failed to identify ", std::quoted(dir_entry.path().string()),
+                            ": Unknown uid ", std::quoted(book.value().manifest.toc.dtb_uid),
+                            " with title: ", std::quoted(book.value().manifest.toc.title));
+                continue;
+            }
             book_readers.emplace(vol.value(), std::move(reader));
             books.emplace(vol.value(), std::move(book.value()));
         }
@@ -30,30 +48,6 @@ void print_books(const fs::path& input_dir)
 
     for (auto it : books) {
         std::cout << "Found " << it.second.manifest.toc.title << "\n";
-    }
-
-    if (books.empty()) { // Nothing? this time with errors
-    for (auto const &dir_entry : fs::directory_iterator{input_dir}) {
-        if (!dir_entry.is_regular_file()) {
-            std::cout << "Not a regular file: " << dir_entry.path().string() << std::endl;
-        }
-        if (dir_entry.path().extension().compare(epub_ext)) {
-            auto reader = std::make_unique<epub::book_reader>(dir_entry);
-            auto book = reader->dump();
-            if (book.has_failure()) {
-                std::cout << "Dump error: " << book.error().message() << std::endl;
-                continue;
-            }
-            auto vol = identify_volume(book.value().manifest.toc.dtb_uid);
-            if (vol.has_failure()) {
-                std::cout << "Identification error, unknown " << std::quoted(book.value().manifest.toc.dtb_uid) << std::endl;
-            }
-            book_readers.emplace(vol.value(), std::move(reader));
-            books.emplace(vol.value(), std::move(book.value()));
-        } else {
-            std::cout << "Extension not matching: " << dir_entry.path().extension().string() << " is not " << epub_ext.string() << std::endl;
-        }
-    }
     }
 }
 
@@ -104,6 +98,7 @@ void print_books(const fs::path& input_dir)
 int main(int argc, char* argv[])
 {
     #ifdef _WIN32
+    log_verbose("Info: setting local .utf8");
     std::locale::global(std::locale(".utf8"));
     #else
     std::locale::global(std::locale(""));
@@ -117,20 +112,22 @@ int main(int argc, char* argv[])
         do_dump();
     }
 
-    print_books(options.input_dir);
+    if (args::command::NORMAL == options.command) {
+        print_books(options.input_dir);
 
-    bool everything_done = false;
-    if (!everything_done) {
-        if (options.output_created) {
-            std::cerr << "ebooks not created successfully. Cleaning up created files.\n";
-            std::error_code ec;
-            fs::remove(options.output_dir, ec);
-            if (ec) {
-                std::system_error e{ec};
-                std::cerr << "Error: unable to delete directory " << options.output_dir << ": " << e.code() << ' ' << e.what() << std::endl;
+        bool everything_done = false;
+        if (!everything_done) {
+            if (options.output_created) {
+                std::cerr << "ebooks not created successfully. Cleaning up created files.\n";
+                std::error_code ec;
+                fs::remove(options.output_dir, ec);
+                if (ec) {
+                    std::system_error e{ec};
+                    std::cerr << "Error: unable to delete directory " << options.output_dir << ": " << e.code() << ' ' << e.what() << std::endl;
+                }
             }
+            return EXIT_SUCCESS;
         }
-        return EXIT_SUCCESS;
     }
 
     return EXIT_SUCCESS;
