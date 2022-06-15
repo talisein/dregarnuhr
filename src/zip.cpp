@@ -1,3 +1,4 @@
+#include <type_traits>
 #include <iostream>
 #include <cstdlib>
 #include "zip.h"
@@ -49,11 +50,18 @@ namespace zip
     reader::reader(const fs::path& filename)
     {
         mz_zip_zero_struct(&zip);
-        if (MZ_FALSE == mz_zip_reader_init_file(&zip, filename.c_str(), 0)) [[unlikely]] {
-            mz_zip_error err = mz_zip_get_last_error(&zip);
-            throw std::system_error(err);
+        if constexpr (std::is_same<std::invoke_result<decltype(&std::filesystem::path::c_str)>, const char *>::value) {
+            if (MZ_FALSE == mz_zip_reader_init_file(&zip, filename.c_str(), 0)) [[unlikely]] {
+                mz_zip_error err = mz_zip_get_last_error(&zip);
+                throw std::system_error(err);
+            }
+        } else { // Windows' c_str() returns wchar_t*
+            auto filename_string = filename.string();
+            if (MZ_FALSE == mz_zip_reader_init_file(&zip, filename_string.c_str(), 0)) [[unlikely]] {
+                mz_zip_error err = mz_zip_get_last_error(&zip);
+                throw std::system_error(err);
+            }
         }
-
         p_zip.reset(&zip);
     }
 

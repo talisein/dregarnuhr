@@ -21,23 +21,23 @@ namespace
         try {
             throw;
         } catch (xmlpp::internal_error &e) {
-            log_error(filename, ": xml internal_error from ", src.function_name(), ':', src.line(), ": ", e.what(), '\n');
+            log_error(filename, ": xml internal_error from ", src.function_name(), ':', src.line(), ": ", e.what());
             return std::errc::invalid_argument;
         } catch (xmlpp::validity_error &e) {
 
             return std::errc::invalid_argument;
         } catch (xmlpp::parse_error &e) {
             log_error(filename, ": xml parse_error from ",
-                      src.function_name(), ':', src.line(), ": ", e.what(), '\n');
+                      src.function_name(), ':', src.line(), ": ", e.what());
             return std::errc::invalid_argument;
         } catch (xmlpp::exception &e) {
-            log_error(filename, ": xml parse_error from ", src.function_name(), ':', src.line(), ": ", e.what(), '\n');
+            log_error(filename, ": xml parse_error from ", src.function_name(), ':', src.line(), ": ", e.what());
             return std::errc::invalid_argument;
         } catch (std::exception &e) {
-            log_error(filename, ": exception from ", src.function_name(), ':', src.line(), ": ", e.what(), '\n');
+            log_error(filename, ": exception from ", src.function_name(), ':', src.line(), ": ", e.what());
             return outcome::error_from_exception();
         } catch (...) {
-            log_error(filename, ": unexpected exception in", src.function_name(), ':', src.line(), '\n');
+            log_error(filename, ": unexpected exception in", src.function_name(), ':', src.line());
             return outcome::error_from_exception();
         }
         assert(false); // unreachable
@@ -72,7 +72,7 @@ namespace
         try {
             set = ele->find(xpath, map);
             if (set.size() == 0) {
-                log_error("Couldn't find ", xpath, '\n');
+                log_error("Couldn't find ", xpath);
                 return std::errc::invalid_argument;
             }
             return set;
@@ -90,7 +90,7 @@ namespace
         OUTCOME_TRY(auto set, find(xpath, map, ele, filename));
         auto attr = dynamic_cast<const xmlpp::Attribute*>(set.front());
         if (!attr) {
-            log_error("Error: Not an attribute: ", xpath, '\n');
+            log_error("Not an attribute: ", xpath);
             return std::errc::invalid_argument;
         }
         return attr->get_value();
@@ -104,7 +104,7 @@ namespace
     {
         OUTCOME_TRY(auto set, find(xpath, map, ele, filename));
         auto textnode = dynamic_cast<const xmlpp::TextNode*>(set.front());
-        if (!textnode) {log_error( "Error: Not a textnode: ", xpath, '\n');
+        if (!textnode) {log_error( "Not a textnode: ", xpath);
             return std::errc::invalid_argument;
         }
         return textnode->get_content();
@@ -157,14 +157,14 @@ namespace epub
     {
         auto mimetype = get_mimetype();
         if (!mimetype) {
-            log_error( "Error: couldn't find mimetype. Is this really an epub file?\n");
+            log_error( "couldn't find mimetype. Is this really an epub file?");
             return mimetype.as_failure();
         } else {
             if (!verify_mimetype(mimetype.value())) {
-                log_error( "Error: Found incorrect mimetype: ", mimetype.value(), ". Is this really an epub file?\n");
+                log_error( "Found incorrect mimetype: ", mimetype.value(), ". Is this really an epub file?");
                 return std::errc::invalid_argument;
             } else {
-                log_verbose("mimetype: ", mimetype.value(), '\n');
+                log_verbose("mimetype: ", mimetype.value());
             }
         }
 
@@ -178,7 +178,7 @@ namespace epub
             } else {
                 log_verbose_ml("std::nullopt");
             }
-            log_verbose_ml(", ", std::boolalpha, item.in_spine, " },\n");
+            log_verbose(", ", std::boolalpha, item.in_spine, " },");
         }
         return outcome::success();
     }
@@ -188,26 +188,26 @@ namespace epub
     {
         auto rootfile = get_file_reader(rootfile_path);
         if (!rootfile) {
-            log_error("Error: rootfile ", rootfile_path, " couldn't be read: ", "\n");
+            log_error("rootfile ", rootfile_path, " couldn't be read");
             return rootfile.as_failure();
         }
         auto cdoc = rootfile.value().get_doc();
         auto root = cdoc->get_root_node();
         if (!root) {
-            log_error(rootfile_path, " is empty\n");
+            log_error(rootfile_path, " is empty");
             return std::errc::invalid_argument;
         }
         xmlpp::Element::PrefixNsMap map;
         map.insert({"opf", "http://www.idpf.org/2007/opf"});
         OUTCOME_TRY(auto tocncx, find_attr("/opf:package/opf:spine/@toc", map, root, rootfile_path));
-        log_verbose(rootfile_path, ": toc: ", tocncx,'\n');
+        log_verbose(rootfile_path, ": toc: ", tocncx);
 
         using namespace std::string_literals;
         OUTCOME_TRY(auto toc_href, find_attr("/opf:package/opf:manifest/opf:item[@id='"s + tocncx + "']/@href"s , map, root, rootfile_path));
 
         std::string prefix = rootfile_path.substr(0, rootfile_path.find_last_of('/'));
         std::string toc_path = prefix + "/"s + toc_href;
-        log_verbose(rootfile_path, ": toc_href: ", toc_href, ", toc_path: ", toc_path, '\n');
+        log_verbose(rootfile_path, ": toc_href: ", toc_href, ", toc_path: ", toc_path);
 
         OUTCOME_TRY(auto toc, dump_toc(prefix + "/"s + toc_href));
 
@@ -235,7 +235,7 @@ namespace epub
         for (const auto& item : spine_items) {
             auto id = dynamic_cast<const xmlpp::Attribute*>(item);
             if (!id) {
-                log_error("Error: Not an attribute: ", "idref", '\n');
+                log_error("Not an attribute: ", "idref");
                 return std::errc::invalid_argument;
             }
             auto iter = std::ranges::find_if(manifest.items, [&id](const auto& i) { return i.id == id->get_value(); });
@@ -255,7 +255,7 @@ namespace epub
         auto cdoc = toc_file.get_doc();
         auto root = cdoc->get_root_node();
         if (!root) {
-            log_error(toc_path, " is empty\n");
+            log_error(toc_path, " is empty");
             return std::errc::invalid_argument;
         }
 
@@ -271,9 +271,9 @@ namespace epub
         // title
         OUTCOME_TRY(toc.title, find_textnode("/dtb:ncx/dtb:docTitle/dtb:text/text()", map, root, toc_path));
 
-        log_verbose(toc_path, ": dtb_uid: ", toc.dtb_uid, '\n');
-        log_verbose(toc_path, ": dtb_depth: ", toc.dtb_depth, '\n');
-        log_verbose(toc_path, ": title: ", toc.title, '\n');
+        log_verbose(toc_path, ": dtb_uid: ", toc.dtb_uid);
+        log_verbose(toc_path, ": dtb_depth: ", toc.dtb_depth);
+        log_verbose(toc_path, ": title: ", toc.title);
 
         OUTCOME_TRY(auto navpoint_set, find("/dtb:ncx/dtb:navMap/dtb:navPoint", map, root, toc_path));
         for (const auto &node : navpoint_set) {
@@ -292,16 +292,16 @@ namespace epub
     {
         auto container = get_file_reader("META-INF/container.xml");
         if (!container) {
-            log_error("Error: couldn't find META-INF/container.xml. Is this really an epub file?\n");
+            log_error("couldn't find META-INF/container.xml. Is this really an epub file?");
             return container.as_failure();
         } else {
-            log_verbose("META-INF/container.xml\n");
+            log_verbose("META-INF/container.xml");
         }
 
         auto cdoc = container.value().get_doc();
         auto root = cdoc->get_root_node();
         if (!root) {
-            log_error("Error: container.xml is empty\n");
+            log_error("container.xml is empty");
             return std::errc::invalid_argument;
         }
 
