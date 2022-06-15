@@ -8,20 +8,8 @@
 #include "args.h"
 
 template <typename T>
-concept is_optional =
-    std::same_as<T, std::optional<typename std::pointer_traits<T>::element_type>>;
-
-template <typename T>
 void _log_helper(std::ostream& out, bool autonl, T t)
 {
-    if constexpr (is_optional<T>) {
-        if (t)
-            out << *t;
-        if (autonl)
-            out << '\n';
-        return;
-    }
-
     if constexpr (std::is_same_v<std::remove_cvref_t<T>, char>) {
         if (!autonl || '\n' == t) {
             out << t;
@@ -52,12 +40,7 @@ void _log_helper(std::ostream& out, bool autonl, T t)
 template <typename T, typename... Args>
 void _log_helper(std::ostream& out, bool autonl, T t, Args... argz)
 {
-    if constexpr(is_optional<T>) {
-        if (t)
-            out << *t;
-    } else {
-        out << t;
-    }
+    out << t;
     _log_helper(out, autonl, argz...);
 }
 

@@ -172,7 +172,7 @@ namespace epub
         OUTCOME_TRY(auto manifest, dump_rootfile(rootfile_path));
 
         for (const auto& item : manifest.items) {
-            log_verbose_ml("{ ", options.dump_volume, ", ",std::quoted(item.id), ", ", std::quoted(item.href), ", ", std::quoted(item.media_type), ", ");
+            log_verbose_ml("{ ", options.dump_volume ? *options.dump_volume : "VREF", ", ",std::quoted(item.id), ", ", std::quoted(item.href), ", ", std::quoted(item.media_type), ", ");
             if (item.toc_label) {
                 log_verbose_ml(std::quoted(*item.toc_label));
             } else {
