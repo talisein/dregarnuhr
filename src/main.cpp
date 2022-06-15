@@ -44,6 +44,8 @@ void print_books(const fs::path& input_dir)
 
 int main(int argc, char* argv[])
 {
+    std::locale::global(std::locale(""));
+
     if (parse(argc, argv).has_failure()) {
         return EXIT_SUCCESS;
     }

@@ -13,7 +13,7 @@ struct args options;
 namespace {
     void usage(const char *prg)
     {
-        log_info("Usage: ", fs::path(prg).filename().native(), " input_dir output_dir\n\n",
+        log_info("Usage: ", fs::path(prg).filename().string(), " input_dir output_dir\n\n",
                  "input_dir : Directory where Ascendence of a Bookworm .epub files reside.\n",
                  "output_dir: Directory to output new .epub files. Must not be input_dir.");
     }
