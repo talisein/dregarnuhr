@@ -10,6 +10,8 @@ add_global_arguments('-D_LARGEFILE64_SOURCE', language: 'c')
 cpp_compiler = meson.get_compiler('cpp')
 cpp_compiler.has_header_symbol('version', '__cpp_lib_filesystem', required: true)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_string_view', required: true)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges', required: true)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_source_location', required: true)
 
 libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
 

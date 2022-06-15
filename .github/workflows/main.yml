@@ -79,7 +79,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Configure
-        run: meson --buildtype release --default-library static  build-mac
+        run: CC=gcc CXX=g++ meson setup --buildtype release --default-library static  build-mac
 
       # Runs a set of commands using the runners shell
       - name: Compile
@@ -105,9 +105,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Install deps
-        run: |
-          choco install meson ninja
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - run: pip install meson ninja
 
       - name: Prepare MSVC
         uses: bus1/cabuild/action/msdevshell@v1
@@ -126,7 +127,8 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Configure
-        run: meson --buildtype release --default-library static  build-win
+        run: |
+          meson --buildtype release --default-library static  build-win
 
       # Runs a set of commands using the runners shell
       - name: Compile
@@ -140,5 +142,5 @@ jobs:
       - name: Binary
         uses: actions/upload-artifact@v3
         with:
-          name: dregarnuhr-macos
+          name: dregarnuhr-win
           path: build-win/src/dregarnuhr.exe
