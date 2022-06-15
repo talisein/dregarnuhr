@@ -144,5 +144,5 @@ jobs:
         with:
           name: dregarnuhr-win
           path: |
-            build-win/src/dregarnuhr.exe
-            build-win/subprojects/libxml++-5.0.1/libxml++/xml++-vc142-5.0-1.dll
+            **/dregarnuhr.exe
+            **/xml++-vc142-5.0-1.dll
