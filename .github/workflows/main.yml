@@ -131,7 +131,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Configure
         run: |
-          meson --buildtype release -Dc_std=c17 -Dcpp_std=c++20 build-win -Dzlib:default_library=static -Dlibxml2:default_library=static
+          meson --buildtype release -Dc_std=c17 -Dcpp_std=c++20 -Ddefault_library=static -Dlibxmlpp:maintainer-mode=false build-win
 
       # Runs a set of commands using the runners shell
       - name: Compile
@@ -148,4 +148,3 @@ jobs:
           name: dregarnuhr-win
           path: |
             **/dregarnuhr.exe
-            **/xml++-vc142-5.0-1.dll

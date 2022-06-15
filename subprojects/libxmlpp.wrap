@@ -1,12 +1,6 @@
-[wrap-file]
-directory = libxml++-5.0.1
-source_url = https://download.gnome.org/sources/libxml++/5.0/libxml++-5.0.1.tar.xz
-source_filename = libxml++-5.0.1.tar.xz
-source_hash = 15c38307a964fa6199f4da6683a599eb7e63cc89198545b36349b87cf9aa0098
-patch_filename = libxmlpp_5.0.1-1_patch.zip
-patch_url = https://wrapdb.mesonbuild.com/v2/libxmlpp_5.0.1-1/get_patch
-patch_hash = 4b51d39d03cb04802c0aab71cce0ff419319850d839adacb9ba88205bb15937d
+[wrap-git]
+url = https://github.com/talisein/libxmlplusplus.git
+revision = mine
 
 [provide]
-libxml++ = libxmlpp_dep
-
+dependency_names = libxml++-5.0

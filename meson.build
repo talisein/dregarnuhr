@@ -25,7 +25,8 @@ libxmlpp_dep = dependency('libxml++-5.0',
                           fallback: ['libxmlpp'],
                           default_options: ['build-deprecated-api=false',
                                             'build-examples=false',
-                                            'validation=false'])
+                                            'validation=false',
+                                            'maintainer_mode=false'])
 
 miniz_dep = dependency('miniz',
                        fallback: ['miniz', 'miniz_dep'])
