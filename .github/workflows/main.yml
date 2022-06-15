@@ -79,7 +79,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Configure
-        run: CC=gcc CXX=g++ meson setup --buildtype release --default-library static  build-mac
+        run: CC=gcc CXX=g++ meson setup --buildtype release --default-library static build-mac
 
       # Runs a set of commands using the runners shell
       - name: Compile
@@ -128,7 +128,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Configure
         run: |
-          meson --buildtype release --default-library static  build-win
+          meson --buildtype release  build-win
 
       # Runs a set of commands using the runners shell
       - name: Compile

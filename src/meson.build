@@ -1,6 +1,6 @@
 
 
-deps = [libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep]
+deps = [zlib_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep]
 inc = []
 src = ['main.cpp', 'zip.cpp', 'args.cpp', 'epub.cpp']
 
