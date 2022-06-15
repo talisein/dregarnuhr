@@ -72,13 +72,9 @@ namespace {
         options.output_created = false;
         std::error_code ec;
 
-        if (fs::equivalent(input_dir, output_dir)) {
-            log_error("Input and output directories are the same. This isn't allowed.\n");
-            return std::errc::invalid_argument;
-        }
-
         bool output_exists = fs::exists(output_dir, ec);
         OUTCOME_TRY(handle_error(ec));
+
         if (!output_exists) {
             log_info("Output directory ", output_dir, " doesn't exist. Creating.\n");
             options.output_created = fs::create_directory(output_dir, ec);
@@ -95,6 +91,12 @@ namespace {
                 log_error("Output directory ", output_dir, " exists but isn't a directory.\n");
                 return std::errc::not_a_directory;
             }
+
+            if (fs::equivalent(input_dir, output_dir, ec)) {
+                log_error("Input and output directories are the same. This isn't allowed.\n");
+                return std::errc::invalid_argument;
+            }
+            OUTCOME_TRY(handle_error(ec));
         }
 
         return outcome::success();

@@ -94,7 +94,7 @@ void print_books(const fs::path& input_dir)
                   << std::quoted(item.id) <<  ", " <<  std::quoted(item.href) << ", "
                   << std::quoted(item.media_type) <<  ", ";
         if (item.toc_label) {
-            std::cout << "std::make_optional<std::string_view>(" << std::quoted(*item.toc_label) << ")";
+            std::cout << "std::make_optional<std::string_view>(" << std::quoted(*item.toc_label) << "sv)";
         } else {
             std::cout << "std::nullopt";
         }
@@ -108,11 +108,11 @@ void print_books(const fs::path& input_dir)
 int main(int argc, char* argv[])
 {
     #ifdef IS_WINDOWS
-    log_verbose("Info: setting local .utf8");
     std::locale::global(std::locale(".utf8"));
+    log_verbose("Info: set locale .utf8");
     #else
-    log_verbose("Info: setting local \"\"");
     std::locale::global(std::locale(""));
+    log_verbose("Info: set locale \"\"");
     #endif
 
     if (auto res = parse(argc, argv); res.has_failure()) {
