@@ -178,7 +178,7 @@ namespace epub
             } else {
                 log_verbose_ml("std::nullopt");
             }
-            log_verbose(", ", std::boolalpha, item.in_spine, " },");
+            log_verbose(", ", item.in_spine ? "true":"false", " },");
         }
         return outcome::success();
     }
