@@ -65,7 +65,7 @@ jobs:
       - name: Install deps
         run: |
           brew update
-          brew install meson libxml++@5 gcc@12 ninja
+          brew install meson libxml2 gcc@12 ninja
 
       - name: Cache subprojects
         id: meson-cache

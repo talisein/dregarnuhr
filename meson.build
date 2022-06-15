@@ -14,6 +14,7 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_filesystem', required: true
 cpp_compiler.has_header_symbol('version', '__cpp_lib_string_view', required: true)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges', required: true)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_source_location', required: true)
+cpp_compiler.has_header_symbol('version', '__cpp_concepts', required: true)
 
 zlib_dep = dependency('zlib', fallback: ['zlib'])
 
