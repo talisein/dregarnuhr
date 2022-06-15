@@ -146,5 +146,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dregarnuhr-win
-          path: |
-            build-win/src/dregarnuhr.exe
+          path: build-win/src/dregarnuhr.exe

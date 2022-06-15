@@ -31,7 +31,34 @@ void print_books(const fs::path& input_dir)
     for (auto it : books) {
         std::cout << "Found " << it.second.manifest.toc.title << "\n";
     }
+
+    if (books.empty()) { // Nothing? this time with errors
+    for (auto const &dir_entry : fs::directory_iterator{input_dir}) {
+        if (!dir_entry.is_regular_file()) {
+            std::cout << "Not a regular file: " << dir_entry.path().string() << std::endl;
+        }
+        if (dir_entry.path().extension().compare(epub_ext)) {
+            auto reader = std::make_unique<epub::book_reader>(dir_entry);
+            auto book = reader->dump();
+            if (book.has_failure()) {
+                std::cout << "Dump error: " << book.error().message() << std::endl;
+                continue;
+            }
+            auto vol = identify_volume(book.value().manifest.toc.dtb_uid);
+            if (vol.has_failure()) {
+                std::cout << "Identification error, unknown " << std::quoted(book.value().manifest.toc.dtb_uid) << std::endl;
+            }
+            book_readers.emplace(vol.value(), std::move(reader));
+            books.emplace(vol.value(), std::move(book.value()));
+        } else {
+            std::cout << "Extension not matching: " << dir_entry.path().extension().string() << " is not " << epub_ext.string() << std::endl;
+        }
+    }
+    }
 }
+
+
+
 
 [[noreturn]] void do_dump()
 {
