@@ -21,23 +21,23 @@ namespace
         try {
             throw;
         } catch (xmlpp::internal_error &e) {
-            log_error(filename, ": xml internal_error from ", src.function_name(), ':', src.line(), ": ", e.what());
+            log_error(filename, ": xml internal_error from ", src.function_name(), ":", src.line(), ": ", e.what());
             return std::errc::invalid_argument;
         } catch (xmlpp::validity_error &e) {
 
             return std::errc::invalid_argument;
         } catch (xmlpp::parse_error &e) {
             log_error(filename, ": xml parse_error from ",
-                      src.function_name(), ':', src.line(), ": ", e.what());
+                      src.function_name(), ":", src.line(), ": ", e.what());
             return std::errc::invalid_argument;
         } catch (xmlpp::exception &e) {
-            log_error(filename, ": xml parse_error from ", src.function_name(), ':', src.line(), ": ", e.what());
+            log_error(filename, ": xml parse_error from ", src.function_name(), ":", src.line(), ": ", e.what());
             return std::errc::invalid_argument;
         } catch (std::exception &e) {
-            log_error(filename, ": exception from ", src.function_name(), ':', src.line(), ": ", e.what());
+            log_error(filename, ": exception from ", src.function_name(), ":", src.line(), ": ", e.what());
             return outcome::error_from_exception();
         } catch (...) {
-            log_error(filename, ": unexpected exception in", src.function_name(), ':', src.line());
+            log_error(filename, ": unexpected exception in", src.function_name(), ":", src.line());
             return outcome::error_from_exception();
         }
         assert(false); // unreachable
