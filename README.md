@@ -43,9 +43,6 @@ OEBPS/toc.ncx: title: Ascendance of a Bookworm: Part 1 Daughter of a Soldier Vol
 { P1V1, "toc", "Text/toc.xhtml", "application/xhtml+xml", std::nullopt, true },
 { P1V1, "prologue.xhtml", "Text/prologue.xhtml", "application/xhtml+xml", "Prologue", true },
 { P1V1, "chapter01.xhtml", "Text/chapter01.xhtml", "application/xhtml+xml", "A New Life", true },
-{ P1V1, "chapter02.xhtml", "Text/chapter02.xhtml", "application/xhtml+xml", "Exploring My Home", true },
-{ P1V1, "insert1.xhtml", "Text/insert1.xhtml", "application/xhtml+xml", std::nullopt, true },
-{ P1V1, "chapter021.xhtml", "Text/chapter021.xhtml", "application/xhtml+xml", std::nullopt, true },
 { P1V1, "chapter03.xhtml", "Text/chapter03.xhtml", "application/xhtml+xml", "Exploring the City", true },
 { P1V1, "chapter04.xhtml", "Text/chapter04.xhtml", "application/xhtml+xml", "Books: Unobtainable", true },
 { P1V1, "chapter05.xhtml", "Text/chapter05.xhtml", "application/xhtml+xml", "Lifestyle Overhaul", true },
@@ -55,7 +52,7 @@ OEBPS/toc.ncx: title: Ascendance of a Bookworm: Part 1 Daughter of a Soldier Vol
 The idea is to use this to initialize a struct for a chronological order, e.g.
 
 ```c++
-struct reversed {
+struct manifest {
   enum volume { P1V1, FB1 };
   string id;
   string path;
@@ -64,15 +61,22 @@ struct reversed {
   bool in_spine;
 };
 
-vector<reversed> reversed_p1v1 = {
-{ P1V1, "chapter05.xhtml", "Text/chapter05.xhtml", "application/xhtml+xml", "Lifestyle Overhaul", true },
-{ P1V1, "chapter04.xhtml", "Text/chapter04.xhtml", "application/xhtml+xml", "Books: Unobtainable", true },
+vector<manifest> reversed_p1v1 = {
+{ P1V1, "style", "Styles/stylesheet.css", "text/css", std::nullopt, false },
+{ P1V1, "Cover.jpg", "Images/Cover.jpg", "image/jpeg", std::nullopt, false },
+{ P1V1, "Insert1.jpg", "Images/Insert1.jpg", "image/jpeg", std::nullopt, false },
+{ P1V1, "cover", "Text/cover.xhtml", "application/xhtml+xml", "Cover", true },
 { P1V1, "chapter03.xhtml", "Text/chapter03.xhtml", "application/xhtml+xml", "Exploring the City", true },
 { FB1, "x37.xhtml", "Text/37.xhtml", "application/xhtml+xml", "My Daughter’s about to Be a Criminal?! by Suzuka", true },
-{ P1V1, "chapter021.xhtml", "Text/chapter021.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ P1V1, "chapter02.xhtml", "Text/chapter02.xhtml", "application/xhtml+xml", "Exploring My Home", true },
 { P1V1, "insert1.xhtml", "Text/insert1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ P1V1, "chapter021.xhtml", "Text/chapter021.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ P1V1, "chapter01.xhtml", "Text/chapter01.xhtml", "application/xhtml+xml", "A New Life", true },
+{ P1V1, "afterword.xhtml", "Text/afterword.xhtml", "application/xhtml+xml", "Afterword", true },
+{ P1V1, "signup.xhtml", "Text/signup.xhtml", "application/xhtml+xml", "About J-Novel Club", true },
+{ P1V1, "copyright.xhtml", "Text/copyright.xhtml", "application/xhtml+xml", "Copyright", true },
 }
 ```
 
-Then its just a matter of walking through the struct and spitting out new xml
+Then its just a matter of walking through the vector and spitting out new xml
 for the new P1V1 rootfile and toc, and copying the chapters into a new zipfile.
