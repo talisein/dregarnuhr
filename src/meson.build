@@ -1,5 +1,12 @@
 
 
+conf_data = configuration_data()
+conf_data.set('IS_WINDOWS', host_machine.system() == 'windows')
+
+config = configure_file(input: 'config.h.in',
+                        output: 'config.h',
+                        configuration: conf_data)
+
 deps = [zlib_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep]
 inc = []
 src = ['main.cpp', 'zip.cpp', 'args.cpp', 'epub.cpp', 'volumes.cpp']

@@ -18,7 +18,7 @@ struct args
         TEST
     } command;
 
-    std::optional<std::string_view> dump_volume;
+    std::optional<std::string> dump_volume;
     fs::path input_file;
     fs::path input_dir;
     fs::path output_dir;

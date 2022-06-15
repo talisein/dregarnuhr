@@ -86,6 +86,8 @@ namespace {
                 std::system_error e{ec};
                 log_error("Failed to create output directory ", output_dir, ": ", e.code(), ' ', e.what());
                 return ec;
+            } else {
+                log_verbose("Info: created directory ", output_dir.string());
             }
         } else {
             if (!fs::is_directory(output_dir, ec) || ec) {
@@ -153,7 +155,9 @@ parse(int argc, char **argv)
         options.output_dir = *it;
 
         OUTCOME_TRY(verify_input_directory(options.input_dir));
+        log_verbose("Verified input dir: ", options.input_dir.string());
         OUTCOME_TRY(verify_output_directory(options.input_dir, options.output_dir));
+        log_verbose("Verified output dir: ", options.output_dir.string());
     }
     return outcome::success();
 }

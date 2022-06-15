@@ -7,6 +7,7 @@
 #include "epub.h"
 #include "volumes.h"
 #include "log.h"
+#include "config.h"
 
 namespace fs = std::filesystem;
 
@@ -67,14 +68,23 @@ void print_books(const fs::path& input_dir)
     using namespace std::string_view_literals;
     if (!options.dump_volume) {
         do {
-            auto part_pos = book.manifest.toc.title.find("Part ");
-            if (std::string::npos == part_pos) break;
             std::stringstream ss;
-            ss << 'P' << book.manifest.toc.title.substr(part_pos + 5, 1);
-            auto vol_pos = book.manifest.toc.title.find("Volume ");
-            if (std::string::npos == vol_pos) break;
-            ss << 'V' << book.manifest.toc.title.substr(vol_pos + 7, 1);
-            options.dump_volume = ss.str();
+            if (auto part_pos = book.manifest.toc.title.find("Part ");
+                std::string::npos != part_pos)
+            {
+                ss << 'P' << book.manifest.toc.title.substr(part_pos + 5, 1);
+            } else {
+                break;
+            }
+
+            if (auto vol_pos = book.manifest.toc.title.find("Volume ");
+                std::string::npos != vol_pos)
+            {
+                ss << 'V' << book.manifest.toc.title.substr(vol_pos + 7, 1);
+                options.dump_volume = std::make_optional<std::string>(ss.str());
+            } else {
+                break;
+            }
         } while (false);
     }
     std::cout << "{" << std::quoted(book.manifest.toc.dtb_uid) << "sv, volume::"sv
@@ -97,14 +107,16 @@ void print_books(const fs::path& input_dir)
 
 int main(int argc, char* argv[])
 {
-    #ifdef _WIN32
+    #ifdef IS_WINDOWS
     log_verbose("Info: setting local .utf8");
     std::locale::global(std::locale(".utf8"));
     #else
+    log_verbose("Info: setting local \"\"");
     std::locale::global(std::locale(""));
     #endif
 
-    if (parse(argc, argv).has_failure()) {
+    if (auto res = parse(argc, argv); res.has_failure()) {
+        log_error("Failed to parse arguments: ", res.error().message());
         return EXIT_SUCCESS;
     }
 
