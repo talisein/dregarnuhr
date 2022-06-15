@@ -125,13 +125,19 @@ parse(int argc, char **argv)
 
 
     if (args::command::DUMP == options.command) {
-        if (std::distance(args_files.begin(), args_files.end()) != 2) {
+        const auto num_files = std::distance(args_files.begin(), args_files.end());
+        if (num_files == 0) {
             usage(argv[0]);
             return outcome::failure(std::errc::invalid_argument);
         }
         auto it = args_files.begin();
-        options.dump_volume = *it++;
-        options.input_file = *it;
+
+        if (2 == num_files) {
+            options.dump_volume = *it++;
+            options.input_file = *it;
+        } else {
+            options.input_file = *it;
+        }
 
         OUTCOME_TRY(verify_input_file(options.input_file));
     }

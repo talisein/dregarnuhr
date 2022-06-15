@@ -47,10 +47,11 @@ std::error_code make_error_code(mz_zip_error e)
 
 namespace zip
 {
-    reader::reader(const fs::path& filename)
+    reader::reader(const fs::path& filename) :
+        path(filename)
     {
         mz_zip_zero_struct(&zip);
-        auto filename_string = filename.string(); // Windows' c_str() returns wchar_t*
+        auto filename_string = path.string(); // Windows' c_str() returns wchar_t*
         if (MZ_FALSE == mz_zip_reader_init_file(&zip, filename_string.c_str(), 0)) [[unlikely]] {
             mz_zip_error err = mz_zip_get_last_error(&zip);
             throw std::system_error(err);
@@ -223,12 +224,6 @@ namespace zip
             return mz_zip_get_last_error(&zip);
         }
         return st;
-    }
-
-    void
-    reader::free_deleter::operator()(char *p) const noexcept
-    {
-        std::free(p);
     }
 
     void

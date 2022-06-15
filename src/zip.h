@@ -86,16 +86,12 @@ namespace zip
         result<mz_zip_archive_file_stat> stat(mz_uint idx);
 
     private:
-        struct free_deleter {
-            void operator()(char *p) const noexcept;
-        };
-        using cbuf_ptr=std::unique_ptr<char, free_deleter>;
-
         struct archive_deleter {
             void operator ()(mz_zip_archive *zip) const noexcept;
         };
         using zip_ptr = std::unique_ptr<mz_zip_archive, archive_deleter>;
 
+        fs::path path;
         mz_zip_archive zip;
         zip_ptr p_zip;
     };

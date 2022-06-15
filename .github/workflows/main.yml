@@ -147,4 +147,4 @@ jobs:
         with:
           name: dregarnuhr-win
           path: |
-            **/dregarnuhr.exe
+            build-win/src/dregarnuhr.exe

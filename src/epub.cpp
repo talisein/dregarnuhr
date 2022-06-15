@@ -117,12 +117,13 @@ namespace epub
     using outcome::result;
 
     book_reader::book_reader(const fs::path& epub) :
+        path(epub),
         zip(epub)
     {
     }
 
-    book_reader::book_reader(zip::reader&& zip) :
-        zip(std::move(zip))
+    book_reader::book_reader(zip::reader&& inzip) :
+        zip(std::move(inzip))
     {
     }
 
@@ -152,7 +153,7 @@ namespace epub
         return get_file_reader(path.c_str());
     }
 
-    result<void>
+    result<book>
     book_reader::dump()
     {
         auto mimetype = get_mimetype();
@@ -168,22 +169,16 @@ namespace epub
             }
         }
 
-        OUTCOME_TRY(auto rootfile_path, dump_container());
-        OUTCOME_TRY(auto manifest, dump_rootfile(rootfile_path));
+        book book;
+        book.mimetype = mimetype.value();
 
-        for (const auto& item : manifest.items) {
-            log_verbose_ml("{ ", options.dump_volume ? *options.dump_volume : "VREF", ", ",std::quoted(item.id), ", ", std::quoted(item.href), ", ", std::quoted(item.media_type), ", ");
-            if (item.toc_label) {
-                log_verbose_ml(std::quoted(*item.toc_label));
-            } else {
-                log_verbose_ml("std::nullopt");
-            }
-            log_verbose(", ", item.in_spine ? "true":"false", " },");
-        }
-        return outcome::success();
+        OUTCOME_TRY(book.rootfile_path, dump_container());
+        OUTCOME_TRY(book.manifest, dump_rootfile(book.rootfile_path));
+
+        return book;
     }
 
-    result<book_reader::manifest>
+    result<manifest>
     book_reader::dump_rootfile(const std::string& rootfile_path)
     {
         auto rootfile = get_file_reader(rootfile_path);
@@ -209,9 +204,8 @@ namespace epub
         std::string toc_path = prefix + "/"s + toc_href;
         log_verbose(rootfile_path, ": toc_href: ", toc_href, ", toc_path: ", toc_path);
 
-        OUTCOME_TRY(auto toc, dump_toc(prefix + "/"s + toc_href));
-
         manifest manifest;
+        OUTCOME_TRY(manifest.toc, dump_toc(prefix + "/"s + toc_href));
         OUTCOME_TRY(auto items, find("/opf:package/opf:manifest/opf:item", map, root, rootfile_path));
         for (const auto &item : items) {
             OUTCOME_TRY(auto id, find_attr("@id", map, item, rootfile_path));
@@ -219,14 +213,15 @@ namespace epub
             OUTCOME_TRY(auto media_type, find_attr("@media-type", map, item, rootfile_path));
 
             auto itemref = find_quiet("/opf:package/opf:spine/opf:itemref[@idref='"s + id + "']", map, root, rootfile_path);
-            if (toc.has_entry(href)) {
-                manifest.items.emplace_back(id, href, media_type, toc.get_label(href), itemref.has_value());
+            if (manifest.toc.has_entry(href)) {
+                manifest.items.emplace_back(id, href, media_type, manifest.toc.get_label(href), itemref.has_value());
             } else {
                 manifest.items.emplace_back(id, href, media_type, std::nullopt, itemref.has_value());
             }
         }
 
         struct manifest sorted_manifest;
+        sorted_manifest.toc = std::move(manifest.toc);
         for (const auto& item : manifest.items) {
             if (!item.in_spine)
                 sorted_manifest.items.push_back(item);
@@ -247,7 +242,7 @@ namespace epub
         return sorted_manifest;
     }
 
-    result<book_reader::toc>
+    result<toc>
     book_reader::dump_toc(const std::string& toc_path)
     {
         OUTCOME_TRY(auto &&toc_file, get_file_reader(toc_path));
@@ -277,7 +272,7 @@ namespace epub
 
         OUTCOME_TRY(auto navpoint_set, find("/dtb:ncx/dtb:navMap/dtb:navPoint", map, root, toc_path));
         for (const auto &node : navpoint_set) {
-            book_reader::toc::toc_entry entry;
+            toc::toc_entry entry;
             xmlpp::Node::const_NodeSet entryset;
             OUTCOME_TRY(entry.label, find_textnode("dtb:navLabel/dtb:text/text()", map, node, toc_path));
             OUTCOME_TRY(entry.content, find_attr("dtb:content/@src", map, node, toc_path));
