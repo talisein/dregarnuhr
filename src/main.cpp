@@ -109,10 +109,10 @@ int main(int argc, char* argv[])
 {
     #ifdef IS_WINDOWS
     std::locale::global(std::locale(".utf8"));
-    log_verbose("Info: set locale .utf8");
+    log_info("Info: set locale .utf8");
     #else
     std::locale::global(std::locale(""));
-    log_verbose("Info: set locale \"\"");
+    log_info("Info: set locale \"\"");
     #endif
 
     if (auto res = parse(argc, argv); res.has_failure()) {
