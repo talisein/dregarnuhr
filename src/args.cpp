@@ -76,7 +76,7 @@ namespace {
         OUTCOME_TRY(handle_error(ec));
 
         if (!output_exists) {
-            log_info("Output directory ", output_dir, " doesn't exist. Creating.\n");
+            log_info("Output directory ", output_dir, " doesn't exist. Creating.");
             options.output_created = fs::create_directory(output_dir, ec);
             if (ec) {
                 std::system_error e{ec};

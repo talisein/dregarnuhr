@@ -20,51 +20,51 @@ namespace {
         switch (v)
         {
             case volume::P1V1:
-                return std::ranges::views::all(std::span(part_1::vol_1.begin(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P1V2:
-                return std::ranges::views::all(std::span(part_1::vol_2.begin(), part_1::vol_2.end()));
+                return std::ranges::subrange(part_1::vol_2);
             case volume::P1V3:
-                return std::ranges::views::all(std::span(part_1::vol_3.begin(), part_1::vol_3.end()));
+                return std::ranges::subrange(part_1::vol_3);
             case volume::P2V1:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P2V2:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P2V3:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P2V4:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P3V1:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P3V2:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P3V3:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P3V4:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P3V5:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P4V1:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P4V2:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P4V3:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P4V4:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P4V5:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P4V6:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P4V7:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::P4V8:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::FB1:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::FB2:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
             case volume::RA1:
-                return std::ranges::views::all(std::span(part_1::vol_1.end(), part_1::vol_1.end()));
+                return std::ranges::subrange(part_1::vol_1);
               }
         assert(false);
     }
@@ -80,15 +80,16 @@ namespace bookmaker
                            const std::map<volume, std::unique_ptr<epub::book_reader>>& book_readers,
                            const auto& definition)
     {
-        return outcome::success();
+        return std::errc::function_not_supported;
     }
 
     result<void> make_books(const std::map<volume, epub::book>& books,
                             const std::map<volume, std::unique_ptr<epub::book_reader>>& book_readers)
     {
         int created_books = 0;
-        for (const auto defined_volume : defined_volumes) {
-            auto view = get_definition_view(defined_volume);
+        for (auto defined_volume : defined_volumes) {
+            const auto view = get_definition_view(defined_volume);
+            log_info("vol ", to_string_view(defined_volume), " has ", view.size(), " elements.");
             std::set<volume> located_inputs;
             for (const auto& def : view) {
                 if (books.end() != books.find(def.vol))
@@ -96,10 +97,6 @@ namespace bookmaker
             }
             if (located_inputs.size() == 0) {
                 log_verbose("Info: No inputs to make ", to_string_view(defined_volume));
-                continue;
-            }
-            if (located_inputs.size() == 1) {
-                log_info("Info: ", to_string_view(defined_volume), " only has 1 input available. Skipping.");
                 continue;
             }
             log_info("Creating chronologically ordered ", to_string_view(defined_volume));
@@ -112,6 +109,8 @@ namespace bookmaker
             }
         }
 
+        if (0 == created_books)
+            return std::errc::no_such_file_or_directory;
         return outcome::success();
     }
 

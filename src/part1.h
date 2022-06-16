@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <span>
 #include <string_view>
 #include <optional>
 #include "volumes.h"
@@ -11,7 +10,7 @@ namespace part_1
     using namespace std::string_view_literals;
 
         constinit std::array vol_1 = std::to_array<volume_definition>({
-            { volume::P1V1, "style"sv, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+{ volume::P1V1, "style"sv, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
 { volume::P1V1, "ncx"sv, "toc.ncx"sv, "application/x-dtbncx+xml"sv, std::nullopt, false },
 { volume::P1V1, "Cover.jpg"sv, "Images/Cover.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P1V1, "FrontMatter1.jpg"sv, "Images/FrontMatter1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
@@ -60,14 +59,13 @@ namespace part_1
 { volume::P1V1, "chapter14.xhtml"sv, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Tuuli’s Hair Ornament"sv), true },
 { volume::P1V1, "insert5.xhtml"sv, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V1, "chapter141.xhtml"sv, "Text/chapter141.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
-{ volume::FB2, "side1.xhtml"sv, "Text/side1.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("One Winter Day"sv), true },
-{ volume::FB2, "x2.xhtml"sv, "Text/2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::FB2,  "side1.xhtml"sv, "Text/side1.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("One Winter Day"sv), true },
+{ volume::FB2,  "x2.xhtml"sv, "Text/2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V1, "chapter15.xhtml"sv, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Bring Me to The Forest"sv), true },
 { volume::P1V1, "chapter16.xhtml"sv, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Long Live Mesopotamian Culture"sv), true },
 { volume::P1V1, "insert6.xhtml"sv, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V1, "chapter161.xhtml"sv, "Text/chapter161.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
-{ volume::FB1, "x37.xhtml"sv, "Text/37.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("My Daughter’s about to Be a Criminal?! by Suzuka"sv), true },
-
+{ volume::FB1,  "x37.xhtml"sv, "Text/37.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("My Daughter’s about to Be a Criminal?! by Suzuka"sv), true },
 { volume::P1V1, "chapter17.xhtml"sv, "Text/chapter17.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Clay Tablets Won’t Work"sv), true },
 { volume::P1V1, "chapter18.xhtml"sv, "Text/chapter18.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Tuuli’s Baptism"sv), true },
 { volume::P1V1, "chapter19.xhtml"sv, "Text/chapter19.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("I Love You, Yellow River Culture"sv), true },

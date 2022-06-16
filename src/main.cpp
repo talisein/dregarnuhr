@@ -114,10 +114,8 @@ int main(int argc, char* argv[])
 {
     #ifdef IS_WINDOWS
     std::locale::global(std::locale(".utf8"));
-    log_info("Info: set locale .utf8");
     #else
     std::locale::global(std::locale(""));
-    log_info("Info: set locale \"\"");
     #endif
 
     if (auto res = parse(argc, argv); res.has_failure()) {
@@ -135,12 +133,12 @@ int main(int argc, char* argv[])
         bool everything_done = !res.has_error();
         if (!everything_done) {
             if (options.output_created) {
-                std::cerr << "ebooks not created successfully. Cleaning up created files.\n";
+                log_error("No ebooks created successfully. Cleaning up created directory.");
                 std::error_code ec;
                 fs::remove(options.output_dir, ec);
                 if (ec) {
                     std::system_error e{ec};
-                    std::cerr << "Error: unable to delete directory " << options.output_dir << ": " << e.code() << ' ' << e.what() << std::endl;
+                    log_error("Error: unable to delete directory ", options.output_dir, ": ", e.code(), ' ', e.what());
                 }
             }
             return EXIT_SUCCESS;
