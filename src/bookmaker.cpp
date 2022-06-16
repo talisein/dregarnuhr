@@ -1,11 +1,15 @@
 #include <algorithm>
-#include <set>
 #include <ranges>
+#include <span>
+#include <set>
+
 #include "bookmaker.h"
 #include "volumes.h"
 #include "log.h"
 #include "part1.h"
-
+#include "part2.h"
+#include "part3.h"
+#include "part4.h"
 
 namespace {
 
@@ -20,51 +24,49 @@ namespace {
         switch (v)
         {
             case volume::P1V1:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P1V2:
-                return std::ranges::subrange(part_1::vol_2.begin(), part_1::vol_2.end());
+                return std::span(part_1::vol_2.begin(), part_1::vol_2.end());
             case volume::P1V3:
-                return std::ranges::subrange(part_1::vol_3.begin(), part_1::vol_3.end());
+                return std::span(part_1::vol_3.begin(), part_1::vol_3.end());
             case volume::P2V1:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_2::vol_1.begin(), part_2::vol_1.end());
             case volume::P2V2:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_2::vol_2.begin(), part_2::vol_2.end());
             case volume::P2V3:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_2::vol_3.begin(), part_2::vol_3.end());
             case volume::P2V4:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_2::vol_4.begin(), part_2::vol_4.end());
             case volume::P3V1:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_3::vol_1.begin(), part_3::vol_1.end());
             case volume::P3V2:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_3::vol_2.begin(), part_3::vol_2.end());
             case volume::P3V3:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_3::vol_3.begin(), part_3::vol_3.end());
             case volume::P3V4:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_3::vol_4.begin(), part_3::vol_4.end());
             case volume::P3V5:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_3::vol_5.begin(), part_3::vol_5.end());
             case volume::P4V1:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_4::vol_1.begin(), part_4::vol_1.end());
             case volume::P4V2:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_4::vol_2.begin(), part_4::vol_2.end());
             case volume::P4V3:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_4::vol_3.begin(), part_4::vol_3.end());
             case volume::P4V4:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_4::vol_4.begin(), part_4::vol_4.end());
             case volume::P4V5:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_4::vol_5.begin(), part_4::vol_5.end());
             case volume::P4V6:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_4::vol_6.begin(), part_4::vol_6.end());
             case volume::P4V7:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_4::vol_7.begin(), part_4::vol_7.end());
             case volume::P4V8:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
-            case volume::FB1:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
-            case volume::FB2:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                return std::span(part_4::vol_8.begin(), part_4::vol_8.end());
+            case volume::FB1: [[fallthrough]];
+            case volume::FB2: [[fallthrough]];
             case volume::RA1:
-                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
+                assert(false);
               }
         assert(false);
     }

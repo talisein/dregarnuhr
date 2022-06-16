@@ -1,4 +1,7 @@
+#include <string_view>
 #include <map>
+#include <cassert>
+#include "outcome/result.hpp"
 #include "volumes.h"
 
 namespace {
@@ -51,11 +54,12 @@ std::string_view to_string_view(volume vol)
         case volume::P4V6: return "P4V6"sv;
         case volume::P4V7: return "P4V7"sv;
         case volume::P4V8: return "P4V8"sv;
-        case volume::FB1: return "FB1"sv;
-        case volume::FB2: return "FB2"sv;
-        case volume::RA1: return "RA1"sv;
+        case volume::FB1:  return "FB1"sv;
+        case volume::FB2:  return "FB2"sv;
+        case volume::RA1:  return "RA1"sv;
     }
     assert(false);
+    return "UNKNOWN"sv;
 }
 
 OUTCOME_V2_NAMESPACE::result<volume>
