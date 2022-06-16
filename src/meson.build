@@ -9,7 +9,7 @@ config = configure_file(input: 'config.h.in',
 
 deps = [zlib_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep]
 inc = []
-src = ['main.cpp', 'zip.cpp', 'args.cpp', 'epub.cpp', 'volumes.cpp']
+src = ['main.cpp', 'zip.cpp', 'args.cpp', 'epub.cpp', 'volumes.cpp', 'bookmaker.cpp']
 
 exe = executable('dregarnuhr', src,
                  include_directories: inc,

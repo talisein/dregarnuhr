@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+#include <string_view>
 #include "outcome/result.hpp"
 
 enum class volume
@@ -30,3 +32,14 @@ enum class volume
 };
 
 OUTCOME_V2_NAMESPACE::result<volume> identify_volume(std::string_view uid);
+std::string_view to_string_view(volume vol);
+
+struct volume_definition
+{
+    volume vol;
+    std::string_view id;
+    std::string_view href;
+    std::string_view mediatype;
+    std::optional<std::string_view> toc_label;
+    bool in_spine;
+};

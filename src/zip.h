@@ -1,3 +1,5 @@
+#pragma once
+
 #include <filesystem>
 #include <system_error> // bring in std::error_code et al
 #include "miniz.h"

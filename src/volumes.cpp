@@ -28,6 +28,36 @@ namespace {
     };
 }
 
+std::string_view to_string_view(volume vol)
+{
+    switch (vol) {
+        case volume::P1V1: return "P1V1"sv;
+        case volume::P1V2: return "P1V2"sv;
+        case volume::P1V3: return "P1V3"sv;
+        case volume::P2V1: return "P2V1"sv;
+        case volume::P2V2: return "P2V2"sv;
+        case volume::P2V3: return "P2V3"sv;
+        case volume::P2V4: return "P2V4"sv;
+        case volume::P3V1: return "P3V1"sv;
+        case volume::P3V2: return "P3V2"sv;
+        case volume::P3V3: return "P3V3"sv;
+        case volume::P3V4: return "P3V4"sv;
+        case volume::P3V5: return "P3V5"sv;
+        case volume::P4V1: return "P4V1"sv;
+        case volume::P4V2: return "P4V2"sv;
+        case volume::P4V3: return "P4V3"sv;
+        case volume::P4V4: return "P4V4"sv;
+        case volume::P4V5: return "P4V5"sv;
+        case volume::P4V6: return "P4V6"sv;
+        case volume::P4V7: return "P4V7"sv;
+        case volume::P4V8: return "P4V8"sv;
+        case volume::FB1: return "FB1"sv;
+        case volume::FB2: return "FB2"sv;
+        case volume::RA1: return "RA1"sv;
+    }
+    assert(false);
+}
+
 OUTCOME_V2_NAMESPACE::result<volume>
 identify_volume(std::string_view uid)
 {

@@ -3,15 +3,19 @@
 #include <cstdlib>
 #include <system_error>
 
+#include "outcome/result.hpp"
+#include "outcome/try.hpp"
 #include "args.h"
 #include "epub.h"
 #include "volumes.h"
 #include "log.h"
 #include "config.h"
+#include "bookmaker.h"
+
 
 namespace fs = std::filesystem;
 
-void print_books(const fs::path& input_dir)
+result<void> print_books(const fs::path& input_dir)
 {
     const fs::path epub_ext{".epub"};
     std::map<volume, std::unique_ptr<epub::book_reader>> book_readers;
@@ -50,9 +54,10 @@ void print_books(const fs::path& input_dir)
     for (auto it : books) {
         std::cout << "Found " << it.second.manifest.toc.title << "\n";
     }
+
+    OUTCOME_TRY(bookmaker::make_books(books, book_readers));
+    return outcome::success();
 }
-
-
 
 
 [[noreturn]] void do_dump()
@@ -90,9 +95,9 @@ void print_books(const fs::path& input_dir)
     std::cout << "{" << std::quoted(book.manifest.toc.dtb_uid) << "sv, volume::"sv
               << (options.dump_volume ? *options.dump_volume : "VTMP"sv) << "},\n";
     for (const auto& item : book.manifest.items) {
-        std::cout << "{ " << (options.dump_volume ? *options.dump_volume : "VREF"sv) << ", "
-                  << std::quoted(item.id) <<  ", " <<  std::quoted(item.href) << ", "
-                  << std::quoted(item.media_type) <<  ", ";
+        std::cout << "{ volume::" << (options.dump_volume ? *options.dump_volume : "VREF"sv) << ", "
+                  << std::quoted(item.id) <<  "sv, " <<  std::quoted(item.href) << "sv, "
+                  << std::quoted(item.media_type) <<  "sv, ";
         if (item.toc_label) {
             std::cout << "std::make_optional<std::string_view>(" << std::quoted(*item.toc_label) << "sv)";
         } else {
@@ -125,9 +130,9 @@ int main(int argc, char* argv[])
     }
 
     if (args::command::NORMAL == options.command) {
-        print_books(options.input_dir);
+        auto res = print_books(options.input_dir);
 
-        bool everything_done = false;
+        bool everything_done = !res.has_error();
         if (!everything_done) {
             if (options.output_created) {
                 std::cerr << "ebooks not created successfully. Cleaning up created files.\n";
