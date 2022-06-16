@@ -20,51 +20,51 @@ namespace {
         switch (v)
         {
             case volume::P1V1:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P1V2:
-                return std::ranges::subrange(part_1::vol_2);
+                return std::ranges::subrange(part_1::vol_2.begin(), part_1::vol_2.end());
             case volume::P1V3:
-                return std::ranges::subrange(part_1::vol_3);
+                return std::ranges::subrange(part_1::vol_3.begin(), part_1::vol_3.end());
             case volume::P2V1:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P2V2:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P2V3:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P2V4:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P3V1:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P3V2:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P3V3:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P3V4:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P3V5:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P4V1:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P4V2:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P4V3:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P4V4:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P4V5:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P4V6:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P4V7:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::P4V8:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::FB1:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::FB2:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
             case volume::RA1:
-                return std::ranges::subrange(part_1::vol_1);
+                return std::ranges::subrange(part_1::vol_1.begin(), part_1::vol_1.end());
               }
         assert(false);
     }
