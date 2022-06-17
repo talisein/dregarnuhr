@@ -15,10 +15,10 @@ output. Dregarnuhr is available for Windows, Mac, and Linux.
 
 # Limitations (TODOs)
 
-o The table of contents after the front matter does not reflect the
+- The table of contents after the front matter does not reflect the
 contents. (Internally a toc metadata is updated, but this html toc will need to
 be rewritten).
-o There is no omnibus option yet.
+- There is no omnibus option yet.
 
 # Examples
 The simplest invockation of dregarnuhr takes an input directory with your
@@ -29,13 +29,13 @@ identify the volume.
 ```
 # dregarnuhr ../../../Documents/Myne ../../../Documents/Myne_out
 Output directory "../../../Documents/Myne_out" doesn't exist. Creating.
-Found Ascendance of a Bookworm: Part 1 Daughter of a Soldier Volume 1: "../../../Documents/Myne/a-great-first-book.epub"
-Found Ascendance of a Bookworm: Part 1 Daughter of a Soldier Volume 2: "../../../Documents/Myne/any-epub-name-works.epub"
-Found Ascendance of a Bookworm: Part 1 Daughter of a Soldier Volume 3: "../../../Documents/Myne/ascendance-of-a-bookworm-part-1-volume-3.epub"
+Found P1V1: "../../../Documents/Myne/a-great-first-book.epub"
+Found P1V2: "../../../Documents/Myne/any-epub-name-works.epub"
+Found P1V3: "../../../Documents/Myne/ascendance-of-a-bookworm-part-1-volume-3.epub"
 <snip>
-Found Ascendance of a Bookworm: Official Fanbook Volume 1: "../../../Documents/Myne/ascendance-of-a-bookworm-fanbook-1.epub"
-Found Ascendance of a Bookworm: Official Fanbook Volume 2: "../../../Documents/Myne/ascendance-of-a-bookworm-fanbook-2.epub"
 Created chronologically ordered P1V1: "../../../Documents/Myne_out/chronological-a-great-first-book.epub"
+Created chronologically ordered P1V2: "../../../Documents/Myne_out/chronological-any-epub-name-works.epub"
+Created chronologically ordered P1V3: "../../../Documents/Myne_out/chronological-ascendance-of-a-bookworm-part-1-volume-3.epub"
 ```
 
 If you invoke the program several times, output files are never overwritten.
@@ -81,7 +81,7 @@ For safety, this program will automatically ignore any input that it had
 previously produced.
 
 ```
-# src/dregarnuhr out out2
+# dregarnuhr out out2
 Output directory "out2" doesn't exist. Creating.
 Info: "out/chronological-ascendance-of-a-bookworm.epub" is produced by this program. Skipping!
 Info: "out/chronological-a-great-first-book.epub" is produced by this program. Skipping!

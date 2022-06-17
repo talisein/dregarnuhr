@@ -51,9 +51,8 @@ result<void> print_books(const fs::path& input_dir)
         }
     }
 
-    for (const auto& it : books ) {
-        auto reader = book_readers.find(it.first);
-        log_info("Found ", it.second.manifest.toc.title, ": ", reader->second->path);
+    for (const auto& it : book_readers ) {
+        log_info("Found ", to_string_view(it.first), ": ", it.second->path);
     }
     if (books.end() == books.find(volume::FB1)) {
         log_info("Couldn't find Fanbook 1, so those chapters will be skipped in the new epubs.");
