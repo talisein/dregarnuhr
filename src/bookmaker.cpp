@@ -262,7 +262,7 @@ namespace {
 namespace bookmaker
 {
 
-    result<void> make_book(volume vol,
+    result<std::filesystem::path> make_book(volume vol,
                            const std::map<volume, epub::book>& books,
                            const std::map<volume, std::unique_ptr<epub::book_reader>>& book_readers,
                            const auto& definition)
@@ -309,8 +309,7 @@ namespace bookmaker
             cleanup_dangling(vol, filename);
             return outcome::error_from_exception();
         }
-
-        return outcome::success();
+        return filename;
     }
 
     result<void> make_books(const std::map<volume, epub::book>& books,
@@ -328,12 +327,11 @@ namespace bookmaker
                 log_verbose("Info: No inputs to make ", to_string_view(defined_volume));
                 continue;
             }
-            log_info("Creating chronologically ordered ", to_string_view(defined_volume));
             auto res = make_book(defined_volume, books, book_readers, view);
             if (res.has_error()) {
                 log_error("Couldn't make ", to_string_view(defined_volume), ": ", res.error().message(), ". Moving on...");
             } else {
-                log_verbose("Created chronologically ordered ", to_string_view(defined_volume), " success!");
+                log_info("Created chronologically ordered ", to_string_view(defined_volume), ": ", res.value() );
                 ++created_books;
             }
         }

@@ -51,8 +51,9 @@ result<void> print_books(const fs::path& input_dir)
         }
     }
 
-    for (auto it : books) {
-        std::cout << "Found " << it.second.manifest.toc.title << "\n";
+    for (const auto& it : books ) {
+        auto reader = book_readers.find(it.first);
+        log_info("Found ", it.second.manifest.toc.title, ": ", reader->second->path);
     }
 
     OUTCOME_TRY(bookmaker::make_books(books, book_readers));
