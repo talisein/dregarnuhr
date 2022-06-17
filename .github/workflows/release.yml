@@ -1,0 +1,178 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install meson g++-12 ninja-build
+
+      - name: Cache subprojects
+        id: meson-cache
+        uses: actions/cache@v3
+        with:
+          path: subprojects/packagecache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Configure
+        run: meson --buildtype release --default-library static  build-linux
+
+      - name: Compile
+        run: ninja -C build-linux
+
+      - name: Test
+        run: ninja -C build-linux test
+
+      - name: Binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: dregarnuhr-linux
+          path: build-linux/src/dregarnuhr
+
+  build-mac:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install deps
+        run: |
+          brew update
+          brew install meson libxml2 gcc@12 ninja
+
+      - name: Cache subprojects
+        id: meson-cache
+        uses: actions/cache@v3
+        with:
+          path: subprojects/packagecache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Configure
+        run: CC=gcc-12 CXX=g++-12 meson setup --buildtype release --default-library static build-mac
+
+      - name: Compile
+        run: ninja -C build-mac
+
+      - name: Test
+        run: ninja -C build-mac test
+
+      - name: Binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: dregarnuhr-macos
+          path: build-mac/src/dregarnuhr
+
+  build-win:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - run: pip install meson ninja
+
+      - name: Prepare MSVC
+        uses: bus1/cabuild/action/msdevshell@v1
+        with:
+          architecture: x64
+
+      - name: Cache subprojects
+        id: meson-cache
+        uses: actions/cache@v3
+        with:
+          path: subprojects/packagecache
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Configure
+        run: |
+          meson setup --buildtype release -Dc_std=c17 -Dcpp_std=c++20 --default-library static build-win
+
+      - name: Compile
+        run: ninja -C build-win
+
+      - name: Test
+        run: ninja -C build-win test
+
+      - name: Binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: dregarnuhr-win
+          path: build-win/src/dregarnuhr.exe
+
+  release:
+    needs: [build-linux, build-mac, build-win]
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Release Linux Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dregarnuhr-linux/dregarnuhr-linux.zip
+          asset_name: dregarnuhr-linux.zip
+          asset_content_type: application/zip
+
+      - name: Release Mac Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dregarnuhr-mac/dregarnuhr-mac.zip
+          asset_name: dregarnuhr-mac.zip
+          asset_content_type: application/zip
+
+      - name: Release Windows Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dregarnuhr-win/dregarnuhr-win.zip
+          asset_name: dregarnuhr-win.zip
+          asset_content_type: application/zip
+
+      - name: Print context
+        env:
+          EVENT_CONTEXT: ${{ toJSON(github.event) }}
+        run: |
+          echo $EVENT_CONTEXT
