@@ -138,8 +138,17 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: true
 
+      - name: Print context
+        env:
+          EVENT_CONTEXT: ${{ toJSON(github.event) }}
+        run: |
+          echo $EVENT_CONTEXT
+
       - name: Download Artifacts
         uses: actions/download-artifact@v3
+
+      - name: Display files
+        run: ls -R
 
       - name: Release Linux Artifact
         uses: actions/upload-release-asset@v1
@@ -147,7 +156,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dregarnuhr-linux/dregarnuhr-linux.zip
+          asset_path: dregarnuhr-linux
           asset_name: dregarnuhr-linux.zip
           asset_content_type: application/zip
 
@@ -157,7 +166,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dregarnuhr-mac/dregarnuhr-mac.zip
+          asset_path: dregarnuhr-mac
           asset_name: dregarnuhr-mac.zip
           asset_content_type: application/zip
 
@@ -167,12 +176,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dregarnuhr-win/dregarnuhr-win.zip
+          asset_path: dregarnuhr-win
           asset_name: dregarnuhr-win.zip
           asset_content_type: application/zip
-
-      - name: Print context
-        env:
-          EVENT_CONTEXT: ${{ toJSON(github.event) }}
-        run: |
-          echo $EVENT_CONTEXT

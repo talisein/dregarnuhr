@@ -19,6 +19,7 @@ output. Dregarnuhr is available for Windows, Mac, and Linux.
 contents. (Internally a toc metadata is updated, but this html toc will need to
 be rewritten).
 - There is no omnibus option yet.
+- I don't have a mac to test the mac version on. Let me know if it works.
 
 # Examples
 The simplest invockation of dregarnuhr takes an input directory with your
