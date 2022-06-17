@@ -256,6 +256,50 @@ namespace {
         OUTCOME_TRY(writer.add(rootfile_path, rootfile_buf));
         return outcome::success();
     }
+
+    result<void> make_book_impl(volume vol,
+                                zip::writer &writer,
+                                const epub::book& base_book,
+                                const std::unique_ptr<epub::book_reader>& base_reader,
+                                const std::map<volume, epub::book>& books,
+                                const std::map<volume, std::unique_ptr<epub::book_reader>>& book_readers,
+                                const auto &definition)
+    {
+        OUTCOME_TRY(auto basefiles, base_reader->zip.get_files());
+        OUTCOME_TRY(start_book(basefiles, base_book, base_reader, writer, definition));
+        for (const volume_definition& def : definition)
+//                     | std::ranges::views::filter([&base_book](const volume_definition& def) { return def.href != base_book.manifest.toc_relpath; }))
+        {
+            if (def.href == base_book.manifest.toc_relpath) {
+                OUTCOME_TRY(add_toc(basefiles, base_book, base_reader, writer, definition));
+                continue;
+            }
+            auto reader_it = book_readers.find(def.vol);
+            if (book_readers.end() == reader_it) {
+                log_verbose("Volume ", to_string_view(def.vol), " is unavailable. Skipping insertion.");
+                continue;
+            }
+            auto& reader = reader_it->second;
+            const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
+            auto src {root};
+            src.append(def.href);
+            auto dst {root};
+            dst.append(to_string_view(def.vol));
+            dst.append("/");
+            dst.append(def.href);
+            if (def.vol == vol) {
+                dst.assign(src);
+            }
+            OUTCOME_TRY(writer.copy_from(reader->zip, src, dst));
+            basefiles.remove(src);
+        }
+        for (auto src : basefiles) {
+            log_info("Bug: left over file in src: ", src);
+        }
+        OUTCOME_TRY(writer.finish());
+        return outcome::success();
+    }
+
 } // anonymous namespace
 
 
@@ -272,41 +316,20 @@ namespace bookmaker
         auto filename = get_new_filename(base_reader->path);
         try {
             zip::writer writer(filename);
-            OUTCOME_TRY(auto basefiles, base_reader->zip.get_files());
-            OUTCOME_TRY(start_book(basefiles, base_book, base_reader, writer, definition));
-            for (const volume_definition& def : definition)
-//                     | std::ranges::views::filter([&base_book](const volume_definition& def) { return def.href != base_book.manifest.toc_relpath; }))
-            {
-                if (def.href == base_book.manifest.toc_relpath) {
-                    OUTCOME_TRY(add_toc(basefiles, base_book, base_reader, writer, definition));
-                    continue;
-                }
-                auto& reader = book_readers.find(def.vol)->second;
-                const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
-                auto src {root};
-                src.append(def.href);
-                auto dst {root};
-                dst.append(to_string_view(def.vol));
-                dst.append("/");
-                dst.append(def.href);
-                if (def.vol == vol) {
-                    dst.assign(src);
-                }
-                auto res = writer.copy_from(reader->zip, src, dst);
-                if (res.has_failure()) {
-//                    cleanup_dangling(vol, filename);
-                    return res.as_failure();
-                }
-                basefiles.remove(src);
+            auto res = make_book_impl(vol,
+                                      writer,
+                                      base_book,
+                                      base_reader,
+                                      books,
+                                      book_readers,
+                                      definition);
+            if (res.has_failure()) {
+                cleanup_dangling(vol, filename);
+                return res.as_failure();
             }
-            for (auto src : basefiles) {
-                log_info("Left over file in src: ", src);
-            }
-            // Copy an extra cover to OEBPS
-
-            OUTCOME_TRY(writer.finish());
         } catch (std::exception& e) {
             cleanup_dangling(vol, filename);
+            log_error("make_book: ", e.what());
             return outcome::error_from_exception();
         }
         return filename;
@@ -336,8 +359,10 @@ namespace bookmaker
             }
         }
 
-        if (0 == created_books)
+        if (0 == created_books) {
+            log_info("Sorry, no books could be created.");
             return std::errc::no_such_file_or_directory;
+        }
         return outcome::success();
     }
 
