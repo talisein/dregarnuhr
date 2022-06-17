@@ -19,6 +19,8 @@ struct args
     } command;
 
     std::optional<std::string> dump_volume;
+    std::optional<std::string> prefix;
+    std::optional<std::string> suffix;
     fs::path input_file;
     fs::path input_dir;
     fs::path output_dir;
@@ -27,6 +29,6 @@ struct args
 };
 
 
-extern args options;
+const args* get_options();
 
 result<void> parse(int argc, char **argv);

@@ -62,7 +62,7 @@ result<void> print_books(const fs::path& input_dir)
 
 [[noreturn]] void do_dump()
 {
-    auto reader = epub::book_reader(options.input_file);
+    auto reader = epub::book_reader(get_options()->input_file);
 
     auto res = reader.dump();
     if (!res) {
@@ -71,7 +71,10 @@ result<void> print_books(const fs::path& input_dir)
     }
     auto book = res.value();
     using namespace std::string_view_literals;
-    if (!options.dump_volume) {
+    std::string dump_volume {"VTMP"};
+    if (get_options()->dump_volume) {
+        dump_volume = *get_options()->dump_volume;
+    } else {
         do {
             std::stringstream ss;
             if (auto part_pos = book.manifest.toc.title.find("Part ");
@@ -86,16 +89,16 @@ result<void> print_books(const fs::path& input_dir)
                 std::string::npos != vol_pos)
             {
                 ss << 'V' << book.manifest.toc.title.substr(vol_pos + 7, 1);
-                options.dump_volume = std::make_optional<std::string>(ss.str());
+                dump_volume = ss.str();
             } else {
                 break;
             }
         } while (false);
     }
     std::cout << "{" << std::quoted(book.manifest.toc.dtb_uid) << "sv, volume::"sv
-              << (options.dump_volume ? *options.dump_volume : "VTMP"sv) << "},\n";
+              <<  "VTMP" << "},\n";
     for (const auto& item : book.manifest.items) {
-        std::cout << "{ volume::" << (options.dump_volume ? *options.dump_volume : "VREF"sv) << ", "
+        std::cout << "{ volume::" << (get_options()->dump_volume ? *get_options()->dump_volume : "VREF"sv) << ", "
                   << std::quoted(item.id) <<  "sv, " <<  std::quoted(item.href) << "sv, "
                   << std::quoted(item.media_type) <<  "sv, ";
         if (item.toc_label) {
@@ -123,22 +126,24 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
-    if (args::command::DUMP == options.command) {
+    if (args::command::DUMP == get_options()->command) {
         do_dump();
     }
 
-    if (args::command::NORMAL == options.command) {
-        auto res = print_books(options.input_dir);
+    if (args::command::NORMAL == get_options()->command) {
+        auto res = print_books(get_options()->input_dir);
 
         bool everything_done = !res.has_error();
         if (!everything_done) {
-            if (options.output_created) {
-                log_error("No ebooks created successfully. Cleaning up created directory.");
+            if (get_options()->output_created) {
                 std::error_code ec;
-                fs::remove(options.output_dir, ec);
-                if (ec) {
-                    std::system_error e{ec};
-                    log_error("Error: unable to delete directory ", options.output_dir, ": ", e.code(), ' ', e.what());
+                if (std::filesystem::is_empty(get_options()->output_dir, ec) && !ec) {
+                    log_verbose("No ebooks created successfully. Cleaning up created directory.");
+                    fs::remove(get_options()->output_dir, ec);
+                    if (ec) {
+                        std::system_error e{ec};
+                        log_error("Error: unable to delete empty output directory ", get_options()->output_dir, ": ", e.code(), ' ', e.what());
+                    }
                 }
             }
             return EXIT_SUCCESS;

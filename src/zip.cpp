@@ -1,9 +1,11 @@
 #include <type_traits>
+#include <utility>
 #include <iostream>
 #include <cstdlib>
 #include "zip.h"
 #include "outcome/utils.hpp"
 #include "outcome/try.hpp"
+#include "log.h"
 
 namespace {
     extern "C" {
@@ -45,59 +47,106 @@ std::error_code make_error_code(mz_zip_error e)
   return {static_cast<int>(e), MzZipErrc_category()};
 }
 
+
 namespace zip
 {
+    namespace {
+        size_t _zip_file_read_func(void *pOpaque, mz_uint64 file_ofs, void *pBuf, size_t n)
+        {
+            auto istream = static_cast<std::ifstream*>(pOpaque);
+            auto desired_pos = std::ifstream::traits_type::pos_type(file_ofs);
+            auto cur_ofs = istream->tellg();
+            if (std::cmp_not_equal(desired_pos - cur_ofs, 0)) {
+                istream->seekg(desired_pos);
+            }
+            istream->read(static_cast<char *>(pBuf), n);
+            return istream->gcount();
+        }
+    }
     reader::reader(const fs::path& filename) :
         path(filename)
     {
+        auto file_size = std::filesystem::file_size(filename);
         mz_zip_zero_struct(&zip);
-        auto filename_string = path.string(); // Windows' c_str() returns wchar_t*
-        if (MZ_FALSE == mz_zip_reader_init_file(&zip, filename_string.c_str(), 0)) [[unlikely]] {
+        istream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+        istream.open(filename, std::ios_base::in | std::ios_base::binary);
+        zip.m_pRead = _zip_file_read_func;
+        zip.m_pIO_opaque = &istream;
+        if (MZ_FALSE == mz_zip_reader_init(&zip, file_size, 0)) [[unlikely]] {
             mz_zip_error err = mz_zip_get_last_error(&zip);
             throw std::system_error(err);
         }
         p_zip.reset(&zip);
     }
 
-    bool
+    result<bool>
     reader::is_readable()
     {
-        auto num_files = mz_zip_reader_get_num_files(&zip);
-        for (decltype(num_files) i = 0; i < num_files; ++i) {
-            if (MZ_TRUE != mz_zip_validate_archive(&zip, MZ_ZIP_FLAG_VALIDATE_HEADERS_ONLY))
-                return false;
-        }
+        try {
+            auto num_files = mz_zip_reader_get_num_files(&zip);
+            auto err = mz_zip_get_last_error(&zip);
+            if (err != MZ_ZIP_NO_ERROR) {
+                return outcome::failure(err);
+            }
+            for (decltype(num_files) i = 0; i < num_files; ++i) {
+                if (MZ_TRUE != mz_zip_validate_archive(&zip, MZ_ZIP_FLAG_VALIDATE_HEADERS_ONLY))
+                    return false;
+            }
 
-        return true;
+            return true;
+        } catch (std::exception &e) {
+            return outcome::error_from_exception();
+        }
     }
 
     result<void>
     reader::print_files()
     {
-        auto num_files = mz_zip_reader_get_num_files(&zip);
-        for (decltype(num_files) i = 0U; i < num_files; ++i) {
-            OUTCOME_TRY(auto st, stat(i));
-            std::cout << "File: " << st.m_filename << "\n";
+        try {
+            auto num_files = mz_zip_reader_get_num_files(&zip);
+            for (decltype(num_files) i = 0U; i < num_files; ++i) {
+                OUTCOME_TRY(auto st, stat(i));
+                std::cout << "File: " << st.m_filename << "\n";
+            }
+            return outcome::success();
+        } catch (std::exception &e) {
+            return outcome::error_from_exception();
         }
-
-        return outcome::success();
+    }
+    result<std::list<std::string>>
+    reader::get_files()
+    {
+        try {
+            std::list<std::string> res;
+            auto num_files = mz_zip_reader_get_num_files(&zip);
+            for (decltype(num_files) i = 0U; i < num_files; ++i) {
+                OUTCOME_TRY(auto st, stat(i));
+                res.push_back(st.m_filename);
+            }
+            return res;
+        } catch (std::exception &e) {
+            return outcome::error_from_exception();
+        }
     }
 
     result<mz_uint>
     reader::locate_file(const char *filename)
     {
-        mz_uint32 idx;
-        auto found = mz_zip_reader_locate_file_v2(&zip, filename, nullptr, 0, &idx);
-        if (!found) {
-            auto err = mz_zip_get_last_error(&zip);
-            if (err != MZ_ZIP_NO_ERROR) {
-                return outcome::failure(err);
-            } else {
-                return std::errc::no_such_file_or_directory;
+        try {
+            mz_uint32 idx;
+            auto found = mz_zip_reader_locate_file_v2(&zip, filename, nullptr, 0, &idx);
+            if (!found) {
+                auto err = mz_zip_get_last_error(&zip);
+                if (err != MZ_ZIP_NO_ERROR) {
+                    return outcome::failure(err);
+                } else {
+                    return std::errc::no_such_file_or_directory;
+                }
             }
+            return outcome::success(idx);
+        } catch (std::exception& e) {
+            return outcome::error_from_exception();
         }
-
-        return outcome::success(idx);
     }
 
     result<std::string>
@@ -108,15 +157,14 @@ namespace zip
         std::string res;
         try {
             res.reserve(st.m_uncomp_size);
+            if (!mz_zip_reader_extract_to_callback(&zip, idx, &_extract_to_std_string,
+                                                   &res, flags)) {
+                return mz_zip_get_last_error(&zip);
+            } else {
+                return res;
+            }
         } catch (std::exception &e) {
             return outcome::error_from_exception();
-        }
-
-        if (!mz_zip_reader_extract_to_callback(&zip, idx, &_extract_to_std_string,
-                                               &res, flags)) {
-            return mz_zip_get_last_error(&zip);
-        } else {
-            return res;
         }
     }
 
@@ -132,11 +180,15 @@ namespace zip
             return outcome::error_from_exception();
         }
 
-        if (!mz_zip_reader_extract_to_callback(&zip, idx, &_extract_to_std_basic_string_uchar,
-                                               &res, flags)) {
-            return mz_zip_get_last_error(&zip);
-        } else {
-            return res;
+        try {
+            if (!mz_zip_reader_extract_to_callback(&zip, idx, &_extract_to_std_basic_string_uchar,
+                                                   &res, flags)) {
+                return mz_zip_get_last_error(&zip);
+            } else {
+                return res;
+            }
+        } catch (std::exception &e) {
+            return outcome::error_from_exception();
         }
     }
 
@@ -220,14 +272,143 @@ namespace zip
     reader::stat(mz_uint idx)
     {
         mz_zip_archive_file_stat st;
-        if (MZ_FALSE == mz_zip_reader_file_stat(&zip, idx, &st)) {
-            return mz_zip_get_last_error(&zip);
+        try {
+            if (MZ_FALSE == mz_zip_reader_file_stat(&zip, idx, &st)) {
+                return mz_zip_get_last_error(&zip);
+            }
+            return st;
+        } catch (std::exception &e) {
+            return outcome::error_from_exception();
         }
-        return st;
+    }
+
+    namespace {
+        size_t _file_write_func(void *pOpaque, mz_uint64 file_ofs, const void *pBuf, size_t n)
+        {
+            auto ostream = static_cast<std::ofstream*>(pOpaque);
+            auto cur_pos = ostream->tellp();
+            auto desired_pos = std::ifstream::traits_type::pos_type(file_ofs);
+            if (std::cmp_not_equal(desired_pos - cur_pos, 0)) {
+                ostream->seekp(file_ofs);
+            }
+            ostream->write(static_cast<const char *>(pBuf), n);
+            return n; // an exception throws if less than n
+        }
+    }
+    writer::writer(const fs::path& filename) :
+        path(filename)
+    {
+        mz_zip_zero_struct(&zip);
+        ostream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+        ostream.open(filename, std::ios_base::out | std::ios_base::binary);
+        zip.m_pWrite = _file_write_func;
+        zip.m_pIO_opaque = &ostream;
+        if (MZ_FALSE == mz_zip_writer_init(&zip, 0)) [[unlikely]] {
+            mz_zip_error err = mz_zip_get_last_error(&zip);
+            throw std::system_error(err);
+        }
+        p_zip.reset(&zip);
+    }
+
+    namespace {
+        void _log_level_and_flags(std::string_view filename, mz_uint16 flags)
+        {
+            std::stringstream ss;
+//            mz_uint level = flags & 0xF;
+            if (flags & MZ_ZIP_FLAG_IGNORE_PATH) ss << "MZ_ZIP_FLAG_IGNORE_PATH" << ' ';
+            if (flags & MZ_ZIP_FLAG_COMPRESSED_DATA) ss << "MZ_ZIP_FLAG_COMPRESSED_DATA ";
+            if (flags & MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY) ss << "MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY ";
+            if (flags & MZ_ZIP_FLAG_VALIDATE_LOCATE_FILE_FLAG) ss << "MZ_ZIP_FLAG_VALIDATE_LOCATE_FILE_FLAG ";
+            if (flags & MZ_ZIP_FLAG_VALIDATE_HEADERS_ONLY) ss << "MZ_ZIP_FLAG_VALIDATE_HEADERS_ONLY ";
+            if (flags & MZ_ZIP_FLAG_WRITE_ZIP64) ss << "MZ_ZIP_FLAG_WRITE_ZIP64 ";
+            if (flags & MZ_ZIP_FLAG_WRITE_ALLOW_READING) ss << "MZ_ZIP_FLAG_WRITE_ALLOW_READING ";
+            if (flags & MZ_ZIP_FLAG_ASCII_FILENAME) ss << "MZ_ZIP_FLAG_ASCII_FILENAME ";
+            if (flags & MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE) ss << "MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE ";
+//            log_verbose("File: ", filename, " Level: ", level, " Flags: 0x", std::hex, (flags & 0xF0), std::dec, " ", ss.view());
+        }
+    }
+
+
+    result<void>
+    writer::copy_from(reader& reader,
+                      const std::string& src_filename,
+                      const std::string& dst_filename)
+    {
+        OUTCOME_TRY(auto src_idx, reader.locate_file(src_filename.c_str()));
+        OUTCOME_TRY(auto stat, reader.stat(src_idx));
+        _log_level_and_flags(src_filename, stat.m_bit_flag);
+        auto level = stat.m_bit_flag & 0xF;
+        if (src_filename == "mimetype")
+            level = 0;
+        OUTCOME_TRY(auto buf, reader.extract(src_idx, (0 == level) ? 0 : MZ_ZIP_FLAG_COMPRESSED_DATA));
+
+        try {
+            time_t modified = stat.m_time;
+            auto res = mz_zip_writer_add_mem_ex_v2(&zip,
+                                                   dst_filename.c_str(),
+                                                   buf.data(),
+                                                   buf.size(),
+                                                   stat.m_comment,
+                                                   stat.m_comment_size,
+                                                   0 == level ? 0 : (level | MZ_ZIP_FLAG_COMPRESSED_DATA),
+                                                   0 == level ? 0 : stat.m_uncomp_size,
+                                                   0 == level ? 0 : stat.m_crc32,
+                                                   &modified,
+                                                   nullptr, 0, nullptr, 0);
+            if (modified != stat.m_time) {
+                log_verbose("Writer changed the modified time?? from ", stat.m_time, " to ", modified);
+            }
+            if (MZ_FALSE == res) {
+                std::system_error e(mz_zip_get_last_error(&zip));
+                log_error("returned false: ", e.code(), ' ', e.what());
+                return mz_zip_get_last_error(&zip);
+            }
+        } catch (std::exception& e) {
+            log_error("Exception, ", e.what());
+            return outcome::error_from_exception();
+        }
+
+        return outcome::success();
+    }
+
+
+    result<void>
+    writer::add(const std::string& filename,
+                std::span<char> data)
+    {
+        try {
+            if (MZ_FALSE == mz_zip_writer_add_mem(&zip, filename.c_str(), data.data(), data.size(), 8)) {
+                auto err = mz_zip_get_last_error(&zip);
+                std::system_error e(err);
+                log_error("Failed to add ", filename, ": ", e.code(), ' ', e.what());
+                return err;
+            }
+        } catch (std::exception &e) {
+            return outcome::error_from_exception();
+        }
+
+        return outcome::success();
+    }
+
+    result<void>
+    writer::finish()
+    {
+        try {
+            if (MZ_FALSE == mz_zip_writer_finalize_archive(&zip)) {
+                auto err = mz_zip_get_last_error(&zip);
+                std::system_error e(err);
+                log_error("Finalization error: ", e.code(), ' ', e.what());
+                return err;
+            }
+        } catch (std::exception& e) {
+            log_error("Exception: ", e.what());
+            return outcome::error_from_exception();
+        }
+        return outcome::success();
     }
 
     void
-    reader::archive_deleter::operator()(mz_zip_archive *zip) const noexcept
+    archive_deleter::operator()(mz_zip_archive *zip) const noexcept
     {
         if (!mz_zip_end(zip)) {
             std::system_error err {mz_zip_get_last_error(zip)};

@@ -58,14 +58,14 @@ void log_info(Args... argz) {
 
 template<typename... Args>
 void log_verbose_ml(Args... argz) {
-    if (options.verbose) {
+    if (get_options()->verbose) {
         _log_helper(std::cout, false, argz...);
     }
 }
 
 template<typename... Args>
 void log_verbose(Args... argz) {
-    if (options.verbose) {
+    if (get_options()->verbose) {
         _log_helper(std::cout, true, argz...);
     }
 }

@@ -206,12 +206,12 @@ namespace epub
 
         manifest manifest;
         OUTCOME_TRY(manifest.toc, dump_toc(prefix + "/"s + toc_href));
+        manifest.toc_relpath = toc_href;
         OUTCOME_TRY(auto items, find("/opf:package/opf:manifest/opf:item", map, root, rootfile_path));
         for (const auto &item : items) {
             OUTCOME_TRY(auto id, find_attr("@id", map, item, rootfile_path));
             OUTCOME_TRY(auto href, find_attr("@href", map, item, rootfile_path));
             OUTCOME_TRY(auto media_type, find_attr("@media-type", map, item, rootfile_path));
-
             auto itemref = find_quiet("/opf:package/opf:spine/opf:itemref[@idref='"s + id + "']", map, root, rootfile_path);
             if (manifest.toc.has_entry(href)) {
                 manifest.items.emplace_back(id, href, media_type, manifest.toc.get_label(href), itemref.has_value());
@@ -220,7 +220,7 @@ namespace epub
             }
         }
 
-        struct manifest sorted_manifest;
+        struct manifest sorted_manifest(manifest);
         sorted_manifest.toc = std::move(manifest.toc);
         for (const auto& item : manifest.items) {
             if (!item.in_spine)
@@ -312,6 +312,25 @@ namespace epub
             return handle_xmlpp_exception("META-INF/container.xml"sv).as_failure();
         }
 
+    }
+
+    result<const xmlpp::Node*>
+    book_reader::get_metadata(const xmlpp::Document* doc)
+    {
+        auto root = doc->get_root_node();
+        if (!root) {
+            log_error("container.xml is empty");
+            return std::errc::invalid_argument;
+        }
+
+        xmlpp::Element::PrefixNsMap map;
+        map.insert({"opf", "http://www.idpf.org/2007/opf"});
+        OUTCOME_TRY(auto set, find("/opf:package/opf:metadata", map, root, "rootfile"));
+        if (set.size() != 1) {
+            log_error("More than 1 metadata?");
+            return std::errc::invalid_argument;
+        }
+        return *set.begin();
     }
 
     file_reader::file_reader(std::basic_string<unsigned char>&& bytes) :

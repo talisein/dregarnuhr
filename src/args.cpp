@@ -10,12 +10,25 @@
 
 struct args options;
 
+const args* get_options() { return &options; }
+
+namespace {
+    using namespace std::string_view_literals;
+    constinit std::string_view DEFAULT_PREFIX { "chronological-"sv };
+}
+
 namespace {
     void usage(const char *prg)
     {
-        log_info("Usage: ", fs::path(prg).filename().string(), " input_dir output_dir\n\n",
+        log_info("Usage: ", fs::path(prg).filename().string(), " [options] input_dir output_dir\n\n",
                  "input_dir : Directory where Ascendence of a Bookworm .epub files reside.\n",
-                 "output_dir: Directory to output new .epub files. Must not be input_dir.");
+                 "output_dir: Directory to output new .epub files. Must not be input_dir.\n\n",
+                 "Options:\n",
+                 "--prefix=XXX\t: Created filenames will be prefixed with XXX. The default is ", std::quoted(DEFAULT_PREFIX), "\n",
+                 "--suffix=XXX\t: Created filenames will be suffixed with XXX. The default is blank.\n",
+                 "--verbose\t: Print a lot of debugging information\n",
+                 "--mode=dump\t: Dump spine and toc data. Give a path to an epub file instead of a directory. This is mostly for development."
+            );
     }
 
     inline result<void> handle_error(const std::error_code& ec)
@@ -125,6 +138,23 @@ parse(int argc, char **argv)
     }
     if (find (args_options, "--verbose"sv) != args_options.end()) {
         options.verbose = true;
+    }
+    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--suffix="sv); }); it != args_options.end()) {
+        auto pos = it->find("="sv);
+        options.suffix = std::make_optional<std::string>(it->substr(pos+1));
+        log_info("Info: Filename suffix set to ", std::quoted(*options.suffix));
+    }
+    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--prefix="sv); }); it != args_options.end()) {
+        auto pos = it->find("="sv);
+        options.prefix = std::make_optional<std::string>(it->substr(pos+1));
+        if (options.prefix->empty() && (!options.suffix || options.suffix->empty())) {
+            log_error("No suffix and empty prefix defined. This would create files with the same name as the input; that will make things too confusing!");
+            return std::errc::invalid_argument;
+        }
+        log_info("Info: Filename prefix set to ", std::quoted(*options.prefix));
+    }
+    if (!options.prefix && !options.suffix) {
+        options.prefix = std::make_optional<std::string>(DEFAULT_PREFIX);
     }
 
 

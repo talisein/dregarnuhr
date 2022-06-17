@@ -41,6 +41,7 @@ namespace epub
     };
 
     struct manifest {
+        std::string toc_relpath;
         struct toc toc;
         struct item {
             std::string id;
@@ -83,8 +84,12 @@ namespace epub
         result<book> dump();
         result<std::string> get_mimetype();
 
+        // TODO: Fix me, this method doesn't need to be in this class
+        result<const xmlpp::Node*> get_metadata(const xmlpp::Document* doc);
+
         fs::path path;
 
+        zip::reader zip;
     private:
         result<epub::file_reader> get_file_reader(const std::string& path);
         result<epub::file_reader> get_file_reader(const char* path);
@@ -93,7 +98,6 @@ namespace epub
         result<manifest> dump_rootfile(const std::string& rootfile_path);
         result<toc> dump_toc(const std::string& toc_path);
 
-        zip::reader zip;
     };
 
 

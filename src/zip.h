@@ -1,9 +1,13 @@
 #pragma once
 
+#include <list>
 #include <filesystem>
+#include <fstream>
 #include <system_error> // bring in std::error_code et al
+#include <span>
 #include "miniz.h"
 #include "outcome/result.hpp"
+#include "outcome/utils.hpp"
 
 namespace outcome = OUTCOME_V2_NAMESPACE;
 using outcome::result;
@@ -49,6 +53,11 @@ std::error_code make_error_code(mz_zip_error e);
 namespace zip
 {
     namespace fs = std::filesystem;
+    struct archive_deleter {
+        void operator ()(mz_zip_archive *zip) const noexcept;
+    };
+    using zip_ptr = std::unique_ptr<mz_zip_archive, archive_deleter>;
+
 
     class zipstreambuf : public std::streambuf {
     public:
@@ -75,7 +84,7 @@ namespace zip
     public:
         reader(const fs::path& filename);
 
-        bool is_readable();
+        result<bool> is_readable();
 
         result<void> print_files();
 
@@ -84,17 +93,42 @@ namespace zip
         result<std::string> extract(mz_uint idx, mz_uint flags = 0);
         result<std::basic_string<unsigned char>> extract_raw(mz_uint idx, mz_uint flags = 0);
         result<zipstreambuf> extract_stream(mz_uint idx, mz_uint flags = 0);
-
+        inline result<void> extract_to_cb(mz_uint idx, mz_file_write_func pCallback, void *pOpaque, mz_uint flags = 0) {
+            try {
+                auto res = mz_zip_reader_extract_to_callback(&zip, idx, pCallback, pOpaque, flags);
+                if (MZ_FALSE == res) {
+                    return mz_zip_get_last_error(&zip);
+                }
+            } catch (std::exception &e) {
+                return outcome::error_from_exception();
+            }
+            return outcome::success();
+        }
         result<mz_zip_archive_file_stat> stat(mz_uint idx);
-
+        result<std::list<std::string>> get_files();
     private:
-        struct archive_deleter {
-            void operator ()(mz_zip_archive *zip) const noexcept;
-        };
-        using zip_ptr = std::unique_ptr<mz_zip_archive, archive_deleter>;
-
         fs::path path;
         mz_zip_archive zip;
         zip_ptr p_zip;
+        std::ifstream istream;
+    };
+
+    class writer
+    {
+    public:
+        writer(const fs::path& filename);
+
+        result<void> copy_from(reader& reader,
+                               const std::string& src_filename,
+                               const std::string& dst_filename);
+        result<void> add(const std::string& filename,
+                         std::span<char> data);
+        result<void> finish();
+
+    private:
+        fs::path path;
+        mz_zip_archive zip;
+        zip_ptr p_zip;
+        std::ofstream ostream;
     };
 }

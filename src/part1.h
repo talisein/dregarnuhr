@@ -10,7 +10,10 @@ namespace part_1
     using namespace std::string_view_literals;
 
         constinit std::array vol_1 = std::to_array<volume_definition>({
+{ volume::P1V1, "cover"sv, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Cover"sv), true },
 { volume::P1V1, "style"sv, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+{ volume::FB2, "fb2stylesheet.css"sv, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+{ volume::FB1, "fb1stylesheet.css"sv, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
 { volume::P1V1, "ncx"sv, "toc.ncx"sv, "application/x-dtbncx+xml"sv, std::nullopt, false },
 { volume::P1V1, "Cover.jpg"sv, "Images/Cover.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P1V1, "FrontMatter1.jpg"sv, "Images/FrontMatter1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
@@ -24,11 +27,12 @@ namespace part_1
 { volume::P1V1, "Insert7.jpg"sv, "Images/Insert7.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P1V1, "Insert8.jpg"sv, "Images/Insert8.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P1V1, "Insert9.jpg"sv, "Images/Insert9.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::FB1, "x37.jpg"sv, "Images/37.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::FB2, "Image2.jpg"sv, "Images/Image2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P1V1, "FrontMatter2.jpg"sv, "Images/FrontMatter2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P1V1, "Bonus1.jpg"sv, "Images/Bonus1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P1V1, "jnovelclubCMYK.png"sv, "Images/jnovelclubCMYK.png"sv, "image/png"sv, std::nullopt, false },
 { volume::P1V1, "Bonus2.jpg"sv, "Images/Bonus2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
-{ volume::P1V1, "cover"sv, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Cover"sv), true },
 { volume::P1V1, "frontmatter1.xhtml"sv, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Color Illustrations"sv), true },
 { volume::P1V1, "frontmatter2.xhtml"sv, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V1, "frontmatter3.xhtml"sv, "Text/frontmatter3.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Map of Ehrenfest"sv), true },
