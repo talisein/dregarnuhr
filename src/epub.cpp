@@ -194,6 +194,14 @@ namespace epub
         }
         xmlpp::Element::PrefixNsMap map;
         map.insert({"opf", "http://www.idpf.org/2007/opf"});
+        map.insert({"dc", "http://purl.org/dc/elements/1.1/"});
+        // First, check if this is produced from this very program!
+        auto is_dregarnuhr = find_quiet("/opf:package/opf:metadata/dc:contributor[text()='talisein']", map, root, rootfile_path);
+        if (is_dregarnuhr.has_value()) {
+            log_info("Info: ", path, " is produced by this program. Skipping!");
+            return std::errc::identifier_removed;
+        }
+
         OUTCOME_TRY(auto tocncx, find_attr("/opf:package/opf:spine/@toc", map, root, rootfile_path));
         log_verbose(rootfile_path, ": toc: ", tocncx);
 

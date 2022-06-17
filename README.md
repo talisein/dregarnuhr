@@ -13,6 +13,14 @@ version at [mldriscoll/AOAB](https://github.com/mldriscoll/AOAB/). Their version
 is a Windows-only application, but offers perhaps a more curated
 output. Dregarnuhr is available for Windows, Mac, and Linux.
 
+# Limitations (TODOs)
+
+o The table of contents after the front matter does not reflect the
+contents. (Internally a toc metadata is updated, but this html toc will need to
+be rewritten).
+o There is no omnibus option yet.
+
+# Examples
 The simplest invockation of dregarnuhr takes an input directory with your
 bookworm epubs, and an output directory name to generate the new epubs in. As
 long as your epubs have a ".epub" extension, the metadata will be read to
@@ -28,7 +36,6 @@ Found Ascendance of a Bookworm: Part 1 Daughter of a Soldier Volume 3: "../../..
 Found Ascendance of a Bookworm: Official Fanbook Volume 1: "../../../Documents/Myne/ascendance-of-a-bookworm-fanbook-1.epub"
 Found Ascendance of a Bookworm: Official Fanbook Volume 2: "../../../Documents/Myne/ascendance-of-a-bookworm-fanbook-2.epub"
 Created chronologically ordered P1V1: "../../../Documents/Myne_out/chronological-a-great-first-book.epub"
-
 ```
 
 If you invoke the program several times, output files are never overwritten.
@@ -68,7 +75,23 @@ OEBPS/toc.ncx: dtb_depth: 1
 OEBPS/toc.ncx: title: Ascendance of a Bookworm: Official Fanbook Volume 1
 Info: considering ../../../Documents/Myne/ascendance-of-a-bookworm-fanbook-2.epub
 <snip>
+```
 
+For safety, this program will automatically ignore any input that it had
+previously produced.
+
+```
+# src/dregarnuhr out out2
+Output directory "out2" doesn't exist. Creating.
+Info: "out/chronological-ascendance-of-a-bookworm.epub" is produced by this program. Skipping!
+Info: "out/chronological-a-great-first-book.epub" is produced by this program. Skipping!
+Info: "out/chronological-a-great-first-book (2).epub" is produced by this program. Skipping!
+Info: "out/chronological-a-great-first-book (3).epub" is produced by this program. Skipping!
+Info: "out/chronological-any-epub-name-works.epub" is produced by this program. Skipping!
+Info: "out/chronological-ascendance-of-a-bookworm-part-1-volume-3.epub" is produced by this program. Skipping!
+Couldn't find Fanbook 1, so those chapters will be skipped in the new epubs.
+Couldn't find Fanbook 2, so those chapters will be skipped in the new epubs.
+Sorry, no books could be created.
 ```
 
 Finally, this is completely unrelated to Ascendence of a Bookworm, but [Miku is

@@ -17,8 +17,8 @@ namespace {
 
     constinit std::array defined_volumes = std::to_array({
             volume::P1V1,
-//            volume::P1V2,
-//            volume::P1V3,
+            volume::P1V2,
+            volume::P1V3,
         });
 
     constexpr auto get_definition_view(volume v)

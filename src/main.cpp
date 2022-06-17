@@ -55,7 +55,12 @@ result<void> print_books(const fs::path& input_dir)
         auto reader = book_readers.find(it.first);
         log_info("Found ", it.second.manifest.toc.title, ": ", reader->second->path);
     }
-
+    if (books.end() == books.find(volume::FB1)) {
+        log_info("Couldn't find Fanbook 1, so those chapters will be skipped in the new epubs.");
+    }
+    if (books.end() == books.find(volume::FB2)) {
+        log_info("Couldn't find Fanbook 2, so those chapters will be skipped in the new epubs.");
+    }
     OUTCOME_TRY(bookmaker::make_books(books, book_readers));
     return outcome::success();
 }
@@ -68,38 +73,21 @@ result<void> print_books(const fs::path& input_dir)
     auto res = reader.dump();
     if (!res) {
         std::system_error e(res.error());
+        if (e.code() == std::errc::identifier_removed) std::exit(EXIT_SUCCESS);
         std::cerr << "Error: " << e.code() << ' ' << e.what() << std::endl;
     }
     auto book = res.value();
     using namespace std::string_view_literals;
     std::string dump_volume {"VTMP"};
-    if (get_options()->dump_volume) {
+    if (auto it = identify_volume(book.manifest.toc.dtb_uid); it.has_value()) {
+        dump_volume = to_string_view(it.value());
+    } else if (get_options()->dump_volume) {
         dump_volume = *get_options()->dump_volume;
-    } else {
-        do {
-            std::stringstream ss;
-            if (auto part_pos = book.manifest.toc.title.find("Part ");
-                std::string::npos != part_pos)
-            {
-                ss << 'P' << book.manifest.toc.title.substr(part_pos + 5, 1);
-            } else {
-                break;
-            }
-
-            if (auto vol_pos = book.manifest.toc.title.find("Volume ");
-                std::string::npos != vol_pos)
-            {
-                ss << 'V' << book.manifest.toc.title.substr(vol_pos + 7, 1);
-                dump_volume = ss.str();
-            } else {
-                break;
-            }
-        } while (false);
     }
     std::cout << "{" << std::quoted(book.manifest.toc.dtb_uid) << "sv, volume::"sv
-              <<  "VTMP" << "},\n";
+              <<  dump_volume << "},\n";
     for (const auto& item : book.manifest.items) {
-        std::cout << "{ volume::" << (get_options()->dump_volume ? *get_options()->dump_volume : "VREF"sv) << ", "
+        std::cout << "{ volume::" << dump_volume << ", "
                   << std::quoted(item.id) <<  "sv, " <<  std::quoted(item.href) << "sv, "
                   << std::quoted(item.media_type) <<  "sv, ";
         if (item.toc_label) {
