@@ -163,6 +163,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.gz
           asset_name: dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.gz
           asset_content_type: application/gzip
 
@@ -172,6 +173,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz
           asset_name: dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz
           asset_content_type: application/gzip
 
@@ -181,5 +183,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip
           asset_name: dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip
           asset_content_type: application/zip
