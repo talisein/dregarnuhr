@@ -138,17 +138,24 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: true
 
-      - name: Print context
-        env:
-          EVENT_CONTEXT: ${{ toJSON(github.event) }}
-        run: |
-          echo $EVENT_CONTEXT
-
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
       - name: Display files
         run: ls -R
+
+      - name: Tar/zip
+        env:
+          REF: ${{ github.event.ref }}
+        run: |
+          export MYREF=`echo $REF | tr -d refs/tags`
+          tar -C dregarnuhr-linux -czvf dregarnuhr-linux-$MYREF.tar.gz dregarnuhr-linux
+          tar -C dregarnuhr-mac -czvf dregarnuhr-mac-$MYREF.tar.gz dregarnuhr-mac
+          zip -j dregarnuhr-win dregarnuhr-win/*
+          mv dregarnuhr-win.zip dregarnuhr-windows-$MYREF.zip
+
+      - name: Display files 2
+        run: ls
 
       - name: Release Linux Artifact
         uses: actions/upload-release-asset@v1
@@ -156,9 +163,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dregarnuhr-linux
-          asset_name: dregarnuhr-linux.zip
-          asset_content_type: application/zip
+          asset_name: dregarnuhr-linux*.tar.gz
+          asset_content_type: application/gzip
 
       - name: Release Mac Artifact
         uses: actions/upload-release-asset@v1
@@ -166,9 +172,8 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dregarnuhr-mac
-          asset_name: dregarnuhr-mac.zip
-          asset_content_type: application/zip
+          asset_name: dregarnuhr-mac*.tar.gz
+          asset_content_type: application/gzip
 
       - name: Release Windows Artifact
         uses: actions/upload-release-asset@v1
@@ -176,6 +181,5 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dregarnuhr-win
-          asset_name: dregarnuhr-win.zip
+          asset_name: dregarnuhr-windows*.zip
           asset_content_type: application/zip
