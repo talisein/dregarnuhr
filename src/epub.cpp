@@ -229,7 +229,7 @@ namespace epub
         }
 
         struct manifest sorted_manifest(manifest);
-        sorted_manifest.toc = std::move(manifest.toc);
+        sorted_manifest.items.clear();
         for (const auto& item : manifest.items) {
             if (!item.in_spine)
                 sorted_manifest.items.push_back(item);

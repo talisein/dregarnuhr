@@ -19,6 +19,22 @@ namespace {
             volume::P1V1,
             volume::P1V2,
             volume::P1V3,
+            volume::P2V1,
+            volume::P2V2,
+            volume::P2V3,
+            volume::P2V4,
+            volume::P3V1,
+            volume::P3V2,
+            volume::P3V3,
+            volume::P3V4,
+            volume::P3V5,
+            volume::P4V1,
+            volume::P4V2,
+            volume::P4V3,
+            volume::P4V4,
+            volume::P4V5,
+            volume::P4V6,
+            volume::P4V7,
         });
 
     constexpr auto get_definition_view(volume v)
@@ -295,7 +311,8 @@ namespace {
             basefiles.remove(src);
         }
         for (auto src : basefiles) {
-            log_info("Bug: left over file in src: ", src);
+            // P2V4extra8
+            log_info("Warning: left over file in src: ", src, ". This is ok if it was moved to an earlier volume.");
         }
         OUTCOME_TRY(writer.finish());
         return outcome::success();
