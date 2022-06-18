@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*'
 
+concurrency:
+  group: releases
+  cancel-in-progress: true
+
 jobs:
   build-linux:
     runs-on: ubuntu-22.04
@@ -141,21 +145,17 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
-      - name: Display files
-        run: ls -R
-
-      - name: Tar/zip
+      - run: ls -R
+      - id: myref
         env:
           REF: ${{ github.event.ref }}
-        run: |
-          export MYREF=`echo $REF | tr -d refs/tags`
-          tar -C dregarnuhr-linux -czvf dregarnuhr-linux-$MYREF.tar.gz dregarnuhr-linux
-          tar -C dregarnuhr-mac -czvf dregarnuhr-mac-$MYREF.tar.gz dregarnuhr-mac
-          zip -j dregarnuhr-win dregarnuhr-win/*
-          mv dregarnuhr-win.zip dregarnuhr-windows-$MYREF.zip
+        run: echo "::set-output name=MYREF::`echo $REF | tr -d refs/tags`"
 
-      - name: Display files 2
-        run: ls
+      - run: tar -C ./dregarnuhr-linux -czvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.gz" ./dregarnuhr-linux
+      - run: tar -C ./dregarnuhr-macos -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" ./dregarnuhr-macos
+      - run: zip -j ./dregarnuhr-win dregarnuhr-win/*
+      - run: mv ./dregarnuhr-win.zip "./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip"
+      - run: ls
 
       - name: Release Linux Artifact
         uses: actions/upload-release-asset@v1
@@ -163,7 +163,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_name: dregarnuhr-linux*.tar.gz
+          asset_name: dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.gz
           asset_content_type: application/gzip
 
       - name: Release Mac Artifact
@@ -172,7 +172,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_name: dregarnuhr-mac*.tar.gz
+          asset_name: dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz
           asset_content_type: application/gzip
 
       - name: Release Windows Artifact
@@ -181,5 +181,5 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_name: dregarnuhr-windows*.zip
+          asset_name: dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip
           asset_content_type: application/zip
