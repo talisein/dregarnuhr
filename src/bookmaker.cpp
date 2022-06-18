@@ -71,6 +71,7 @@ namespace {
                 assert(false);
               }
         assert(false);
+        return std::span(part_1::vol_1.end(), part_1::vol_1.end());
     }
 
 
