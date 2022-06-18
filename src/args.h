@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <optional>
+#include <regex>
 #include "outcome/result.hpp"
 
 
@@ -26,6 +27,8 @@ struct args
     fs::path output_dir;
     bool output_created;
     bool verbose;
+    std::optional<std::size_t> size_filter;
+    std::optional<std::regex> name_filter;
 };
 
 

@@ -133,6 +133,8 @@ namespace {
         }
     }
 
+
+    // TODO: filters, and missing volumes like fanbook, should be excluded in the rootfile and toc
     result<std::string> create_rootfile(const epub::book& base_book,
                                         const std::unique_ptr<epub::book_reader>& base_reader,
                                         const auto &definition)
@@ -306,6 +308,22 @@ namespace {
             dst.append(def.href);
             if (def.vol == vol) {
                 dst.assign(src);
+            }
+            if (get_options()->size_filter) {
+                OUTCOME_TRY(const auto src_idx, reader->zip.locate_file(src.c_str()));
+                OUTCOME_TRY(const auto src_stat, reader->zip.stat(src_idx));
+                if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
+                    log_info("Filter: ", to_string_view(def.vol), " ", src, " filtered for size ", src_stat.m_uncomp_size);
+                    basefiles.remove(src);
+                    continue;
+                }
+            }
+            if (get_options()->name_filter) {
+                if (std::regex_search(src, get_options()->name_filter.value())) {
+                    log_info("Filter: ", to_string_view(def.vol), " ", src, " filtered for name");
+                    basefiles.remove(src);
+                    continue;
+                  }
             }
             OUTCOME_TRY(writer.copy_from(reader->zip, src, dst));
             basefiles.remove(src);

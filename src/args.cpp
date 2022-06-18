@@ -1,10 +1,12 @@
 #include <ranges>
+#include <string>
 #include <vector>
 #include <algorithm>
 #include <iostream>
 #include <system_error>
 #include <cctype>
 #include "outcome/try.hpp"
+#include "outcome/utils.hpp"
 #include "args.h"
 #include "log.h"
 
@@ -153,9 +155,38 @@ parse(int argc, char **argv)
         }
         log_info("Info: Filename prefix set to ", std::quoted(*options.prefix));
     }
+    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--filter="sv); }); it != args_options.end()) {
+        const auto filters = it->substr(it->find("="sv)+1);
+        // Size
+        if (const auto pos = filters.find("size="sv); std::string::npos != pos) {
+            auto end = filters.find(":", pos);
+            auto count = std::string::npos;
+            if (std::string::npos != end) {
+                count = end - pos - 5;
+            }
+            options.size_filter = std::stoull(std::string(filters.substr(pos + 5, count)));
+            log_info("Size filter: ", *options.size_filter);
+        }
+        // Name
+        if (const auto pos = filters.find("name="sv); std::string::npos != pos) {
+            try {
+                auto end = filters.find(":", pos);
+                auto count = std::string::npos;
+                if (std::string::npos != end) {
+                    count = end - pos - 5;
+                }
+                options.name_filter = std::make_optional<std::regex>(std::string(filters.substr(pos + 5, count)), std::regex_constants::icase);
+            } catch (std::exception &e) {
+                log_error("Failed to prepare regex name filter: ", e.what());
+                return outcome::error_from_exception();
+            }
+        }
+
+    }
     if (!options.prefix && !options.suffix) {
         options.prefix = std::make_optional<std::string>(DEFAULT_PREFIX);
     }
+
 
 
     if (args::command::DUMP == options.command) {
