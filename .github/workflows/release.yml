@@ -151,9 +151,9 @@ jobs:
           REF: ${{ github.event.ref }}
         run: echo "::set-output name=MYREF::`echo $REF | tr -d refs/tags`"
 
-      - run: tar -C ./dregarnuhr-linux -czvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.gz" ./dregarnuhr-linux
-      - run: tar -C ./dregarnuhr-macos -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" ./dregarnuhr-macos
-      - run: zip -j ./dregarnuhr-win dregarnuhr-win/*
+      - run: tar -C ./dregarnuhr-linux -czvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
+      - run: tar -C ./dregarnuhr-macos -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
+      - run: zip -j ./dregarnuhr-win dregarnuhr-win/dregarnuhr.exe
       - run: mv ./dregarnuhr-win.zip "./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip"
       - run: ls
 
