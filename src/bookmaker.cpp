@@ -12,6 +12,10 @@
 #include "part4.h"
 #include "outcome/utils.hpp"
 #include "outcome/try.hpp"
+#include "jpeglib.h"
+#include "libxml++/validators/dtdvalidator.h"
+#include "libxml++/validators/relaxngvalidator.h"
+#include "dtd.h"
 
 namespace {
 
@@ -37,7 +41,7 @@ namespace {
             volume::P4V7,
         });
 
-    constexpr auto get_definition_view(volume v)
+    constexpr epub::definition_t get_definition_view(volume v)
     {
         switch (v)
         {
@@ -132,12 +136,34 @@ namespace {
             }
         }
     }
+} // anonymous namespace
 
+
+namespace epub
+{
+    result<void>
+    book_writer::start_book()
+    {
+        using namespace std::string_literals;
+        static const std::string MIMETYPE { "mimetype"s };
+        static const std::string METAINF { "META-INF/container.xml"s };
+        // First item must be mimetype
+        OUTCOME_TRY(writer.copy_from(base_reader->zip, MIMETYPE, MIMETYPE));
+        basefiles.remove(MIMETYPE);
+        // second item should be META-INF/container.xml
+        OUTCOME_TRY(writer.copy_from(base_reader->zip, METAINF, METAINF));
+        basefiles.remove(METAINF);
+        // Next is the root file, but we need to create it from the definition
+        const std::string rootfile_path = base_book.rootfile_path;
+        basefiles.remove(base_book.rootfile_path);
+        OUTCOME_TRY(auto rootfile_buf, create_rootfile());
+        OUTCOME_TRY(writer.add(rootfile_path, rootfile_buf));
+        return outcome::success();
+    }
 
     // TODO: filters, and missing volumes like fanbook, should be excluded in the rootfile and toc
-    result<std::string> create_rootfile(const epub::book& base_book,
-                                        const std::unique_ptr<epub::book_reader>& base_reader,
-                                        const auto &definition)
+    result<std::string>
+    book_writer::create_rootfile()
     {
         xmlpp::Document doc;
         OUTCOME_TRY(auto idx, base_reader->zip.locate_file(base_book.rootfile_path.c_str()));
@@ -176,7 +202,7 @@ namespace {
             if (it.id == "Cover.jpg") {
                 item->set_attribute("properties", "cover-image");
             }
-            if (it.id == "toc") {
+            if (it.id == "toc" || it.id == "toc.xhtml") {
                 item->set_attribute("properties", "nav");
             }
         }
@@ -196,15 +222,31 @@ namespace {
                         itemref->set_attribute("linear", "yes");
                     }
                 }
+            } else if (child->get_name() == "guide") {
+                root->import_node(child, true);
             }
         }
+        xmlpp::RelaxNGValidator validator;
+//        auto schema = DTD::get_package();
+//        validator.set_schema(&schema, false);
+//        validator.validate(&doc);
         return doc.write_to_string_formatted();
     }
 
-    result<std::string> create_toc(const epub::book& base_book,
-                                   const std::string& toc_fullpath,
-                                   const std::unique_ptr<epub::book_reader>& base_reader,
-                                   const auto &definition)
+    result<void>
+    book_writer::add_ncx()
+    {
+        const auto toc_fullpath = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1).append(base_book.manifest.toc_relpath);
+        auto it = std::ranges::find(basefiles, toc_fullpath);
+        if (it == basefiles.end()) { log_error("Couldn't find toc in original?"); return std::errc::no_such_file_or_directory; }
+        basefiles.remove(toc_fullpath);
+        OUTCOME_TRY(auto toc_buf, create_ncx(toc_fullpath));
+        OUTCOME_TRY(writer.add(toc_fullpath, toc_buf));
+        return outcome::success();
+    }
+
+    result<std::string>
+    book_writer::create_ncx(const std::string& toc_fullpath)
     {
         xmlpp::Document doc;
         OUTCOME_TRY(auto idx, base_reader->zip.locate_file(toc_fullpath.c_str()));
@@ -235,66 +277,23 @@ namespace {
             auto content = navPoint->add_child_element("content");
             content->set_attribute("src", xmlpp::ustring(def.href));
         }
+
         return doc.write_to_string_formatted();
     }
 
-    result<void> add_toc(std::list<std::string>& basefiles,
-                         const epub::book& base_book,
-                         const std::unique_ptr<epub::book_reader>& base_reader,
-                         zip::writer& writer,
-                         const auto& definition)
+    result<void>
+    book_writer::make_book_impl()
     {
-        const auto toc_fullpath = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1).append(base_book.manifest.toc_relpath);
-        auto it = std::ranges::find(basefiles, toc_fullpath);
-        if (it == basefiles.end()) { log_error("Couldn't find toc in original?"); return std::errc::no_such_file_or_directory; }
-        basefiles.remove(toc_fullpath);
-        OUTCOME_TRY(auto toc_buf, create_toc(base_book, toc_fullpath, base_reader, definition));
-        OUTCOME_TRY(writer.add(toc_fullpath, toc_buf));
-        return outcome::success();
-    }
-
-    result<void> start_book(std::list<std::string>& basefiles,
-                            const epub::book& base_book,
-                            const std::unique_ptr<epub::book_reader>& base_reader,
-                            zip::writer& writer,
-                            const auto& definition)
-    {
-        using namespace std::string_literals;
-        static const std::string MIMETYPE { "mimetype"s };
-        static const std::string METAINF { "META-INF/container.xml"s };
-        // First item must be mimetype
-        OUTCOME_TRY(writer.copy_from(base_reader->zip, MIMETYPE, MIMETYPE));
-        basefiles.remove(MIMETYPE);
-        // second item should be META-INF/container.xml
-        OUTCOME_TRY(writer.copy_from(base_reader->zip, METAINF, METAINF));
-        basefiles.remove(METAINF);
-        // Next is the root file, but we need to create it from the definition
-        const std::string rootfile_path = base_book.rootfile_path;
-        basefiles.remove(base_book.rootfile_path);
-        OUTCOME_TRY(auto rootfile_buf, create_rootfile(base_book, base_reader, definition));
-        OUTCOME_TRY(writer.add(rootfile_path, rootfile_buf));
-        return outcome::success();
-    }
-
-    result<void> make_book_impl(volume vol,
-                                zip::writer &writer,
-                                const epub::book& base_book,
-                                const std::unique_ptr<epub::book_reader>& base_reader,
-                                const std::map<volume, epub::book>& books,
-                                const std::map<volume, std::unique_ptr<epub::book_reader>>& book_readers,
-                                const auto &definition)
-    {
-        OUTCOME_TRY(auto basefiles, base_reader->zip.get_files());
-        OUTCOME_TRY(start_book(basefiles, base_book, base_reader, writer, definition));
+        OUTCOME_TRY(start_book());
         for (const volume_definition& def : definition)
 //                     | std::ranges::views::filter([&base_book](const volume_definition& def) { return def.href != base_book.manifest.toc_relpath; }))
         {
             if (def.href == base_book.manifest.toc_relpath) {
-                OUTCOME_TRY(add_toc(basefiles, base_book, base_reader, writer, definition));
+                OUTCOME_TRY(add_ncx());
                 continue;
             }
-            auto reader_it = book_readers.find(def.vol);
-            if (book_readers.end() == reader_it) {
+            auto reader_it = src_readers.find(def.vol);
+            if (src_readers.end() == reader_it) {
                 log_verbose("Volume ", to_string_view(def.vol), " is unavailable. Skipping insertion.");
                 continue;
             }
@@ -325,8 +324,47 @@ namespace {
                     continue;
                   }
             }
+            if (src.ends_with(".jpg") && get_options()->jpg_quality) {
+                OUTCOME_TRY(const auto idx, reader->zip.locate_file(src.c_str()));
+                OUTCOME_TRY(const auto buf, reader->zip.extract_raw(idx));
+                struct jpeg_decompress_struct dinfo;
+                struct jpeg_compress_struct cinfo;
+                struct jpeg_error_mgr cjerr;
+                struct jpeg_error_mgr djerr;
+                cinfo.err = jpeg_std_error(&cjerr);
+                dinfo.err = jpeg_std_error(&djerr);
+                jpeg_create_compress(&cinfo);
+                jpeg_create_decompress(&dinfo);
+                jpeg_mem_src(&dinfo, buf.data(), buf.size());
+                unsigned char* outbuf = nullptr;
+                unsigned long outbuf_len = 0;
+                jpeg_mem_dest(&cinfo, &outbuf, &outbuf_len);
+                jpeg_read_header(&dinfo, true);
+                jpeg_calc_output_dimensions(&dinfo);
+                cinfo.image_width = dinfo.image_width;
+                cinfo.image_height = dinfo.image_height;
+                cinfo.input_components = dinfo.output_components;
+                cinfo.in_color_space = dinfo.out_color_space;
+                jpeg_set_defaults(&cinfo);
+                jpeg_set_quality(&cinfo, get_options()->jpg_quality.value(), true);
+                jpeg_start_decompress(&dinfo);
+                jpeg_start_compress(&cinfo, true);
+                auto row_stride = dinfo.output_width * dinfo.output_components;
+                auto buffer = (*dinfo.mem->alloc_sarray) ((j_common_ptr)&dinfo, JPOOL_IMAGE, row_stride, 1);
+                while (dinfo.output_scanline < dinfo.output_height) {
+                    auto dim_read = jpeg_read_scanlines(&dinfo, buffer, 1);
+                    auto dim_wrote [[maybe_unused]] = jpeg_write_scanlines(&cinfo, buffer, dim_read);
+                }
+                jpeg_finish_decompress(&dinfo);
+                jpeg_finish_compress(&cinfo);
+                jpeg_destroy_decompress(&dinfo);
+                OUTCOME_TRY(writer.add(src, std::span<const char>(reinterpret_cast<char*>(outbuf), outbuf_len)));
+                basefiles.remove(src);
+                continue;
+            }
             OUTCOME_TRY(writer.copy_from(reader->zip, src, dst));
             basefiles.remove(src);
+            continue;
         }
         for (auto src : basefiles) {
             // P2V4extra8
@@ -336,29 +374,11 @@ namespace {
         return outcome::success();
     }
 
-} // anonymous namespace
-
-
-namespace bookmaker
-{
-
-    result<std::filesystem::path> make_book(volume vol,
-                           const std::map<volume, epub::book>& books,
-                           const std::map<volume, std::unique_ptr<epub::book_reader>>& book_readers,
-                           const auto& definition)
+    result<fs::path>
+    book_writer::make_book()
     {
-        const auto& base_book = books.find(vol)->second;
-        const auto& base_reader = book_readers.find(vol)->second;
-        auto filename = get_new_filename(base_reader->path);
         try {
-            zip::writer writer(filename);
-            auto res = make_book_impl(vol,
-                                      writer,
-                                      base_book,
-                                      base_reader,
-                                      books,
-                                      book_readers,
-                                      definition);
+            auto res = make_book_impl();
             if (res.has_failure()) {
                 cleanup_dangling(vol, filename);
                 return res.as_failure();
@@ -371,27 +391,54 @@ namespace bookmaker
         return filename;
     }
 
-    result<void> make_books(const std::map<volume, epub::book>& books,
-                            const std::map<volume, std::unique_ptr<epub::book_reader>>& book_readers)
+    book_writer::book_writer(volume volume,
+                             const books_t &books,
+                             const readers_t &readers,
+                             definition_t def) :
+        vol(volume),
+        src_books(books),
+        src_readers(readers),
+        base_book(src_books.find(vol)->second),
+        base_reader(src_readers.find(vol)->second),
+        definition(def),
+        filename(get_new_filename(base_reader->path)),
+        writer(filename)
+    {
+        auto res = base_reader->zip.get_files();
+        if (res) {
+            basefiles = std::move(res.value());
+        } else {
+            std::system_error e(res.error());
+            throw e;
+        }
+    }
+
+    result<void>
+    bookmaker::make_books()
     {
         int created_books = 0;
         for (auto defined_volume : defined_volumes) {
-            const auto view = get_definition_view(defined_volume);
+            const definition_t view = get_definition_view(defined_volume);
             std::set<volume> located_inputs;
             for (const auto& def : view) {
-                if (books.end() != books.find(def.vol))
+                if (src_books.end() != src_books.find(def.vol))
                     located_inputs.insert(def.vol);
             }
             if (located_inputs.size() == 0) {
                 log_verbose("Info: No inputs to make ", to_string_view(defined_volume));
                 continue;
             }
-            auto res = make_book(defined_volume, books, book_readers, view);
-            if (res.has_error()) {
-                log_error("Couldn't make ", to_string_view(defined_volume), ": ", res.error().message(), ". Moving on...");
-            } else {
-                log_info("Created chronologically ordered ", to_string_view(defined_volume), ": ", res.value() );
-                ++created_books;
+            try {
+                book_writer writer(defined_volume, src_books, src_readers, view);
+                auto res = writer.make_book();
+                if (res.has_error()) {
+                    log_error("Couldn't make ", to_string_view(defined_volume), ": ", res.error().message(), ". Moving on...");
+                } else {
+                    log_info("Created chronologically ordered ", to_string_view(defined_volume), ": ", res.value() );
+                    ++created_books;
+                }
+            } catch (std::exception& e) {
+                log_error("Couldn't make writer for ", to_string_view(defined_volume), ": ", e.what(), ". Moving on...");
             }
         }
 
@@ -402,5 +449,10 @@ namespace bookmaker
         return outcome::success();
     }
 
-
+    bookmaker::bookmaker(books_t&& books,
+                         readers_t&& book_readers) :
+            src_books(std::move(books)),
+            src_readers(std::move(book_readers))
+    {
+    }
 }

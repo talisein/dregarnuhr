@@ -181,8 +181,14 @@ parse(int argc, char **argv)
                 return outcome::error_from_exception();
             }
         }
-
     }
+    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--jpg-quality="sv); }); it != args_options.end()) {
+        auto pos = it->find("="sv);
+        auto i = std::atoi(it->substr(pos+1).begin());
+        options.jpg_quality = std::make_optional<int>( i );
+        log_info("JPG quality will be ", options.jpg_quality.value());
+    }
+
     if (!options.prefix && !options.suffix) {
         options.prefix = std::make_optional<std::string>(DEFAULT_PREFIX);
     }

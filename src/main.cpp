@@ -18,8 +18,8 @@ namespace fs = std::filesystem;
 result<void> print_books(const fs::path& input_dir)
 {
     const fs::path epub_ext{".epub"};
-    std::map<volume, std::unique_ptr<epub::book_reader>> book_readers;
-    std::map<volume, epub::book> books;
+    epub::readers_t book_readers;
+    epub::books_t books;
     log_verbose("Info: Looking for epubs in ", input_dir.string());
     for (auto const &dir_entry : fs::directory_iterator{input_dir}) {
         log_verbose("Info: considering ", dir_entry.path().string());
@@ -60,7 +60,9 @@ result<void> print_books(const fs::path& input_dir)
     if (books.end() == books.find(volume::FB2)) {
         log_info("Couldn't find Fanbook 2, so those chapters will be skipped in the new epubs.");
     }
-    OUTCOME_TRY(bookmaker::make_books(books, book_readers));
+
+    epub::bookmaker bookmaker(std::move(books), std::move(book_readers));
+    OUTCOME_TRY(bookmaker.make_books());
     return outcome::success();
 }
 

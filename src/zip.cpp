@@ -374,7 +374,7 @@ namespace zip
 
     result<void>
     writer::add(const std::string& filename,
-                std::span<char> data)
+                std::span<const char> data)
     {
         try {
             if (MZ_FALSE == mz_zip_writer_add_mem(&zip, filename.c_str(), data.data(), data.size(), 8)) {

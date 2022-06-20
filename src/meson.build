@@ -7,9 +7,16 @@ config = configure_file(input: 'config.h.in',
                         output: 'config.h',
                         configuration: conf_data)
 
-deps = [zlib_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep]
+deps = [zlib_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep]
 inc = []
-src = ['main.cpp', 'zip.cpp', 'args.cpp', 'epub.cpp', 'volumes.cpp', 'bookmaker.cpp']
+src = ['main.cpp',
+       'zip.cpp',
+       'args.cpp',
+       'epub.cpp',
+       'volumes.cpp',
+       'bookmaker.cpp',
+       'dtd.cpp'
+      ]
 
 exe = executable('dregarnuhr', src,
                  include_directories: inc,

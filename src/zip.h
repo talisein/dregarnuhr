@@ -122,7 +122,7 @@ namespace zip
                                const std::string& src_filename,
                                const std::string& dst_filename);
         result<void> add(const std::string& filename,
-                         std::span<char> data);
+                         std::span<const char> data);
         result<void> finish();
 
     private:
