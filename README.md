@@ -15,9 +15,6 @@ output. Dregarnuhr is available for Windows, Mac, and Linux.
 
 # Limitations (TODOs)
 
-- The table of contents after the front matter does not reflect the
-contents. (Internally a toc metadata is updated, but this html toc will need to
-be rewritten).
 - There is no omnibus option yet.
 - I don't have a mac to test the mac version on. Let me know if it works.
 
@@ -37,6 +34,16 @@ Found P1V3: "../../../Documents/Myne/ascendance-of-a-bookworm-part-1-volume-3.ep
 Created chronologically ordered P1V1: "../../../Documents/Myne_out/chronological-a-great-first-book.epub"
 Created chronologically ordered P1V2: "../../../Documents/Myne_out/chronological-any-epub-name-works.epub"
 Created chronologically ordered P1V3: "../../../Documents/Myne_out/chronological-ascendance-of-a-bookworm-part-1-volume-3.epub"
+```
+
+If you want to create a slimmed down set of volumes to read on your phone, you
+can filter out the bonus illustrations and adjust the jpg quality. Note the name
+filter is a case insensitive regex. When filtering out images, you should also
+filter out the xhtml pages that reference them. This recipe produces epubs that
+are about 3MiB large, a good improvement over the 30MiB originals.
+
+```
+src/dregarnuhr --jpg-quality=75 --jpg-scale=2 '--filter=name=bonus[0-9].(jpg|xhtml)'  ~/Documents/Myne ~/Documents/Myne_out
 ```
 
 If you invoke the program several times, output files are never overwritten.
