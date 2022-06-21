@@ -3,7 +3,8 @@ project('dregarnuhr', ['c', 'cpp'],
         version : '0.9.0',
         default_options : ['c_std=gnu17',
                            'cpp_std=gnu++20',
-                           'buildtype=release'])
+                           'buildtype=release',
+                           'cpp_eh=s'])
 
 if host_machine.system() == 'linux'
   add_global_arguments('-D_LARGEFILE64_SOURCE', language: 'c')

@@ -19,13 +19,7 @@ src = ['main.cpp',
        'jpeg.cpp'
       ]
 
-compiler = meson.get_compiler('cpp')
-cppargs = ''
-if compiler.has_argument('/EHsc-')
-  cppargs = '/EHsc-'
-endif
 exe = executable('dregarnuhr', src,
                  include_directories: inc,
                  dependencies: deps,
-                 cpp_args: cppargs,
                  install: true)
