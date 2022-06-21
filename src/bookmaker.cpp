@@ -453,7 +453,7 @@ namespace epub
                         for (const auto &src_iter : src_root_child->get_children()) {
                             if (src_iter->get_name() == "nav") {
                                 auto srcattr = dynamic_cast<xmlpp::Element*>(src_iter)->get_attribute("type", "epub");
-                                boolean is_toc = srcattr->get_value() == "toc";
+                                bool is_toc = srcattr->get_value() == "toc";
                                 if (is_toc) {
                                     auto nav = dynamic_cast<xmlpp::Element*>(body->import_node(src_iter, false));
                                     for (const auto &attr : dynamic_cast<xmlpp::Element*>(src_iter)->get_attributes()) {

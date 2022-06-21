@@ -18,7 +18,7 @@ cpp_compiler.has_header_symbol('version', '__cpp_concepts', required: true)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_functions', required: true)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip')
 
-jpeg_dep = dependency('libjpeg', fallback: ['libjeg-turbo'])
+jpeg_dep = dependency('libjpeg', fallback: ['libjpeg-turbo'])
 
 zlib_dep = dependency('zlib', fallback: ['zlib'])
 

@@ -9,14 +9,16 @@ namespace
 {
     using namespace std::string_view_literals;
     typedef std::pair<const std::string_view, const std::string_view> _pair_t;
-#define JCOPYRIGHT_SHORT "copyright violation"
-#define JVERSION "jpeg version wrong"
+#define JCOPYRIGHT_SHORT "Copyright (C) @COPYRIGHT_YEAR@ The libjpeg-turbo Project and many others"
+#define JCOPYRIGHT "Copyright (C) @COPYRIGHT_YEAR@ The libjpeg-turbo Project and many others"
+#define JVERSION "8d  15-Jan-2012"
 #define JMESSAGE(code, string)  { code, std::make_pair(#code, string) },
     const std::map<J_MESSAGE_CODE, const _pair_t> _error_map {
 #include "jerror.h"
     };
 #undef JMESSAGE
 #undef JVERSION
+#undef JCOPYRIGHT
 #undef JCOPYRIGHT_SHORT
 
 
@@ -82,7 +84,7 @@ namespace jpeg
     compressor::compress_from(decompressor& decompressor, std::optional<int> quality, std::optional<int> scale)
     {
         try {
-            jpeg_read_header(&decompressor.cinfo, true);
+            jpeg_read_header(&decompressor.cinfo, TRUE);
             if (scale) {
                 decompressor.cinfo.scale_denom = scale.value();
             }
@@ -97,9 +99,9 @@ namespace jpeg
             cinfo.in_color_space = decompressor.cinfo.out_color_space;
             jpeg_set_defaults(&cinfo);
             if (quality)
-                jpeg_set_quality(&cinfo, quality.value(), true);
+                jpeg_set_quality(&cinfo, quality.value(), TRUE);
             jpeg_start_decompress(&decompressor.cinfo);
-            jpeg_start_compress(&cinfo, true);
+            jpeg_start_compress(&cinfo, TRUE);
             const auto row_stride = decompressor.cinfo.output_width * decompressor.cinfo.output_components;
             auto buffer = (*decompressor.cinfo.mem->alloc_sarray) ((j_common_ptr)&decompressor.cinfo, JPOOL_IMAGE, row_stride, 1);
             while (decompressor.cinfo.output_scanline < decompressor.cinfo.output_height) {
