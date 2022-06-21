@@ -29,6 +29,8 @@ namespace {
                  "--prefix=XXX\t: Created filenames will be prefixed with XXX. The default is ", std::quoted(DEFAULT_PREFIX), "\n",
                  "--suffix=XXX\t: Created filenames will be suffixed with XXX. The default is blank.\n",
                  "--verbose\t: Print a lot of debugging information\n",
+                 "--jpg-scale=[n]\t: Scale jpg images down by 1/n, where n is between 1-16\n",
+                 "--jpg-quality=[n]\t: Low jpg quality to n, where n is between 1-100\n"
                  "--mode=dump\t: Dump spine and toc data. Give a path to an epub file instead of a directory. This is mostly for development."
             );
     }
@@ -187,6 +189,12 @@ parse(int argc, char **argv)
         auto i = std::atoi(it->substr(pos+1).begin());
         options.jpg_quality = std::make_optional<int>( i );
         log_info("JPG quality will be ", options.jpg_quality.value());
+    }
+    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--jpg-scale="sv); }); it != args_options.end()) {
+        auto pos = it->find("="sv);
+        auto i = std::atoi(it->substr(pos+1).begin());
+        options.jpg_scale = std::make_optional<int>( i );
+        log_info("JPG scale will be ", options.jpg_scale.value());
     }
 
     if (!options.prefix && !options.suffix) {

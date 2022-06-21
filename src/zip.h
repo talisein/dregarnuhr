@@ -121,8 +121,24 @@ namespace zip
         result<void> copy_from(reader& reader,
                                const std::string& src_filename,
                                const std::string& dst_filename);
+
+        template <typename T>
         result<void> add(const std::string& filename,
-                         std::span<const char> data);
+                         std::span<const T> data)
+        {
+            try {
+                if (MZ_FALSE == mz_zip_writer_add_mem(&zip, filename.c_str(), data.data(), data.size_bytes(), 8)) {
+                    auto err = mz_zip_get_last_error(&zip);
+                    std::system_error e(err);
+                    return err;
+                }
+            } catch (std::exception &e) {
+                return outcome::error_from_exception();
+            }
+
+            return outcome::success();
+        }
+
         result<void> finish();
 
     private:

@@ -371,25 +371,6 @@ namespace zip
         return outcome::success();
     }
 
-
-    result<void>
-    writer::add(const std::string& filename,
-                std::span<const char> data)
-    {
-        try {
-            if (MZ_FALSE == mz_zip_writer_add_mem(&zip, filename.c_str(), data.data(), data.size(), 8)) {
-                auto err = mz_zip_get_last_error(&zip);
-                std::system_error e(err);
-                log_error("Failed to add ", filename, ": ", e.code(), ' ', e.what());
-                return err;
-            }
-        } catch (std::exception &e) {
-            return outcome::error_from_exception();
-        }
-
-        return outcome::success();
-    }
-
     result<void>
     writer::finish()
     {

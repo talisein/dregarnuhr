@@ -52,7 +52,7 @@ namespace epub
         result<void> add_ncx();
         result<std::string> create_rootfile();
         result<void> start_book();
-
+        void make_toc(xmlpp::Element *nav_node, const xmlpp::Element *src_nav);
     private:
         using book_t = books_t::value_type::second_type;
         using reader_t = readers_t::value_type::second_type;

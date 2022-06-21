@@ -82,15 +82,29 @@ namespace
     }
 
     template<typename T>
-    result<xmlpp::ustring> find_attr(const xmlpp::ustring& xpath,
-                                     const xmlpp::Element::PrefixNsMap& map,
-                                     const T ele,
-                                     const std::string &filename)
+    result<xmlpp::ustring> find_attr_required(const xmlpp::ustring& xpath,
+                                              const xmlpp::Element::PrefixNsMap& map,
+                                              const T ele,
+                                              const std::string &filename)
     {
         OUTCOME_TRY(auto set, find(xpath, map, ele, filename));
         auto attr = dynamic_cast<const xmlpp::Attribute*>(set.front());
         if (!attr) {
             log_error("Not an attribute: ", xpath);
+            return std::errc::invalid_argument;
+        }
+        return attr->get_value();
+    }
+
+    template<typename T>
+    result<xmlpp::ustring> find_attr(const xmlpp::ustring& xpath,
+                                     const xmlpp::Element::PrefixNsMap& map,
+                                     const T ele,
+                                     const std::string &filename)
+    {
+        OUTCOME_TRY(auto set, find_quiet(xpath, map, ele, filename));
+        auto attr = dynamic_cast<const xmlpp::Attribute*>(set.front());
+        if (!attr) {
             return std::errc::invalid_argument;
         }
         return attr->get_value();
@@ -202,11 +216,11 @@ namespace epub
             return std::errc::identifier_removed;
         }
 
-        OUTCOME_TRY(auto tocncx, find_attr("/opf:package/opf:spine/@toc", map, root, rootfile_path));
+        OUTCOME_TRY(auto tocncx, find_attr_required("/opf:package/opf:spine/@toc", map, root, rootfile_path));
         log_verbose(rootfile_path, ": toc: ", tocncx);
 
         using namespace std::string_literals;
-        OUTCOME_TRY(auto toc_href, find_attr("/opf:package/opf:manifest/opf:item[@id='"s + tocncx + "']/@href"s , map, root, rootfile_path));
+        OUTCOME_TRY(auto toc_href, find_attr_required("/opf:package/opf:manifest/opf:item[@id='"s + tocncx + "']/@href"s , map, root, rootfile_path));
 
         std::string prefix = rootfile_path.substr(0, rootfile_path.find_last_of('/'));
         std::string toc_path = prefix + "/"s + toc_href;
@@ -217,14 +231,31 @@ namespace epub
         manifest.toc_relpath = toc_href;
         OUTCOME_TRY(auto items, find("/opf:package/opf:manifest/opf:item", map, root, rootfile_path));
         for (const auto &item : items) {
-            OUTCOME_TRY(auto id, find_attr("@id", map, item, rootfile_path));
-            OUTCOME_TRY(auto href, find_attr("@href", map, item, rootfile_path));
-            OUTCOME_TRY(auto media_type, find_attr("@media-type", map, item, rootfile_path));
+            OUTCOME_TRY(auto id, find_attr_required("@id", map, item, rootfile_path));
+            OUTCOME_TRY(auto href, find_attr_required("@href", map, item, rootfile_path));
+            OUTCOME_TRY(auto media_type, find_attr_required("@media-type", map, item, rootfile_path));
+            auto props_node = find_attr("@properties", map, item, rootfile_path);
+            std::optional<std::string> properties;
+            std::optional<std::string> spine_properties;
+            bool is_linear = false;
+            bool in_spine = false;
+            if (props_node) {
+                properties = std::make_optional<std::string>(props_node.value());
+            }
             auto itemref = find_quiet("/opf:package/opf:spine/opf:itemref[@idref='"s + id + "']", map, root, rootfile_path);
+            if (itemref) {
+                in_spine = true;
+                auto linear = find_attr("@linear", map, itemref.value().front(), rootfile_path);
+                is_linear = linear.has_value();
+                auto props = find_attr("@properties", map, itemref.value().front(), rootfile_path);
+                if (props.has_value()) {
+                    spine_properties = std::make_optional<std::string>(spine_properties.value());
+                }
+            }
             if (manifest.toc.has_entry(href)) {
-                manifest.items.emplace_back(id, href, media_type, manifest.toc.get_label(href), itemref.has_value());
+                manifest.items.emplace_back(id, href, media_type, manifest.toc.get_label(href), properties, spine_properties, in_spine, is_linear);
             } else {
-                manifest.items.emplace_back(id, href, media_type, std::nullopt, itemref.has_value());
+                manifest.items.emplace_back(id, href, media_type, std::nullopt, properties, spine_properties, in_spine, is_linear);
             }
         }
 
@@ -266,10 +297,10 @@ namespace epub
         map.insert({"dtb", "http://www.daisy.org/z3986/2005/ncx/"});
 
         // dtb_uid
-        OUTCOME_TRY(toc.dtb_uid, find_attr("/dtb:ncx/dtb:head/dtb:meta[@name='dtb:uid']/@content", map, root, toc_path));
+        OUTCOME_TRY(toc.dtb_uid, find_attr_required("/dtb:ncx/dtb:head/dtb:meta[@name='dtb:uid']/@content", map, root, toc_path));
 
         // dtb_depth
-        OUTCOME_TRY(toc.dtb_depth, find_attr("/dtb:ncx/dtb:head/dtb:meta[@name='dtb:depth']/@content", map, root, toc_path));
+        OUTCOME_TRY(toc.dtb_depth, find_attr_required("/dtb:ncx/dtb:head/dtb:meta[@name='dtb:depth']/@content", map, root, toc_path));
 
         // title
         OUTCOME_TRY(toc.title, find_textnode("/dtb:ncx/dtb:docTitle/dtb:text/text()", map, root, toc_path));
@@ -283,7 +314,7 @@ namespace epub
             toc::toc_entry entry;
             xmlpp::Node::const_NodeSet entryset;
             OUTCOME_TRY(entry.label, find_textnode("dtb:navLabel/dtb:text/text()", map, node, toc_path));
-            OUTCOME_TRY(entry.content, find_attr("dtb:content/@src", map, node, toc_path));
+            OUTCOME_TRY(entry.content, find_attr_required("dtb:content/@src", map, node, toc_path));
             toc.entries.push_back(std::move(entry));
         }
 
@@ -311,7 +342,7 @@ namespace epub
         try {
             xmlpp::Element::PrefixNsMap map;
             map.insert({"c", "urn:oasis:names:tc:opendocument:xmlns:container"});
-            OUTCOME_TRY(auto content_path, find_attr("/c:container/c:rootfiles/c:rootfile/@full-path", map, root, "META-INF/container.xml"));
+            OUTCOME_TRY(auto content_path, find_attr_required("/c:container/c:rootfiles/c:rootfile/@full-path", map, root, "META-INF/container.xml"));
             log_verbose("META-INF/container.xml: rootfile: ", content_path);
 
             return content_path;

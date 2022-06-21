@@ -2,6 +2,7 @@
 #include <ranges>
 #include <span>
 #include <set>
+#include <string>
 
 #include "bookmaker.h"
 #include "volumes.h"
@@ -12,7 +13,7 @@
 #include "part4.h"
 #include "outcome/utils.hpp"
 #include "outcome/try.hpp"
-#include "jpeglib.h"
+#include "jpeg.h"
 #include "libxml++/validators/dtdvalidator.h"
 #include "libxml++/validators/relaxngvalidator.h"
 #include "dtd.h"
@@ -156,8 +157,8 @@ namespace epub
         // Next is the root file, but we need to create it from the definition
         const std::string rootfile_path = base_book.rootfile_path;
         basefiles.remove(base_book.rootfile_path);
-        OUTCOME_TRY(auto rootfile_buf, create_rootfile());
-        OUTCOME_TRY(writer.add(rootfile_path, rootfile_buf));
+        OUTCOME_TRY(const auto rootfile_buf, create_rootfile());
+        OUTCOME_TRY(writer.add(rootfile_path, std::span<const char>(rootfile_buf)));
         return outcome::success();
     }
 
@@ -166,70 +167,122 @@ namespace epub
     book_writer::create_rootfile()
     {
         xmlpp::Document doc;
+        OUTCOME_TRY(const auto base_vol, identify_volume(base_book.manifest.toc.dtb_uid));
         OUTCOME_TRY(auto idx, base_reader->zip.locate_file(base_book.rootfile_path.c_str()));
         OUTCOME_TRY(epub::file_reader f, base_reader->zip.extract_stream(idx));
-        OUTCOME_TRY(const auto metadata_src, base_reader->get_metadata(f.get_doc()));
-        auto src_root = f.get_doc()->get_root_node();
-        auto src_root_attrs = src_root->get_attributes();
+        auto base_root = f.get_doc()->get_root_node();
+        auto base_root_attrs = base_root->get_attributes();
         auto root = doc.create_root_node_by_import(f.get_doc()->get_root_node(), false);
-        for (const auto& attr : src_root_attrs) {
+        for (const auto& attr : base_root_attrs) {
             root->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
         }
-        root->set_namespace_declaration(src_root->get_namespace_uri(), src_root->get_namespace_prefix());
-        auto metadata_node = root->import_node(metadata_src, true);
-        auto mynode = metadata_node->get_first_child()->get_parent()->add_child_element("contributor", "dc");
-        mynode->set_attribute("id", "contributor01");
-        mynode->set_first_child_text("talisein");
-        auto manifest = root->add_child_element("manifest");
-        for (const auto &it : definition) {
-            auto item = manifest->add_child_element("item");
-            item->set_attribute("id", xmlpp::ustring(it.id));
-
-            // basebook just stay in normal place
-            OUTCOME_TRY(auto base_vol, identify_volume(base_book.manifest.toc.dtb_uid));
-            if (it.vol == base_vol) {
-            // toc.ncx will stay in OEBPS
-//            if (it.href == base_book.manifest.toc_relpath) {
-                item->set_attribute("href", xmlpp::ustring(it.href));
-            } else {
-                xmlpp::ustring href(to_string_view(it.vol));
-                href.append("/").append(it.href);
-                item->set_attribute("href", href);
-            }
-
-            item->set_attribute("media-type", xmlpp::ustring(it.mediatype));
-            // TODO: make generic
-            if (it.id == "Cover.jpg") {
-                item->set_attribute("properties", "cover-image");
-            }
-            if (it.id == "toc" || it.id == "toc.xhtml") {
-                item->set_attribute("properties", "nav");
-            }
-        }
-
-        auto src_root_children = src_root->get_children();
-        for (auto child : src_root_children) {
-            if (child->get_name() == "spine") {
-                auto spine = dynamic_cast<xmlpp::Element*>(root->import_node(child, false));
-                for (auto attr : child->get_first_child()->get_parent()->get_attributes()) {
+        root->set_namespace_declaration(base_root->get_namespace_uri(), base_root->get_namespace_prefix());
+        for (auto base_child : base_root->get_children()) {
+            if (base_child->get_name() == "spine") {
+                auto spine = dynamic_cast<xmlpp::Element*>(root->import_node(base_child, false));
+                for (auto attr : base_child->get_first_child()->get_parent()->get_attributes()) {
                     spine->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
                 }
-
                 for (const auto &def : definition | std::ranges::views::filter([](const auto& x){return x.in_spine;})) {
+                    { // filters and transformations. TODO: move this to get_definitions()
+                        const auto& src_reader = src_readers.find(def.vol)->second;
+                        const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
+                        auto src {root};
+                        src.append(def.href);
+
+                        if (get_options()->size_filter) {
+                            const auto src_idx = src_reader->zip.locate_file(src.c_str()).value();
+                            const auto src_stat = src_reader->zip.stat(src_idx).value();
+                            if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
+                                continue;
+                            }
+                        }
+                        if (get_options()->name_filter) {
+                            if (std::regex_search(src, get_options()->name_filter.value())) {
+                                continue;
+                            }
+                        }
+                    }
+
                     auto itemref = spine->add_child_element("itemref");
                     itemref->set_attribute("idref", xmlpp::ustring(def.id));
-                    if (def.id == "toc") {
-                        itemref->set_attribute("linear", "yes");
+                    //meow
+                    auto src_book = src_books.find(def.vol);
+                    auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&id = def.id](const auto &item) { return item.id == id; });
+                    if (src_iter != std::end(src_book->second.manifest.items)) {
+                        if (src_iter->spine_properties) {
+                            itemref->set_attribute("properties", src_iter->spine_properties.value());
+                        }
+                        if (src_iter->is_linear) {
+                            itemref->set_attribute("linear", "yes");
+                        }
                     }
                 }
-            } else if (child->get_name() == "guide") {
-                root->import_node(child, true);
+            } else if (base_child->get_name() == "metadata") {
+                OUTCOME_TRY(const auto base_metadata, base_reader->get_metadata(f.get_doc()));
+                auto metadata_node = dynamic_cast<xmlpp::Element*>(root->import_node(base_metadata, true));
+                auto contributor = metadata_node->add_child_element("contributor", "dc");
+                contributor->set_attribute("id", "contributor01");
+                contributor->set_first_child_text("talisein");
+            } else if (base_child->get_name() == "manifest") {
+                auto manifest = root->add_child_element("manifest");
+                for (const auto &def : definition) {
+                    { // filters and transformations. TODO: move this to get_definitions()
+                        const auto& src_reader = src_readers.find(def.vol)->second;
+                        const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
+                        auto src {root};
+                        src.append(def.href);
+
+                        if (get_options()->size_filter) {
+                            const auto src_idx = src_reader->zip.locate_file(src.c_str()).value();
+                            const auto src_stat = src_reader->zip.stat(src_idx).value();
+                            if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
+                                continue;
+                            }
+                        }
+                        if (get_options()->name_filter) {
+                            if (std::regex_search(src, get_options()->name_filter.value())) {
+                                continue;
+                            }
+                        }
+                    }
+
+                    const auto src_book = src_books.find(def.vol);
+                    auto item = manifest->add_child_element("item");
+                    item->set_attribute("id", xmlpp::ustring(def.id));
+                    // basebook just stay in normal place
+                    if (def.vol == base_vol) {
+                        // toc.ncx will stay in OEBPS
+//                  if (def.href == base_book.manifest.toc_relpath) {
+                        item->set_attribute("href", xmlpp::ustring(def.href));
+                    } else {
+                        xmlpp::ustring href(to_string_view(def.vol));
+                        href.append("/").append(def.href);
+                        item->set_attribute("href", href);
+                    }
+
+                    item->set_attribute("media-type", xmlpp::ustring(def.mediatype));
+
+                    // TODO: Maybe just use the source for most of the above properties
+                    auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&id = def.id](const auto &item) {
+                            return id == item.id;
+                        });
+                    if (src_iter != src_book->second.manifest.items.end() && src_iter->properties) {
+                        item->set_attribute("properties", src_iter->properties.value());
+                    }
+                }
+            } else if (base_child->get_name() == "guide") {
+                root->import_node(base_child, true);
+            } else {
+                auto x = dynamic_cast<const xmlpp::TextNode*>(base_child);
+                if (!x) {
+                    log_info("Unexpected epub package node ", base_child->get_name());
+                    root->import_node(base_child, true);
+                }
             }
         }
-        xmlpp::RelaxNGValidator validator;
-//        auto schema = DTD::get_package();
-//        validator.set_schema(&schema, false);
-//        validator.validate(&doc);
+
+        // TODO: Validation
         return doc.write_to_string_formatted();
     }
 
@@ -241,7 +294,7 @@ namespace epub
         if (it == basefiles.end()) { log_error("Couldn't find toc in original?"); return std::errc::no_such_file_or_directory; }
         basefiles.remove(toc_fullpath);
         OUTCOME_TRY(auto toc_buf, create_ncx(toc_fullpath));
-        OUTCOME_TRY(writer.add(toc_fullpath, toc_buf));
+        OUTCOME_TRY(writer.add(toc_fullpath, std::span<const char>(toc_buf)));
         return outcome::success();
     }
 
@@ -267,6 +320,30 @@ namespace epub
         std::stringstream ss;
         for (const auto& def : definition
                  | std::ranges::views::filter([](const auto& def) { return def.toc_label.has_value(); })) {
+            // Filters & Transformations
+            {
+                const auto& src_reader = src_readers.find(def.vol)->second;
+                const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
+                auto src {root};
+                src.append(def.href);
+
+                if (get_options()->size_filter) {//meow
+                    src.append(def.href);
+                    OUTCOME_TRY(const auto src_idx, src_reader->zip.locate_file(src.c_str()));
+                    OUTCOME_TRY(const auto src_stat, src_reader->zip.stat(src_idx));
+                    if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
+                        log_info("Filter: ", to_string_view(def.vol), " ", src, " filtered for size ", src_stat.m_uncomp_size);
+                        basefiles.remove(src);
+                        continue;
+                    }
+                }
+                if (get_options()->name_filter) {
+                    if (std::regex_search(src, get_options()->name_filter.value())) {
+                        continue;
+                    }
+                }
+            }
+
             auto navPoint = navmap->add_child_element("navPoint");
             ss.str("");
             ss << "navPoint" << point++;
@@ -275,7 +352,13 @@ namespace epub
             auto text = navLabel->add_child_element("text");
             text->add_child_text(xmlpp::ustring(*def.toc_label));
             auto content = navPoint->add_child_element("content");
-            content->set_attribute("src", xmlpp::ustring(def.href));
+            ss.str("");
+            if (vol == def.vol) {
+                ss << def.href;
+            } else {
+                ss << to_string_view(def.vol) << "/" << def.href;
+            }
+            content->set_attribute("src", ss.str());
         }
 
         return doc.write_to_string_formatted();
@@ -292,12 +375,20 @@ namespace epub
                 OUTCOME_TRY(add_ncx());
                 continue;
             }
-            auto reader_it = src_readers.find(def.vol);
-            if (src_readers.end() == reader_it) {
+            auto src_reader_iter = src_readers.find(def.vol);
+            if (src_readers.end() == src_reader_iter) {
                 log_verbose("Volume ", to_string_view(def.vol), " is unavailable. Skipping insertion.");
                 continue;
             }
-            auto& reader = reader_it->second;
+            const auto& src_reader = src_reader_iter->second;
+            const auto& src_book = src_books.find(def.vol)->second;
+            const auto& src_item = std::ranges::find_if(src_book.manifest.items, [&id = def.id](const auto &item) { return id == item.id; });
+            std::optional<manifest::item> item;
+            if (std::end(src_book.manifest.items) != src_item) {
+                item = std::make_optional<manifest::item>(*src_item);
+            }
+
+            // Determine src and dst paths. dst will be e.g. OEBPS/FB1/Text. Basebook is just OEBPS/Text
             const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
             auto src {root};
             src.append(def.href);
@@ -308,9 +399,11 @@ namespace epub
             if (def.vol == vol) {
                 dst.assign(src);
             }
+
+            // Filters & Transformations
             if (get_options()->size_filter) {
-                OUTCOME_TRY(const auto src_idx, reader->zip.locate_file(src.c_str()));
-                OUTCOME_TRY(const auto src_stat, reader->zip.stat(src_idx));
+                OUTCOME_TRY(const auto src_idx, src_reader->zip.locate_file(src.c_str()));
+                OUTCOME_TRY(const auto src_stat, src_reader->zip.stat(src_idx));
                 if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
                     log_info("Filter: ", to_string_view(def.vol), " ", src, " filtered for size ", src_stat.m_uncomp_size);
                     basefiles.remove(src);
@@ -324,54 +417,144 @@ namespace epub
                     continue;
                   }
             }
-            if (src.ends_with(".jpg") && get_options()->jpg_quality) {
-                OUTCOME_TRY(const auto idx, reader->zip.locate_file(src.c_str()));
-                OUTCOME_TRY(const auto buf, reader->zip.extract_raw(idx));
-                struct jpeg_decompress_struct dinfo;
-                struct jpeg_compress_struct cinfo;
-                struct jpeg_error_mgr cjerr;
-                struct jpeg_error_mgr djerr;
-                cinfo.err = jpeg_std_error(&cjerr);
-                dinfo.err = jpeg_std_error(&djerr);
-                jpeg_create_compress(&cinfo);
-                jpeg_create_decompress(&dinfo);
-                jpeg_mem_src(&dinfo, buf.data(), buf.size());
-                unsigned char* outbuf = nullptr;
-                unsigned long outbuf_len = 0;
-                jpeg_mem_dest(&cinfo, &outbuf, &outbuf_len);
-                jpeg_read_header(&dinfo, true);
-                jpeg_calc_output_dimensions(&dinfo);
-                cinfo.image_width = dinfo.image_width;
-                cinfo.image_height = dinfo.image_height;
-                cinfo.input_components = dinfo.output_components;
-                cinfo.in_color_space = dinfo.out_color_space;
-                jpeg_set_defaults(&cinfo);
-                jpeg_set_quality(&cinfo, get_options()->jpg_quality.value(), true);
-                jpeg_start_decompress(&dinfo);
-                jpeg_start_compress(&cinfo, true);
-                auto row_stride = dinfo.output_width * dinfo.output_components;
-                auto buffer = (*dinfo.mem->alloc_sarray) ((j_common_ptr)&dinfo, JPOOL_IMAGE, row_stride, 1);
-                while (dinfo.output_scanline < dinfo.output_height) {
-                    auto dim_read = jpeg_read_scanlines(&dinfo, buffer, 1);
-                    auto dim_wrote [[maybe_unused]] = jpeg_write_scanlines(&cinfo, buffer, dim_read);
-                }
-                jpeg_finish_decompress(&dinfo);
-                jpeg_finish_compress(&cinfo);
-                jpeg_destroy_decompress(&dinfo);
-                OUTCOME_TRY(writer.add(src, std::span<const char>(reinterpret_cast<char*>(outbuf), outbuf_len)));
+            if (src.ends_with(".jpg") && (get_options()->jpg_quality || get_options()->jpg_scale)) {
+                OUTCOME_TRY(const auto idx, src_reader->zip.locate_file(src.c_str()));
+                OUTCOME_TRY(const auto buf, src_reader->zip.extract_raw(idx));
+                jpeg::compressor comp;
+                jpeg::decompressor decomp {buf};
+                OUTCOME_TRY(const auto outbuf, comp.compress_from(decomp, get_options()->jpg_quality, get_options()->jpg_scale));
+                OUTCOME_TRY(writer.add(dst, outbuf));
                 basefiles.remove(src);
                 continue;
             }
-            OUTCOME_TRY(writer.copy_from(reader->zip, src, dst));
+
+            // toc.xhtml needs to be rewritten
+            if (item && item->properties.has_value() && item->properties.value() == "nav") {
+                OUTCOME_TRY(const auto src_idx, src_reader->zip.locate_file(src.c_str()));
+                OUTCOME_TRY(auto src_streambuf, src_reader->zip.extract_stream(src_idx));
+                std::istream src_stream(&src_streambuf);
+                xmlpp::DomParser src_parser;
+                src_parser.parse_stream(src_stream);
+                xmlpp::Document doc;
+                auto src_root = src_parser.get_document()->get_root_node();
+                auto root = doc.create_root_node_by_import(src_root, false);
+                root->set_namespace_declaration(src_root->get_namespace_uri());
+                root->set_namespace_declaration("http://www.idpf.org/2007/ops", "epub");
+                for (auto attr : src_root->get_attributes()) {
+                    root->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+                }
+                auto dtd = src_parser.get_document()->get_internal_subset();
+                doc.set_internal_subset(dtd->get_name(), dtd->get_external_id(), dtd->get_system_id());
+                for (const auto& src_root_child : src_root->get_children()) {
+                    if (src_root_child->get_name() == "head") {
+                        root->import_node(src_root_child, true);
+                    } else if (src_root_child->get_name() == "body") {
+                        auto body = dynamic_cast<xmlpp::Element*>(root->import_node(src_root_child, false));
+                        for (const auto &src_iter : src_root_child->get_children()) {
+                            if (src_iter->get_name() == "nav") {
+                                auto srcattr = dynamic_cast<xmlpp::Element*>(src_iter)->get_attribute("type", "epub");
+                                boolean is_toc = srcattr->get_value() == "toc";
+                                if (is_toc) {
+                                    auto nav = dynamic_cast<xmlpp::Element*>(body->import_node(src_iter, false));
+                                    for (const auto &attr : dynamic_cast<xmlpp::Element*>(src_iter)->get_attributes()) {
+                                        nav->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+                                    }
+                                    make_toc(nav, dynamic_cast<xmlpp::Element*>(src_iter));
+                                } else {
+                                    body->import_node(src_iter, true);
+                                }
+                            }
+                        }
+                    }
+                }
+                auto str = doc.write_to_string();
+                OUTCOME_TRY(writer.add(dst, std::span<const char>(str)));
+                basefiles.remove(src);
+                continue;
+            }
+
+            // No special case, just copy it.
+            OUTCOME_TRY(writer.copy_from(src_reader->zip, src, dst));
             basefiles.remove(src);
             continue;
         }
-        for (auto src : basefiles) {
-            // P2V4extra8
-            log_info("Warning: left over file in src: ", src, ". This is ok if it was moved to an earlier volume.");
+
+        static const std::list<std::pair<volume, std::string>> expected_leftovers {
+            std::make_pair(volume::P2V4, "OEBPS/Text/extra8.xhtml"),
+            std::make_pair(volume::P4V2, "OEBPS/Text/chapter21.xhtml")
+        };
+        for (auto src : basefiles | std::ranges::views::filter([this](auto const &basefile) { return std::end(expected_leftovers) == std::ranges::find(expected_leftovers, std::make_pair(vol, basefile)); })) {
+            log_info("Warning: left over file in src ", to_string_view(vol), ": ", src);
         }
         OUTCOME_TRY(writer.finish());
         return outcome::success();
+    }
+
+    void
+    book_writer::make_toc(xmlpp::Element *nav, const xmlpp::Element* src_nav)
+    {
+        for (const auto &child : src_nav->get_children()) {
+            if (child->get_name() != "ol") {
+                nav->import_node(child, true);
+                continue;
+            }
+            auto ol = dynamic_cast<xmlpp::Element*>(nav->import_node(child, false));
+            for (const auto& attr : dynamic_cast<const xmlpp::Element*>(child)->get_attributes()) {
+                ol->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+            }
+            auto idx = 1;
+            std::stringstream ss;
+            for (const auto& def : definition | std::ranges::views::filter([](const definition_t::value_type& def){ return def.toc_label.has_value(); }) ) {
+                { // filters and transformations. TODO: move this to get_definitions()
+                    const auto& src_reader = src_readers.find(def.vol)->second;
+                    const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
+                    auto src {root};
+                    src.append(def.href);
+
+                    if (get_options()->size_filter) {
+                        const auto src_idx = src_reader->zip.locate_file(src.c_str()).value();
+                        const auto src_stat = src_reader->zip.stat(src_idx).value();
+                        if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
+                            continue;
+                        }
+                    }
+                    if (get_options()->name_filter) {
+                        if (std::regex_search(src, get_options()->name_filter.value())) {
+                            continue;
+                        }
+                    }
+                }
+
+                xmlpp::Element::PrefixNsMap map;
+                map.insert({"html", "http://www.w3.org/1999/xhtml"});
+                using namespace std::string_literals;
+                xmlpp::Node::const_NodeSet set = src_nav->find("html:ol/html:li/html:a[@href='../"s + std::string(def.href) + "']"s, map);
+                if (set.empty()) { // Sometimes it is "chapter1.html" instead of "../Text/chapter1.html"
+                    set = src_nav->find("html:ol/html:li/html:a[@href='"s + std::string(def.href.substr(def.href.find_last_of('/')+1)) + "']"s, map);
+                }
+                auto li = ol->add_child_element("li");
+                if (!set.empty() && def.vol == vol) {
+                    auto src_li = dynamic_cast<const xmlpp::Element*>(set.front()->get_parent());
+                    for (const auto &attr : src_li->get_attributes()) {
+                        li->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+                    }
+                } else {
+                    ss.str("");
+                    ss << "chrono-chapter" << idx++;
+                    li->set_attribute("class", "toc-chapter");
+                    li->set_attribute("id", ss.str());
+                }
+                auto a = li->add_child_element("a");
+                ss.str("");
+                if (def.vol == vol) { // basevol has same path
+                    ss << "../" << def.href;
+                } else {
+                    ss << "../" << to_string_view(def.vol) << "/" << def.href;
+                }
+                a->set_attribute("href", ss.str());
+                a->add_child_text(xmlpp::ustring(def.toc_label.value()));
+            }
+        }
     }
 
     result<fs::path>

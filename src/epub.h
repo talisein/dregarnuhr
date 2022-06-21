@@ -48,7 +48,10 @@ namespace epub
             std::string href;
             std::string media_type;
             std::optional<std::string> toc_label;
+            std::optional<std::string> properties;
+            std::optional<std::string> spine_properties;
             bool in_spine;
+            bool is_linear;
         };
 
         std::list<item> items;

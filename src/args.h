@@ -30,6 +30,7 @@ struct args
     std::optional<std::size_t> size_filter;
     std::optional<std::regex> name_filter;
     std::optional<int> jpg_quality;
+    std::optional<int> jpg_scale;
 };
 
 
