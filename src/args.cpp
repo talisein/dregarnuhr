@@ -186,13 +186,15 @@ parse(int argc, char **argv)
     }
     if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--jpg-quality="sv); }); it != args_options.end()) {
         auto pos = it->find("="sv);
-        auto i = std::atoi(it->substr(pos+1).begin());
+        std::string quality(it->substr(pos+1));
+        auto i = std::stoi(quality);
         options.jpg_quality = std::make_optional<int>( i );
         log_info("JPG quality will be ", options.jpg_quality.value());
     }
     if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--jpg-scale="sv); }); it != args_options.end()) {
         auto pos = it->find("="sv);
-        auto i = std::atoi(it->substr(pos+1).begin());
+        std::string scale(it->substr(pos+1));
+        auto i = std::stoi(scale);
         options.jpg_scale = std::make_optional<int>( i );
         log_info("JPG scale will be ", options.jpg_scale.value());
     }
