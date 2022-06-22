@@ -4,7 +4,7 @@ project('dregarnuhr', ['c', 'cpp'],
         default_options : ['c_std=gnu17',
                            'cpp_std=gnu++20',
                            'buildtype=release',
-                           'cpp_eh=s'])
+                           'cpp_eh=a'])
 
 if host_machine.system() == 'linux'
   add_global_arguments('-D_LARGEFILE64_SOURCE', language: 'c')
@@ -19,12 +19,7 @@ cpp_compiler.has_header_symbol('version', '__cpp_concepts', required: true)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_functions', required: true)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip')
 
-jpeg_dep = dependency('libjpeg', fallback: ['libjpeg-turbo'])
-
-if '1' != cpp_compiler.get_define('MEM_SRCDST_SUPPORTED', dependencies: jpeg_dep, prefix: '#include "jconfig.h"')
-  jpeg_sp = subproject('libjpeg-turbo')
-  jpeg_dep = jpeg_sp.get_variable(jpeg_dep)
-endif
+jpeg_dep = dependency('libjpeg', version: '>=2.1.0', fallback: ['libjpeg-turbo'])
 
 zlib_dep = dependency('zlib', fallback: ['zlib'])
 
