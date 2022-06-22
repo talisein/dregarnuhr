@@ -60,12 +60,20 @@ enum class chapter_uniqueness
     MULTIPLE
 };
 
-
+enum class omnibus
+{
+    PART1,
+    PART2,
+    PART3,
+    PART4,
+    ALL
+};
 
 OUTCOME_V2_NAMESPACE::result<volume> identify_volume(std::string_view uid);
 std::string_view to_string_view(volume vol);
 
 std::ostream& operator<<(std::ostream& os, const volume& v);
+std::ostream& operator<<(std::ostream& os, const omnibus& v);
 
 struct volume_definition;
 chapter_type get_chapter_type(const volume_definition& v);

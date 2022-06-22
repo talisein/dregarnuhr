@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <variant>
 #include "epub.h"
 #include "volumes.h"
 
@@ -20,6 +21,7 @@ namespace epub
 
         result<void> make_books();
     private:
+        result<void> make_books_impl(const definition_t def, std::variant<volume, omnibus> base);
 
     result<void>
     make_book_impl(volume vol,

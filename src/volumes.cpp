@@ -196,3 +196,26 @@ volume_definition::get_chapter_type() const
     log_error("Unclassified chapter type in ", vol, " for ", href);
     return CHAPTER;
 }
+
+std::ostream& operator<<(std::ostream& os, const omnibus& v)
+{
+    switch (v) {
+        case omnibus::PART1:
+            os << "Part 1";
+            break;
+        case omnibus::PART2:
+            os << "Part 2";
+            break;
+        case omnibus::PART3:
+            os << "Part 3";
+            break;
+        case omnibus::PART4:
+            os << "Part 4";
+            break;
+        case omnibus::ALL:
+            os << "All";
+            break;
+    }
+
+    return os;
+}

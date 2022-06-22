@@ -4,7 +4,7 @@
 #include <optional>
 #include <regex>
 #include "outcome/result.hpp"
-
+#include "volumes.h"
 
 namespace fs = std::filesystem;
 namespace outcome = OUTCOME_V2_NAMESPACE;
@@ -19,6 +19,7 @@ struct args
         TEST
     } command;
 
+
     std::optional<std::string> dump_volume;
     std::optional<std::string> prefix;
     std::optional<std::string> suffix;
@@ -31,6 +32,7 @@ struct args
     std::optional<std::regex> name_filter;
     std::optional<int> jpg_quality;
     std::optional<int> jpg_scale;
+    std::optional<omnibus> omnibus_type;
 };
 
 

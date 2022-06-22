@@ -1,6 +1,7 @@
 #include <set>
 #include <vector>
 #include <algorithm>
+#include <sstream>
 #include "part3.h"
 
 namespace
@@ -459,6 +460,8 @@ constexpr std::array vol_5 = std::to_array<const volume_definition>({
     }
 }) };
 
+    std::set <std::string> ids;
+
     std::vector<volume_definition> _make_part_3()
     {
         std::vector<volume_definition> x;
@@ -479,6 +482,16 @@ constexpr std::array vol_5 = std::to_array<const volume_definition>({
                     }
                 }
             }
+        }
+        int unique = 0;
+        std::stringstream ss;
+        for (auto &def : x) {
+            if (std::string_view::npos != def.mediatype.find("dtbncx") || std::string_view::npos != def.href.find("toc.xhtml"))
+                continue;
+            ss.str("");
+            ss << "unique-" << unique++ << "-" << def.id;
+            auto iter = ids.insert(ss.str());
+            def.id = *iter.first;
         }
        return x;
     }

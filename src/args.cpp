@@ -1,5 +1,6 @@
 #include <ranges>
 #include <string>
+#include <locale>
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -157,6 +158,7 @@ parse(int argc, char **argv)
         }
         log_info("Info: Filename prefix set to ", std::quoted(*options.prefix));
     }
+
     if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--filter="sv); }); it != args_options.end()) {
         const auto filters = it->substr(it->find("="sv)+1);
         // Size
@@ -197,6 +199,31 @@ parse(int argc, char **argv)
         auto i = std::stoi(scale);
         options.jpg_scale = std::make_optional<int>( i );
         log_info("JPG scale will be ", options.jpg_scale.value());
+    }
+    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--omnibus"sv); }); it != args_options.end()) {
+        auto pos = it->find("="sv);
+        if (std::string_view::npos == pos) {
+            options.omnibus_type = omnibus::ALL;
+        } else {
+            auto locale = std::locale();
+            std::string type (it->substr(pos+1));
+            std::ranges::transform(it->substr(pos+1), type.begin(), [&locale](const auto c){ return std::tolower(c, locale); });
+            if (type == "part1") {
+                options.omnibus_type = omnibus::PART1;
+            } else if (type == "part2") {
+                options.omnibus_type = omnibus::PART2;
+            } else if (type == "part3") {
+                options.omnibus_type = omnibus::PART3;
+            } else if (type == "part4") {
+                options.omnibus_type = omnibus::PART4;
+            } else if (type == "all") {
+                options.omnibus_type = omnibus::ALL;
+            } else {
+                log_error("Unrecognized omnibus value: ", type);
+                return std::errc::invalid_argument;
+            }
+            log_info("Omnibus ", *options.omnibus_type, " selected.");
+        }
     }
 
     if (!options.prefix && !options.suffix) {

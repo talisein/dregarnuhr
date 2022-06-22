@@ -42,14 +42,28 @@ namespace {
             volume::P4V7,
         });
 
-    enum class omnibus
+    constexpr epub::definition_t get_definition_view(omnibus o)
     {
-        PART1,
-        PART2,
-        PART3,
-        PART4,
-        ALL
-    };
+        switch (o)
+        {
+            case omnibus::PART1:
+                assert(false);
+                return part_3::get_part_3();
+            case omnibus::PART2:
+                assert(false);
+                return part_3::get_part_3();
+            case omnibus::PART3:
+                return part_3::get_part_3();
+            case omnibus::PART4:
+                assert(false);
+                return part_3::get_part_3();
+            case omnibus::ALL:
+                assert(false);
+                return part_3::get_part_3();
+        }
+        assert(false);
+        return part_3::get_part_3();
+    }
 
     constexpr epub::definition_t get_definition_view(volume v)
     {
@@ -530,36 +544,58 @@ namespace epub
             throw e;
         }
     }
+    template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+    // changes must be mirrored above
+    result<void>
+    bookmaker::make_books_impl(definition_t view, std::variant<volume, omnibus> base)
+    {
+        std::set<volume> located_inputs;
+        for (const auto& def : view) {
+            if (src_books.end() != src_books.find(def.vol))
+                located_inputs.insert(def.vol);
+        }
+
+        if (located_inputs.size() == 0) {
+            std::visit([](auto&& arg) { log_verbose("Info: No inputs to make ", arg); }, base);
+            return std::errc::no_such_file_or_directory;
+        }
+
+        try {
+            auto res = std::visit(overloaded {
+                    [&](omnibus o) { book_writer writer(view.begin()->vol, src_books, src_readers, view); return writer.make_book(); },
+                    [&](volume v) { book_writer writer(v, src_books, src_readers, view); return writer.make_book();}
+                }, base);
+            if (res.has_error()) {
+                std::visit([&](auto&& arg) { log_error("Couldn't make ", arg, ": ", res.error().message(), ". Moving on..."); }, base);
+                return res.as_failure();
+            } else {
+                std::visit([&](auto&& arg) { log_info("Created chronologically ordered ", arg, ": ", res.value() ); }, base);
+                return outcome::success();
+            }
+        } catch (std::exception& e) {
+            std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg, ": ", e.what(), ". Moving on..."); }, base);
+            return outcome::error_from_exception();
+        }
+    }
 
     result<void>
     bookmaker::make_books()
     {
         int created_books = 0;
-        for (auto defined_volume : defined_volumes) {
-            const definition_t view = get_definition_view(defined_volume);
-            std::set<volume> located_inputs;
-            for (const auto& def : view) {
-                if (src_books.end() != src_books.find(def.vol))
-                    located_inputs.insert(def.vol);
+
+        if (get_options()->omnibus_type) {
+            auto res = make_books_impl(get_definition_view(get_options()->omnibus_type.value()), *get_options()->omnibus_type);
+            if (res) {
+                ++created_books;
             }
-            if (located_inputs.size() == 0) {
-                log_verbose("Info: No inputs to make ", to_string_view(defined_volume));
-                continue;
-            }
-            try {
-                book_writer writer(defined_volume, src_books, src_readers, view);
-                auto res = writer.make_book();
-                if (res.has_error()) {
-                    log_error("Couldn't make ", to_string_view(defined_volume), ": ", res.error().message(), ". Moving on...");
-                } else {
-                    log_info("Created chronologically ordered ", to_string_view(defined_volume), ": ", res.value() );
+        } else {
+            for (auto defined_volume : defined_volumes) {
+                auto res = make_books_impl(get_definition_view(defined_volume), defined_volume);
+                if (res) {
                     ++created_books;
                 }
-            } catch (std::exception& e) {
-                log_error("Couldn't make writer for ", to_string_view(defined_volume), ": ", e.what(), ". Moving on...");
             }
         }
-
         if (0 == created_books) {
             log_info("Sorry, no books could be created.");
             return std::errc::no_such_file_or_directory;
@@ -572,9 +608,5 @@ namespace epub
             src_books(std::move(books)),
             src_readers(std::move(book_readers))
     {
-
-        for (const auto &it : part_3::get_part_3()) {
-            log_info(it);
-        }
     }
 }
