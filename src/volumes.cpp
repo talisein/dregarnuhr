@@ -1,8 +1,10 @@
 #include <string_view>
 #include <map>
+#include <regex>
 #include <cassert>
 #include "outcome/result.hpp"
 #include "volumes.h"
+#include "log.h"
 
 namespace {
     using namespace std::string_view_literals;
@@ -29,6 +31,24 @@ namespace {
         {"9781718346352"sv, volume::P4V6},
         {"9781718346376"sv, volume::P4V7},
     };
+
+    const std::regex cover_regex             {"cover.xhtml", std::regex_constants::icase};
+    const std::regex frontmatter_regex       {"text/front", std::regex_constants::icase};
+    const std::regex chapter_regex           {"(chapter|prologue|epilogue|x[0-9_]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
+    const std::regex map_ehrenfest_regex     {"map.xhtml", std::regex_constants::icase}; // can also use toc_label but this works for now
+    const std::regex map_yurgenschmidt_regex {"map2.xhtml", std::regex_constants::icase};
+    const std::regex family_tree_regex       {"tree.xhtml", std::regex_constants::icase};
+    const std::regex afterword_regex         {"afterword.xhtml", std::regex_constants::icase};
+    const std::regex manga_regex             {"text/manga", std::regex_constants::icase};
+    const std::regex poll_regex              {"text/poll", std::regex_constants::icase};
+    const std::regex bonus_regex             {"text/bonus", std::regex_constants::icase};
+    const std::regex copyright_regex         {"text/copyright", std::regex_constants::icase};
+    const std::regex ncx_regex               {"dtbncx", std::regex_constants::icase}; // mediatype
+    const std::regex stylesheet_regex        {"css", std::regex_constants::icase};
+    const std::regex image_regex             {"image/", std::regex_constants::icase}; //mediatype
+    const std::regex toc_regex               {"toc.xhtml", std::regex_constants::icase};
+    const std::regex characters_regex        {"text/character", std::regex_constants::icase};
+    const std::regex signup_regex            {"text/signup", std::regex_constants::icase};
 }
 
 std::string_view to_string_view(volume vol)
@@ -62,6 +82,7 @@ std::string_view to_string_view(volume vol)
     return "UNKNOWN"sv;
 }
 
+
 OUTCOME_V2_NAMESPACE::result<volume>
 identify_volume(std::string_view uid)
 {
@@ -70,4 +91,108 @@ identify_volume(std::string_view uid)
         return std::errc::invalid_argument;
     }
     return iter->second;
+}
+
+std::ostream& operator<<(std::ostream& os, const volume& v)
+{
+    os << to_string_view(v);
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const volume_definition& v)
+{
+    os << "{ volume::" << v.vol << ", " << std::quoted(v.id) << ", " << std::quoted(v.href)
+       << ", " << std::quoted(v.mediatype) << ", ";
+    if (v.toc_label)
+        os << std::quoted(v.toc_label.value());
+    else
+        os << "std::nullopt";
+    os << ", " << std::boolalpha << v.in_spine << " }";
+    return os;
+}
+
+chapter_uniqueness
+get_uniqueness(chapter_type c)
+{
+    switch (c)
+    {
+        case COVER:
+        case CHARACTERS:
+        case TOC:
+        case NCX:
+        case MAP_EHRENFEST:
+        case MAP_YURGENSCHMIDT:
+        case FAMILY_TREE:
+        case SIGNUP:
+        case COPYRIGHT: return chapter_uniqueness::SINGLE;
+        case CHAPTER:
+        case IMAGE:
+        case STYLESHEET:
+        case MANGA:
+        case AFTERWORD:
+        case POLL:
+        case BONUS:
+        case FRONTMATTER: return chapter_uniqueness::MULTIPLE;
+    }
+    assert(false);
+    return chapter_uniqueness::MULTIPLE;
+}
+
+chapter_type
+volume_definition::get_chapter_type() const
+{
+    if (std::regex_search(mediatype.begin(), mediatype.end(), image_regex)) {
+        return IMAGE;
+    }
+    if (std::regex_search(mediatype.begin(), mediatype.end(), ncx_regex)) {
+        return NCX;
+    }
+    if (std::regex_search(mediatype.begin(), mediatype.end(), stylesheet_regex)) {
+        return STYLESHEET;
+    }
+    if (std::regex_search(href.begin(), href.end(), chapter_regex)) {
+        return CHAPTER;
+    }
+    if (std::regex_search(href.begin(), href.end(), cover_regex)) {
+        return COVER;
+    }
+    if (std::regex_search(href.begin(), href.end(), frontmatter_regex)) {
+        return FRONTMATTER;
+    }
+    if (std::regex_search(href.begin(), href.end(), map_ehrenfest_regex)) {
+        return MAP_EHRENFEST;
+    }
+    if (std::regex_search(href.begin(), href.end(), map_yurgenschmidt_regex)) {
+        return MAP_YURGENSCHMIDT;
+    }
+    if (std::regex_search(href.begin(), href.end(), family_tree_regex)) {
+        return FAMILY_TREE;
+    }
+    if (std::regex_search(href.begin(), href.end(), afterword_regex)) {
+        return AFTERWORD;
+    }
+    if (std::regex_search(href.begin(), href.end(), manga_regex)) {
+        return MANGA;
+    }
+    if (std::regex_search(href.begin(), href.end(), poll_regex)) {
+        return POLL;
+    }
+    if (std::regex_search(href.begin(), href.end(), bonus_regex)) {
+        return BONUS;
+    }
+    if (std::regex_search(href.begin(), href.end(), copyright_regex)) {
+        return COPYRIGHT;
+    }
+    if (std::regex_search(href.begin(), href.end(), toc_regex)) {
+        return TOC;
+    }
+    if (std::regex_search(href.begin(), href.end(), characters_regex)) {
+        return CHARACTERS;
+    }
+    if (std::regex_search(href.begin(), href.end(), signup_regex)) {
+        return SIGNUP;
+    }
+
+    log_error("Unclassified chapter type in ", vol, " for ", href);
+    return CHAPTER;
 }

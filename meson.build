@@ -21,6 +21,11 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip')
 
 jpeg_dep = dependency('libjpeg', fallback: ['libjpeg-turbo'])
 
+if '1' != cpp_compiler.get_define('MEM_SRCDST_SUPPORTED', dependencies: jpeg_dep, prefix: '#include "jconfig.h"')
+  jpeg_sp = subproject('libjpeg-turbo')
+  jpeg_dep = jpeg_sp.get_variable(jpeg_dep)
+endif
+
 zlib_dep = dependency('zlib', fallback: ['zlib'])
 
 libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])

@@ -42,6 +42,15 @@ namespace {
             volume::P4V7,
         });
 
+    enum class omnibus
+    {
+        PART1,
+        PART2,
+        PART3,
+        PART4,
+        ALL
+    };
+
     constexpr epub::definition_t get_definition_view(volume v)
     {
         switch (v)
@@ -61,15 +70,15 @@ namespace {
             case volume::P2V4:
                 return std::span(part_2::vol_4.begin(), part_2::vol_4.end());
             case volume::P3V1:
-                return std::span(part_3::vol_1.begin(), part_3::vol_1.end());
+                return part_3::get_vol_1();
             case volume::P3V2:
-                return std::span(part_3::vol_2.begin(), part_3::vol_2.end());
+                return part_3::get_vol_2();
             case volume::P3V3:
-                return std::span(part_3::vol_3.begin(), part_3::vol_3.end());
+                return part_3::get_vol_3();
             case volume::P3V4:
-                return std::span(part_3::vol_4.begin(), part_3::vol_4.end());
+                return part_3::get_vol_4();
             case volume::P3V5:
-                return std::span(part_3::vol_5.begin(), part_3::vol_5.end());
+                return part_3::get_vol_5();
             case volume::P4V1:
                 return std::span(part_4::vol_1.begin(), part_4::vol_1.end());
             case volume::P4V2:
@@ -93,6 +102,32 @@ namespace {
               }
         assert(false);
         return std::span(part_1::vol_1.end(), part_1::vol_1.end());
+    }
+
+    auto get_filtered_defs(epub::definition_t defs, const epub::books_t& src_books, const epub::readers_t& src_readers)
+    {
+        return std::ranges::views::filter(defs, [&src_books, &src_readers](const volume_definition& def) {
+            const auto& src_reader = src_readers.find(def.vol)->second;
+            const auto& src_book = src_books.find(def.vol)->second;
+            const auto root = src_book.rootfile_path.substr(0, src_book.rootfile_path.find_first_of('/')+1);
+            auto src {root};
+            src.append(def.href);
+
+            if (get_options()->size_filter) {
+                const auto src_idx = src_reader->zip.locate_file(src.c_str()).value();
+                const auto src_stat = src_reader->zip.stat(src_idx).value();
+                if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
+                    return false;
+                }
+            }
+
+            if (get_options()->name_filter) {
+                if (std::regex_search(src, get_options()->name_filter.value())) {
+                    return false;
+                }
+            }
+            return true;
+        });
     }
 
 
@@ -183,32 +218,12 @@ namespace epub
                 for (auto attr : base_child->get_first_child()->get_parent()->get_attributes()) {
                     spine->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
                 }
-                for (const auto &def : definition | std::ranges::views::filter([](const auto& x){return x.in_spine;})) {
-                    { // filters and transformations. TODO: move this to get_definitions()
-                        const auto& src_reader = src_readers.find(def.vol)->second;
-                        const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
-                        auto src {root};
-                        src.append(def.href);
-
-                        if (get_options()->size_filter) {
-                            const auto src_idx = src_reader->zip.locate_file(src.c_str()).value();
-                            const auto src_stat = src_reader->zip.stat(src_idx).value();
-                            if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
-                                continue;
-                            }
-                        }
-                        if (get_options()->name_filter) {
-                            if (std::regex_search(src, get_options()->name_filter.value())) {
-                                continue;
-                            }
-                        }
-                    }
-
+                for (const auto &def : get_filtered_defs(definition, src_books, src_readers) | std::ranges::views::filter([](const auto& x){return x.in_spine;})) {
                     auto itemref = spine->add_child_element("itemref");
                     itemref->set_attribute("idref", xmlpp::ustring(def.id));
                     //meow
                     auto src_book = src_books.find(def.vol);
-                    auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&id = def.id](const auto &item) { return item.id == id; });
+                    auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&def](const auto &item) { return item.id == def.id; });
                     if (src_iter != std::end(src_book->second.manifest.items)) {
                         if (src_iter->spine_properties) {
                             itemref->set_attribute("properties", src_iter->spine_properties.value());
@@ -226,27 +241,7 @@ namespace epub
                 contributor->set_first_child_text("talisein");
             } else if (base_child->get_name() == "manifest") {
                 auto manifest = root->add_child_element("manifest");
-                for (const auto &def : definition) {
-                    { // filters and transformations. TODO: move this to get_definitions()
-                        const auto& src_reader = src_readers.find(def.vol)->second;
-                        const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
-                        auto src {root};
-                        src.append(def.href);
-
-                        if (get_options()->size_filter) {
-                            const auto src_idx = src_reader->zip.locate_file(src.c_str()).value();
-                            const auto src_stat = src_reader->zip.stat(src_idx).value();
-                            if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
-                                continue;
-                            }
-                        }
-                        if (get_options()->name_filter) {
-                            if (std::regex_search(src, get_options()->name_filter.value())) {
-                                continue;
-                            }
-                        }
-                    }
-
+                for (const auto &def : get_filtered_defs(definition, src_books, src_readers)) {
                     const auto src_book = src_books.find(def.vol);
                     auto item = manifest->add_child_element("item");
                     item->set_attribute("id", xmlpp::ustring(def.id));
@@ -264,8 +259,8 @@ namespace epub
                     item->set_attribute("media-type", xmlpp::ustring(def.mediatype));
 
                     // TODO: Maybe just use the source for most of the above properties
-                    auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&id = def.id](const auto &item) {
-                            return id == item.id;
+                    auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&def](const auto &item) {
+                            return def.id == item.id;
                         });
                     if (src_iter != src_book->second.manifest.items.end() && src_iter->properties) {
                         item->set_attribute("properties", src_iter->properties.value());
@@ -318,32 +313,8 @@ namespace epub
         auto navmap = root->add_child_element("navMap");
         int point = 1;
         std::stringstream ss;
-        for (const auto& def : definition
+        for (const auto& def : get_filtered_defs(definition, src_books, src_readers)
                  | std::ranges::views::filter([](const auto& def) { return def.toc_label.has_value(); })) {
-            // Filters & Transformations
-            {
-                const auto& src_reader = src_readers.find(def.vol)->second;
-                const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
-                auto src {root};
-                src.append(def.href);
-
-                if (get_options()->size_filter) {//meow
-                    src.append(def.href);
-                    OUTCOME_TRY(const auto src_idx, src_reader->zip.locate_file(src.c_str()));
-                    OUTCOME_TRY(const auto src_stat, src_reader->zip.stat(src_idx));
-                    if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
-                        log_info("Filter: ", to_string_view(def.vol), " ", src, " filtered for size ", src_stat.m_uncomp_size);
-                        basefiles.remove(src);
-                        continue;
-                    }
-                }
-                if (get_options()->name_filter) {
-                    if (std::regex_search(src, get_options()->name_filter.value())) {
-                        continue;
-                    }
-                }
-            }
-
             auto navPoint = navmap->add_child_element("navPoint");
             ss.str("");
             ss << "navPoint" << point++;
@@ -368,7 +339,7 @@ namespace epub
     book_writer::make_book_impl()
     {
         OUTCOME_TRY(start_book());
-        for (const volume_definition& def : definition)
+        for (const volume_definition& def : get_filtered_defs(definition, src_books, src_readers))
 //                     | std::ranges::views::filter([&base_book](const volume_definition& def) { return def.href != base_book.manifest.toc_relpath; }))
         {
             if (def.href == base_book.manifest.toc_relpath) {
@@ -400,23 +371,7 @@ namespace epub
                 dst.assign(src);
             }
 
-            // Filters & Transformations
-            if (get_options()->size_filter) {
-                OUTCOME_TRY(const auto src_idx, src_reader->zip.locate_file(src.c_str()));
-                OUTCOME_TRY(const auto src_stat, src_reader->zip.stat(src_idx));
-                if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
-                    log_info("Filter: ", to_string_view(def.vol), " ", src, " filtered for size ", src_stat.m_uncomp_size);
-                    basefiles.remove(src);
-                    continue;
-                }
-            }
-            if (get_options()->name_filter) {
-                if (std::regex_search(src, get_options()->name_filter.value())) {
-                    log_info("Filter: ", to_string_view(def.vol), " ", src, " filtered for name");
-                    basefiles.remove(src);
-                    continue;
-                  }
-            }
+            // Transformations
             if (src.ends_with(".jpg") && (get_options()->jpg_quality || get_options()->jpg_scale)) {
                 OUTCOME_TRY(const auto idx, src_reader->zip.locate_file(src.c_str()));
                 OUTCOME_TRY(const auto buf, src_reader->zip.extract_raw(idx));
@@ -504,27 +459,7 @@ namespace epub
             }
             auto idx = 1;
             std::stringstream ss;
-            for (const auto& def : definition | std::ranges::views::filter([](const definition_t::value_type& def){ return def.toc_label.has_value(); }) ) {
-                { // filters and transformations. TODO: move this to get_definitions()
-                    const auto& src_reader = src_readers.find(def.vol)->second;
-                    const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
-                    auto src {root};
-                    src.append(def.href);
-
-                    if (get_options()->size_filter) {
-                        const auto src_idx = src_reader->zip.locate_file(src.c_str()).value();
-                        const auto src_stat = src_reader->zip.stat(src_idx).value();
-                        if (src_stat.m_uncomp_size > get_options()->size_filter.value()) {
-                            continue;
-                        }
-                    }
-                    if (get_options()->name_filter) {
-                        if (std::regex_search(src, get_options()->name_filter.value())) {
-                            continue;
-                        }
-                    }
-                }
-
+            for (const auto& def : get_filtered_defs(definition, src_books, src_readers) | std::ranges::views::filter([](const definition_t::value_type& def){ return def.toc_label.has_value(); }) ) {
                 xmlpp::Element::PrefixNsMap map;
                 map.insert({"html", "http://www.w3.org/1999/xhtml"});
                 using namespace std::string_literals;
@@ -637,5 +572,9 @@ namespace epub
             src_books(std::move(books)),
             src_readers(std::move(book_readers))
     {
+
+        for (const auto &it : part_3::get_part_3()) {
+            log_info(it);
+        }
     }
 }
