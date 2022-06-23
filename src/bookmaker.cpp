@@ -291,13 +291,13 @@ namespace epub
                             return def.href == item.href;
                         });
                     if (src_iter != src_book->second.manifest.items.end() && src_iter->properties) {
-                        if (get_options()->omnibus_type) {
+                        if (src_iter->properties.value() != "cover-image" || !get_options()->omnibus_type.has_value()) {
+                            item->set_attribute("properties", src_iter->properties.value());
+                        } else if (src_iter->properties.value() == "cover-image" && get_options()->omnibus_type) {
                             static bool seen_cover = false;
-                            if (!seen_cover && src_iter->properties.value() == "cover-image") {
+                            if (!seen_cover) {
                                 item->set_attribute("properties", src_iter->properties.value());
                                 seen_cover = true;
-                            } else {
-                                item->set_attribute("properties", src_iter->properties.value());
                             }
                         }
                     }

@@ -20,7 +20,7 @@ output. Dregarnuhr is available for Windows, Mac, and Linux.
 - I don't have a mac to test the mac version on. Let me know if it works.
 
 # Examples
-The simplest invockation of dregarnuhr takes an input directory with your
+The simplest invocation of dregarnuhr takes an input directory with your
 bookworm epubs, and an output directory name to generate the new epubs in. As
 long as your epubs have a ".epub" extension, the metadata will be read to
 identify the volume.
@@ -50,7 +50,6 @@ are about 3MiB large, a good improvement over the 30MiB originals.
 To create a single epub omnibus containing all your volumes:
 ```
 # dregarnuhr --omnibus --prefix=omnibus- ~/Documents/Myne out
-
 ```
 That creates a 650MiB file if you have everything from P1V1 to P4V7! If you want a 50MiB slim version:
 ```
