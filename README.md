@@ -51,9 +51,16 @@ To create a single epub omnibus containing all your volumes:
 ```
 # dregarnuhr --omnibus --prefix=omnibus- ~/Documents/Myne out
 ```
+
 That creates a 650MiB file if you have everything from P1V1 to P4V7! If you want a 50MiB slim version:
 ```
 # dregarnuhr --omnibus --prefix=omnibus- --suffix=-slim --jpg-quality=75 --jpg-scale=2 "--filter=name=bonus[0-9].(jpg|xhtml)"   ~/Documents/Myne out
+```
+
+You can add a custom cover image. It must be a JPEG. An examine is in the
+covers/ directory of this repo. Custom covers are only for an omnibus.
+```
+dregarnuhr --omnibus --cover=cover.jpg ~/Documents/Myne out
 ```
 
 If you invoke the program several times, output files are never overwritten.
