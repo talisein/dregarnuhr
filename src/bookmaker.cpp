@@ -119,6 +119,12 @@ namespace {
     auto get_filtered_defs(epub::definition_t defs, const epub::books_t& src_books, const epub::readers_t& src_readers)
     {
         return std::ranges::views::filter(defs, [&src_books, &src_readers](const volume_definition& def) {
+            // Filter out sources we don't have available
+            const auto& src_book_iter = src_books.find(def.vol);
+            if (std::end(src_books) == src_book_iter) {
+                return false;
+            }
+
             const auto& src_reader = src_readers.find(def.vol)->second;
             const auto& src_book = src_books.find(def.vol)->second;
             const auto root = src_book.rootfile_path.substr(0, src_book.rootfile_path.find_first_of('/')+1);
