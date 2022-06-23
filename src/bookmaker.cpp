@@ -47,16 +47,13 @@ namespace {
         switch (o)
         {
             case omnibus::PART1:
-                assert(false);
-                return part_3::get_part_3();
+                return part_1::get_part_1();
             case omnibus::PART2:
-                assert(false);
-                return part_3::get_part_3();
+                return part_2::get_part_2();
             case omnibus::PART3:
                 return part_3::get_part_3();
             case omnibus::PART4:
-                assert(false);
-                return part_3::get_part_3();
+                return part_4::get_part_4();
             case omnibus::ALL:
                 assert(false);
                 return part_3::get_part_3();
@@ -70,19 +67,19 @@ namespace {
         switch (v)
         {
             case volume::P1V1:
-                return std::span(part_1::vol_1.begin(), part_1::vol_1.end());
+                return part_1::get_vol_1();
             case volume::P1V2:
-                return std::span(part_1::vol_2.begin(), part_1::vol_2.end());
+                return part_1::get_vol_2();
             case volume::P1V3:
-                return std::span(part_1::vol_3.begin(), part_1::vol_3.end());
+                return part_1::get_vol_3();
             case volume::P2V1:
-                return std::span(part_2::vol_1.begin(), part_2::vol_1.end());
+                return part_2::get_vol_1();
             case volume::P2V2:
-                return std::span(part_2::vol_2.begin(), part_2::vol_2.end());
+                return part_2::get_vol_2();
             case volume::P2V3:
-                return std::span(part_2::vol_3.begin(), part_2::vol_3.end());
+                return part_2::get_vol_3();
             case volume::P2V4:
-                return std::span(part_2::vol_4.begin(), part_2::vol_4.end());
+                return part_2::get_vol_4();
             case volume::P3V1:
                 return part_3::get_vol_1();
             case volume::P3V2:
@@ -94,28 +91,28 @@ namespace {
             case volume::P3V5:
                 return part_3::get_vol_5();
             case volume::P4V1:
-                return std::span(part_4::vol_1.begin(), part_4::vol_1.end());
+                return part_4::get_vol_1();
             case volume::P4V2:
-                return std::span(part_4::vol_2.begin(), part_4::vol_2.end());
+                return part_4::get_vol_2();
             case volume::P4V3:
-                return std::span(part_4::vol_3.begin(), part_4::vol_3.end());
+                return part_4::get_vol_3();
             case volume::P4V4:
-                return std::span(part_4::vol_4.begin(), part_4::vol_4.end());
+                return part_4::get_vol_4();
             case volume::P4V5:
-                return std::span(part_4::vol_5.begin(), part_4::vol_5.end());
+                return part_4::get_vol_5();
             case volume::P4V6:
-                return std::span(part_4::vol_6.begin(), part_4::vol_6.end());
+                return part_4::get_vol_6();
             case volume::P4V7:
-                return std::span(part_4::vol_7.begin(), part_4::vol_7.end());
-            case volume::P4V8:
-                return std::span(part_4::vol_8.begin(), part_4::vol_8.end());
+                return part_4::get_vol_7();
+            case volume::P4V8: [[fallthrough]];
             case volume::FB1: [[fallthrough]];
             case volume::FB2: [[fallthrough]];
             case volume::RA1:
                 assert(false);
               }
         assert(false);
-        return std::span(part_1::vol_1.end(), part_1::vol_1.end());
+        auto x = part_1::get_vol_1();
+        return std::span(x.end(), x.end());
     }
 
     auto get_filtered_defs(epub::definition_t defs, const epub::books_t& src_books, const epub::readers_t& src_readers)

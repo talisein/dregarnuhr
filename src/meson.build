@@ -17,7 +17,11 @@ src = ['main.cpp',
        'bookmaker.cpp',
        'dtd.cpp',
        'jpeg.cpp',
+       'part1.cpp',
+       'part2.cpp',
        'part3.cpp',
+       'part4.cpp',
+       'utils.cpp'
       ]
 
 exe = executable('dregarnuhr', src,

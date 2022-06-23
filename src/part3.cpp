@@ -1,8 +1,9 @@
 #include <set>
 #include <vector>
 #include <algorithm>
-#include <sstream>
+#include <ranges>
 #include "part3.h"
+#include "utils.h"
 
 namespace
 {
@@ -438,62 +439,17 @@ constexpr std::array vol_5 = std::to_array<const volume_definition>({
         std::span(vol_1), std::span(vol_2), std::span(vol_3), std::span(vol_4), std::span(vol_5)
     });
 
-    auto _part_3_view { std::ranges::views::filter(std::ranges::join_view(_part_3_list), [chap_set = std::set<chapter_type>{}, style_set = std::set<volume>{}](const volume_definition& def) mutable {
-    if (get_uniqueness(def.get_chapter_type()) == chapter_uniqueness::SINGLE ) {
-        if (chap_set.contains(def.get_chapter_type())) {
-            return false;
-        } else {
-            chap_set.insert(def.get_chapter_type());
-            return true;
-        }
-    } else {
-        if (def.get_chapter_type() == STYLESHEET) {
-            if (style_set.contains(def.vol)) {
-                return false;
-            } else {
-                style_set.insert(def.vol);
-                return true;
-            }
-        } else {
-            return true;
-        }
-    }
-}) };
-
-    std::set <std::string> ids;
+    std::set<std::string> string_set;
 
     std::vector<volume_definition> _make_part_3()
     {
         std::vector<volume_definition> x;
         x.reserve(vol_1.size() + vol_2.size() + vol_3.size() + vol_4.size() + vol_5.size());
-        std::ranges::copy(std::begin(_part_3_view), std::end(_part_3_view), std::back_inserter(x));
+        auto view { std::ranges::views::filter(std::ranges::join_view(_part_3_list), utils::filter_chapter_stylesheet{}) };
+        std::ranges::transform(view, std::back_inserter(x), utils::transform_unique_ids{string_set, "part3"});
         std::ranges::stable_sort(x);
-        std::optional<std::string_view> prev_label = std::nullopt;
-        for (auto &def : x) {
-            if (!prev_label) {
-                prev_label = def.toc_label;
-                continue;
-            } else {
-                if (def.toc_label) {
-                    if (prev_label.value() == def.toc_label.value()) {
-                        def.toc_label = std::nullopt;
-                    } else {
-                        prev_label = def.toc_label;
-                    }
-                }
-            }
-        }
-        int unique = 0;
-        std::stringstream ss;
-        for (auto &def : x) {
-            if (std::string_view::npos != def.mediatype.find("dtbncx") || std::string_view::npos != def.href.find("toc.xhtml"))
-                continue;
-            ss.str("");
-            ss << "unique-" << unique++ << "-" << def.id;
-            auto iter = ids.insert(ss.str());
-            def.id = *iter.first;
-        }
-       return x;
+        std::ranges::for_each(x, utils::foreach_label{}); // Must be done in order after sort
+        return x;
     }
 
     const std::vector<volume_definition> _part_3 = _make_part_3();
