@@ -21,6 +21,7 @@ src = ['main.cpp',
        'part2.cpp',
        'part3.cpp',
        'part4.cpp',
+       'omnibus.cpp',
        'utils.cpp'
       ]
 

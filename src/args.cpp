@@ -27,6 +27,7 @@ namespace {
                  "input_dir : Directory where Ascendence of a Bookworm .epub files reside.\n",
                  "output_dir: Directory to output new .epub files. Must not be input_dir.\n\n",
                  "Options:\n",
+                 "--omnibus[=part1]\t: Create an omnibus epub. If you only want part2, use --omnibus=part2\n"
                  "--prefix=XXX\t: Created filenames will be prefixed with XXX. The default is ", std::quoted(DEFAULT_PREFIX), "\n",
                  "--suffix=XXX\t: Created filenames will be suffixed with XXX. The default is blank.\n",
                  "--verbose\t: Print a lot of debugging information\n",

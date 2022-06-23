@@ -12,6 +12,7 @@
 #include "part2.h"
 #include "part3.h"
 #include "part4.h"
+#include "omnibus.h"
 #include "outcome/utils.hpp"
 #include "outcome/try.hpp"
 #include "jpeg.h"
@@ -56,8 +57,7 @@ namespace {
             case omnibus::PART4:
                 return part_4::get_part_4();
             case omnibus::ALL:
-                assert(false);
-                return part_3::get_part_3();
+                return get_omnibus_definition();
         }
         assert(false);
         return part_3::get_part_3();
@@ -510,7 +510,14 @@ namespace epub
                     ss << "../" << to_string_view(def.vol) << "/" << def.href;
                 }
                 a->set_attribute("href", ss.str());
-                a->add_child_text(xmlpp::ustring(def.toc_label.value()));
+                if (get_options()->omnibus_type) {
+                    ss.str("");
+                    ss << def.vol << ": " << def.toc_label.value();
+                    a->add_child_text(ss.str());
+                } else {
+                    a->add_child_text(xmlpp::ustring(def.toc_label.value()));
+                }
+
             }
         }
     }
