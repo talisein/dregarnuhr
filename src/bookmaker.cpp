@@ -4,6 +4,7 @@
 #include <span>
 #include <set>
 #include <string>
+#include <fstream>
 
 #include "bookmaker.h"
 #include "volumes.h"
@@ -21,6 +22,25 @@
 #include "dtd.h"
 
 namespace {
+    const std::string_view USER_COVER_JPG_PATH {"Images/OverrideFrontCover.jpg"};
+    const std::string_view USER_COVER_XHTML_ID {"user_provided_cover.xhtml"};
+    const std::string_view USER_COVER_XHTML_PATH {"Text/OverrideFrontCover.xhtml"};
+    const std::string_view USER_COVER_XHTML_BODY {R"xml(<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="default-style"/>
+  <title>Ascendance of a Bookworm: Chronological Omnibus</title>
+  <link href="../Styles/stylesheet.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body class="nomargin center">
+  <section epub:type="cover">
+    <img alt="Cover" class="cover" src="../Images/OverrideFrontCover.jpg"/>
+  </section>
+</body>
+</html>)xml"};
 
     constinit std::array defined_volumes = std::to_array({
             volume::P1V1,
@@ -236,10 +256,14 @@ namespace epub
                 for (auto attr : base_child->get_first_child()->get_parent()->get_attributes()) {
                     spine->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
                 }
+                // Insert cover first
+                if (get_options()->omnibus_type && get_options()->cover) {
+                    auto itemref = spine->add_child_element("itemref");
+                    itemref->set_attribute("idref", xmlpp::ustring(USER_COVER_XHTML_ID));
+                }
                 for (const auto &def : get_filtered_defs(definition, src_books, src_readers) | std::ranges::views::filter([](const auto& x){return x.in_spine;})) {
                     auto itemref = spine->add_child_element("itemref");
                     itemref->set_attribute("idref", xmlpp::ustring(def.id));
-                    //meow
                     auto src_book = src_books.find(def.vol);
                     auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&def](const auto &item) { return item.href == def.href; });
                     if (src_iter != std::end(src_book->second.manifest.items)) {
@@ -268,7 +292,20 @@ namespace epub
                     }
                 }
             } else if (base_child->get_name() == "manifest") {
+                bool seen_cover = false;
                 auto manifest = root->add_child_element("manifest");
+                if (get_options()->omnibus_type && get_options()->cover) {
+                    seen_cover = true;
+                    {   auto item = manifest->add_child_element("item");
+                        item->set_attribute("id", "user_provided_cover.jpg");
+                        item->set_attribute("href", xmlpp::ustring(USER_COVER_JPG_PATH));
+                        item->set_attribute("media-type", "image/jpeg");
+                        item->set_attribute("properties", "cover-image"); }
+                    {   auto item = manifest->add_child_element("item");
+                        item->set_attribute("id", xmlpp::ustring(USER_COVER_XHTML_ID));
+                        item->set_attribute("href", xmlpp::ustring(USER_COVER_XHTML_PATH));
+                        item->set_attribute("media-type", "application/xhtml+xml"); }
+                }
                 for (const auto &def : get_filtered_defs(definition, src_books, src_readers)) {
                     const auto src_book = src_books.find(def.vol);
                     auto item = manifest->add_child_element("item");
@@ -294,7 +331,6 @@ namespace epub
                         if (src_iter->properties.value() != "cover-image" || !get_options()->omnibus_type.has_value()) {
                             item->set_attribute("properties", src_iter->properties.value());
                         } else if (src_iter->properties.value() == "cover-image" && get_options()->omnibus_type) {
-                            static bool seen_cover = false;
                             if (!seen_cover) {
                                 item->set_attribute("properties", src_iter->properties.value());
                                 seen_cover = true;
@@ -349,6 +385,18 @@ namespace epub
         auto navmap = root->add_child_element("navMap");
         int point = 1;
         std::stringstream ss;
+
+        // Insert cover here too
+        if (get_options()->omnibus_type && get_options()->cover) {
+            auto navPoint = navmap->add_child_element("navPoint");
+            ss << "navPoint" << point++;
+            navPoint->set_attribute("id", ss.str());
+            auto navLabel = navPoint->add_child_element("navLabel");
+            auto text = navLabel->add_child_element("text");
+            text->add_child_text(xmlpp::ustring("Omnibus Cover"));
+            auto content = navPoint->add_child_element("content");
+            content->set_attribute("src", xmlpp::ustring(USER_COVER_XHTML_PATH));
+        }
         for (const auto& def : get_filtered_defs(definition, src_books, src_readers)
                  | std::ranges::views::filter([](const auto& def) { return def.toc_label.has_value(); })) {
             auto navPoint = navmap->add_child_element("navPoint");
@@ -375,9 +423,57 @@ namespace epub
     book_writer::make_book_impl()
     {
         OUTCOME_TRY(start_book());
+        const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
+        // insert cover here too
+        if (get_options()->omnibus_type && get_options()->cover) {
+            auto dst {root};
+            dst.append(USER_COVER_XHTML_PATH);
+            std::span<const char> span { USER_COVER_XHTML_BODY.data(), USER_COVER_XHTML_BODY.size() };
+            OUTCOME_TRY(writer.add(dst, span));
+            dst.assign(root);
+            dst.append(USER_COVER_JPG_PATH);
+            try {
+                const auto len = fs::file_size(get_options()->cover.value());
+                std::ifstream cover_stream { get_options()->cover.value(), std::ios::in | std::ios::binary };
+                const auto begin = cover_stream.tellg();
+                cover_stream.exceptions(std::ios_base::badbit | std::ios_base::failbit);
+                std::unique_ptr<char[]> buf = std::make_unique<char[]>(len);
+                cover_stream.read(buf.get(), len);
+                if (std::cmp_not_equal(len, cover_stream.tellg() - begin)) {
+                    log_error("Incomplete read of omnibus cover: expected ", len, " not ", cover_stream.tellg());
+                    return std::errc::resource_unavailable_try_again;
+                }
+                OUTCOME_TRY(writer.add(dst, std::span<const char>(buf.get(), len)));;
+            } catch (std::exception& e) {
+                log_error("Couldn't insert omnibus cover image: ", e.what());
+                return outcome::error_from_exception();
+            }
+        }
+        // if (get_options()->omnibus_type) {
+        //     std::cout << "[";
+        // }
+        // auto filtered_defs = get_filtered_defs(definition, src_books, src_readers);
+        // const auto count_end = std::distance(filtered_defs.begin(), filtered_defs.end());
+        // const auto step = count_end / 75;
+        // std::remove_const_t<decltype(count_end)> count = 0;
+        // auto next = step;
+        // int next_pct = 20;
         for (const volume_definition& def : get_filtered_defs(definition, src_books, src_readers))
 //                     | std::ranges::views::filter([&base_book](const volume_definition& def) { return def.href != base_book.manifest.toc_relpath; }))
         {
+            // if (get_options()->omnibus_type) {
+            //     ++count;
+            //     if (std::cmp_equal(count, next)) {
+            //         auto pct = (count * 100) / count_end;
+            //         if (std::cmp_greater_equal(pct, next_pct)) {
+            //             std::cout << next_pct << '%';
+            //             next_pct += 20;
+            //         } else {
+            //             std::cout << '.';
+            //         }
+            //         next += step;
+            //     }
+            // }
             if (def.href == base_book.manifest.toc_relpath) {
                 OUTCOME_TRY(add_ncx());
                 continue;
@@ -474,7 +570,9 @@ namespace epub
             }
             continue;
         }
-
+//        if (get_options()->omnibus_type) {
+//            std::cout << "100%]\n";
+//        }
         static const std::list<std::pair<volume, std::string>> expected_leftovers {
             std::make_pair(volume::P2V4, "OEBPS/Text/extra8.xhtml"),
             std::make_pair(volume::P4V2, "OEBPS/Text/chapter21.xhtml")
@@ -500,6 +598,17 @@ namespace epub
             }
             auto idx = 1;
             std::stringstream ss;
+
+            // Insert cover here too
+            if (get_options()->omnibus_type && get_options()->cover) {
+                auto li = ol->add_child_element("li");
+                li->set_attribute("class", "toc-front");
+                li->set_attribute("id", "toc-omnibus-cover");
+                auto a = li->add_child_element("a");
+                ss << "../" << USER_COVER_XHTML_PATH;
+                a->set_attribute("href", ss.str());
+                a->add_child_text("Omnibus Cover");
+            }
             for (const auto& def : get_filtered_defs(definition, src_books, src_readers) | std::ranges::views::filter([](const definition_t::value_type& def){ return def.toc_label.has_value(); }) ) {
                 xmlpp::Element::PrefixNsMap map;
                 map.insert({"html", "http://www.w3.org/1999/xhtml"});

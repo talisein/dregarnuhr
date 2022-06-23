@@ -17,7 +17,7 @@ namespace utils
 
     struct transform_unique_ids
     {
-        transform_unique_ids(std::set<std::string>& set, std::string_view prefix) : m_set(set), m_prefix(prefix) {}
+        transform_unique_ids(std::set<std::string>& set, std::string_view prefix) : m_set(set), m_prefix(prefix), unique(0) {}
         transform_unique_ids(const transform_unique_ids& t) : m_set(t.m_set), m_prefix(t.m_prefix), unique(t.unique), ss() {};
         volume_definition operator()(volume_definition def);
 

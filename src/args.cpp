@@ -32,13 +32,14 @@ namespace {
                  "input_dir : Directory where Ascendence of a Bookworm .epub files reside.\n",
                  "output_dir: Directory to output new .epub files. Must not be input_dir.\n\n",
                  "Options:\n",
-                 "--omnibus[=part1]\t: Create an omnibus epub. If you only want part2, use --omnibus=part2\n"
-                 "--title=\"The Tiniest Bookworm in Yurgenschmidt\"\t: Set a title. Only for omnibus.\n"
+                 "--omnibus[=all]\t: Create an omnibus epub. If you only want part2, use --omnibus=part2\n"
+                 "--title=\"XXX\"\t: Set a title. Only for omnibus.\n"
+                 "--cover=XXX.jpg\t: Add a custom cover image. Only for omnibus.\n"
                  "--prefix=XXX\t: Created filenames will be prefixed with XXX. The default is ", std::quoted(DEFAULT_PREFIX), "\n",
                  "--suffix=XXX\t: Created filenames will be suffixed with XXX. The default is blank.\n",
                  "--verbose\t: Print a lot of debugging information\n",
-                 "--jpg-scale=[n]\t: Scale jpg images down by 1/n, where n is between 1-16\n",
-                 "--jpg-quality=[n]\t: Low jpg quality to n, where n is between 1-100\n"
+                 "--jpg-scale=N\t: Scale jpg images down by 1/N, where N is between 1-16\n",
+                 "--jpg-quality=N\t: Low jpg quality to n, where N is between 1-100\n"
                  "--mode=dump\t: Dump spine and toc data. Give a path to an epub file instead of a directory. This is mostly for development."
             );
     }
@@ -214,6 +215,7 @@ parse(int argc, char **argv)
             log_error("Setting a blank title seems like a mistake");
             return std::errc::invalid_argument;
         }
+        log_info("Title set to ", std::quoted(options.title.value()));
     }
     if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--omnibus"sv); }); it != args_options.end()) {
         auto pos = it->find("="sv);
@@ -259,6 +261,31 @@ parse(int argc, char **argv)
             }
             log_info("Omnibus title defaulted to: ", options.title.value());
         }
+    }
+    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--cover="sv); }); it != args_options.end()) {
+        auto pos = it->find("="sv);
+        auto path = fs::path(it->substr(pos+1));
+        std::error_code ec;
+        if (!fs::exists(path, ec) || ec) {
+            log_error("Cover ", path, " doesn't exist");
+            if (ec) return ec;
+            return std::errc::invalid_argument;
+        }
+        auto status = fs::status(path, ec);
+        if (ec) {
+            log_error("Cover ", path, " can't be read: ", ec.message());
+        }
+        if (status.type() != fs::file_type::regular) {
+            log_error("Cover ", path, " isn't a regular file");
+            if (ec) return ec;
+            return std::errc::invalid_argument;
+        }
+        const fs::path JPG {".jpg"};
+        if (path.extension() != JPG) {
+            log_error("Cover ", path, " isn't a .jpg");
+            return std::errc::invalid_argument;
+        }
+        options.cover = path;
     }
 
     if (!options.prefix && !options.suffix) {
