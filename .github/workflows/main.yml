@@ -20,6 +20,13 @@ jobs:
   build-linux:
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    env:
+      CC: gcc-12
+      CXX: g++-12
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -30,6 +37,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install meson g++-12 ninja-build
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
 
       - name: Cache subprojects
         id: meson-cache
@@ -59,6 +69,9 @@ jobs:
         with:
           name: dregarnuhr-linux
           path: build-linux/src/dregarnuhr
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
 
   build-mac:
     # The type of runner that the job will run on

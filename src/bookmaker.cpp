@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <ranges>
 #include <span>
 #include <set>
