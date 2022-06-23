@@ -15,7 +15,10 @@ output. Dregarnuhr is available for Windows, Mac, and Linux.
 
 # Limitations (TODOs)
 
-- There is no omnibus option yet.
+- If you make an omnibus, you need the first book.
+  - Missing volumes after that are ok (obviously, they will not be included)
+- The omnibus has the metadata of the first book, so the title will be "Part 1
+  Volume 1" in your ereader
 - I don't have a mac to test the mac version on. Let me know if it works.
 
 # Examples
@@ -43,7 +46,17 @@ filter out the xhtml pages that reference them. This recipe produces epubs that
 are about 3MiB large, a good improvement over the 30MiB originals.
 
 ```
-src/dregarnuhr --jpg-quality=75 --jpg-scale=2 '--filter=name=bonus[0-9].(jpg|xhtml)'  ~/Documents/Myne ~/Documents/Myne_out
+# src/dregarnuhr --jpg-quality=75 --jpg-scale=2 '--filter=name=bonus[0-9].(jpg|xhtml)'  ~/Documents/Myne ~/Documents/Myne_out
+```
+
+To create a single epub omnibus containing all your volumes:
+```
+# dregarnuhr --omnibus --prefix=omnibus- ~/Documents/Myne out
+
+```
+That creates a 650MiB file if you have everything from P1V1 to P4V7! If you want a 50MiB slim version:
+```
+# dregarnuhr --omnibus --prefix=omnibus- --suffix=-slim --jpg-quality=75 --jpg-scale=2 "--filter=name=bonus[0-9].(jpg|xhtml)"   ~/Documents/Myne out
 ```
 
 If you invoke the program several times, output files are never overwritten.
