@@ -17,8 +17,6 @@ output. Dregarnuhr is available for Windows, Mac, and Linux.
 
 - If you make an omnibus, you need the first book.
   - Missing volumes after that are ok (obviously, they will not be included)
-- The omnibus has the metadata of the first book, so the title will be "Part 1
-  Volume 1" in your ereader
 - I don't have a mac to test the mac version on. Let me know if it works.
 
 # Examples
