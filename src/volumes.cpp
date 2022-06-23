@@ -34,7 +34,7 @@ namespace {
 
     const std::regex cover_regex             {"cover.xhtml", std::regex_constants::icase};
     const std::regex frontmatter_regex       {"text/front", std::regex_constants::icase};
-    const std::regex chapter_regex           {"(chapter|prologue|epilogue|x[0-9_]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
+    const std::regex chapter_regex           {"(chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
     const std::regex map_ehrenfest_regex     {"map.xhtml", std::regex_constants::icase}; // can also use toc_label but this works for now
     const std::regex map_yurgenschmidt_regex {"map2.xhtml", std::regex_constants::icase};
     const std::regex family_tree_regex       {"tree.xhtml", std::regex_constants::icase};
@@ -117,7 +117,6 @@ get_uniqueness(chapter_type c)
     switch (c)
     {
         case COVER:
-        case CHARACTERS:
         case TOC:
         case NCX:
         case MAP_EHRENFEST:
@@ -125,6 +124,7 @@ get_uniqueness(chapter_type c)
         case FAMILY_TREE:
         case SIGNUP:
         case COPYRIGHT: return chapter_uniqueness::SINGLE;
+        case CHARACTERS:
         case CHAPTER:
         case IMAGE:
         case STYLESHEET:

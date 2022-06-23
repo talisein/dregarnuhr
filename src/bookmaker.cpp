@@ -442,7 +442,12 @@ namespace epub
 
             // No special case, just copy it.
             OUTCOME_TRY(writer.copy_from(src_reader->zip, src, dst));
-            basefiles.remove(src);
+            if (def.vol == vol) {
+                auto res = basefiles.remove(src);
+                if (1 != res) [[unlikely]] {
+                    log_error("Unexpectedly removed ", res, " sources named ", src);
+                }
+            }
             continue;
         }
 
