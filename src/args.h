@@ -23,6 +23,7 @@ struct args
     std::optional<std::string> dump_volume;
     std::optional<std::string> prefix;
     std::optional<std::string> suffix;
+    std::optional<std::string> title;
     fs::path input_file;
     fs::path input_dir;
     fs::path output_dir;

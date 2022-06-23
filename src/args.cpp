@@ -18,6 +18,11 @@ const args* get_options() { return &options; }
 namespace {
     using namespace std::string_view_literals;
     constinit std::string_view DEFAULT_PREFIX { "chronological-"sv };
+    constinit std::string_view DEFAULT_OMNIBUS_PART1_TITLE { "Ascendence of a Bookworm: Part 1 Chronological Omnibus"sv };
+    constinit std::string_view DEFAULT_OMNIBUS_PART2_TITLE { "Ascendence of a Bookworm: Part 2 Chronological Omnibus"sv };
+    constinit std::string_view DEFAULT_OMNIBUS_PART3_TITLE { "Ascendence of a Bookworm: Part 3 Chronological Omnibus"sv };
+    constinit std::string_view DEFAULT_OMNIBUS_PART4_TITLE { "Ascendence of a Bookworm: Part 4 Chronological Omnibus"sv };
+    constinit std::string_view DEFAULT_OMNIBUS_TITLE { "Ascendence of a Bookworm: Chronological Omnibus"sv };
 }
 
 namespace {
@@ -28,6 +33,7 @@ namespace {
                  "output_dir: Directory to output new .epub files. Must not be input_dir.\n\n",
                  "Options:\n",
                  "--omnibus[=part1]\t: Create an omnibus epub. If you only want part2, use --omnibus=part2\n"
+                 "--title=\"The Tiniest Bookworm in Yurgenschmidt\"\t: Set a title. Only for omnibus.\n"
                  "--prefix=XXX\t: Created filenames will be prefixed with XXX. The default is ", std::quoted(DEFAULT_PREFIX), "\n",
                  "--suffix=XXX\t: Created filenames will be suffixed with XXX. The default is blank.\n",
                  "--verbose\t: Print a lot of debugging information\n",
@@ -201,6 +207,14 @@ parse(int argc, char **argv)
         options.jpg_scale = std::make_optional<int>( i );
         log_info("JPG scale will be ", options.jpg_scale.value());
     }
+    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--title="sv); }); it != args_options.end()) {
+        auto pos = it->find("="sv);
+        options.title = std::make_optional<std::string>(it->substr(pos+1));
+        if (options.title.value().size() == 0) {
+            log_error("Setting a blank title seems like a mistake");
+            return std::errc::invalid_argument;
+        }
+    }
     if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--omnibus"sv); }); it != args_options.end()) {
         auto pos = it->find("="sv);
         if (std::string_view::npos == pos) {
@@ -224,6 +238,26 @@ parse(int argc, char **argv)
                 return std::errc::invalid_argument;
             }
             log_info("Omnibus ", *options.omnibus_type, " selected.");
+        }
+        if (!options.title) {
+            switch (options.omnibus_type.value()) {
+                case omnibus::PART1:
+                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART1_TITLE);
+                    break;
+                case omnibus::PART2:
+                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART2_TITLE);
+                    break;
+                case omnibus::PART3:
+                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART3_TITLE);
+                    break;
+                case omnibus::PART4:
+                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART4_TITLE);
+                    break;
+                case omnibus::ALL:
+                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_TITLE);
+                    break;
+            }
+            log_info("Omnibus title defaulted to: ", options.title.value());
         }
     }
 

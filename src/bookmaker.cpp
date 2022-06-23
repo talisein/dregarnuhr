@@ -241,7 +241,7 @@ namespace epub
                     itemref->set_attribute("idref", xmlpp::ustring(def.id));
                     //meow
                     auto src_book = src_books.find(def.vol);
-                    auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&def](const auto &item) { return item.id == def.id; });
+                    auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&def](const auto &item) { return item.href == def.href; });
                     if (src_iter != std::end(src_book->second.manifest.items)) {
                         if (src_iter->spine_properties) {
                             itemref->set_attribute("properties", src_iter->spine_properties.value());
@@ -257,6 +257,16 @@ namespace epub
                 auto contributor = metadata_node->add_child_element("contributor", "dc");
                 contributor->set_attribute("id", "contributor01");
                 contributor->set_first_child_text("talisein");
+                if (get_options()->omnibus_type) {
+                    xmlpp::Element::PrefixNsMap map;
+                    map.insert({"dc", "http://purl.org/dc/elements/1.1/"});
+                    xmlpp::Node::NodeSet set = metadata_node->find("dc:title", map);
+                    if (!set.empty()) {
+                        dynamic_cast<xmlpp::Element*>(set.front())->set_first_child_text(get_options()->title.value());
+                    } else {
+                        log_error("Can't find the metadata title..?");
+                    }
+                }
             } else if (base_child->get_name() == "manifest") {
                 auto manifest = root->add_child_element("manifest");
                 for (const auto &def : get_filtered_defs(definition, src_books, src_readers)) {
@@ -278,10 +288,18 @@ namespace epub
 
                     // TODO: Maybe just use the source for most of the above properties
                     auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&def](const auto &item) {
-                            return def.id == item.id;
+                            return def.href == item.href;
                         });
                     if (src_iter != src_book->second.manifest.items.end() && src_iter->properties) {
-                        item->set_attribute("properties", src_iter->properties.value());
+                        if (get_options()->omnibus_type) {
+                            static bool seen_cover = false;
+                            if (!seen_cover && src_iter->properties.value() == "cover-image") {
+                                item->set_attribute("properties", src_iter->properties.value());
+                                seen_cover = true;
+                            } else {
+                                item->set_attribute("properties", src_iter->properties.value());
+                            }
+                        }
                     }
                 }
             } else if (base_child->get_name() == "guide") {

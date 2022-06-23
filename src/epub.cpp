@@ -249,7 +249,7 @@ namespace epub
                 is_linear = linear.has_value();
                 auto props = find_attr("@properties", map, itemref.value().front(), rootfile_path);
                 if (props.has_value()) {
-                    spine_properties = std::make_optional<std::string>(spine_properties.value());
+                    spine_properties = std::make_optional<std::string>(props.value());
                 }
             }
             if (manifest.toc.has_entry(href)) {

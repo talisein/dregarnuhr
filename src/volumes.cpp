@@ -32,23 +32,25 @@ namespace {
         {"9781718346376"sv, volume::P4V7},
     };
 
-    const std::regex cover_regex             {"cover.xhtml", std::regex_constants::icase};
-    const std::regex frontmatter_regex       {"text/front", std::regex_constants::icase};
-    const std::regex chapter_regex           {"(chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
-    const std::regex map_ehrenfest_regex     {"map.xhtml", std::regex_constants::icase}; // can also use toc_label but this works for now
-    const std::regex map_yurgenschmidt_regex {"map2.xhtml", std::regex_constants::icase};
-    const std::regex family_tree_regex       {"tree.xhtml", std::regex_constants::icase};
-    const std::regex afterword_regex         {"afterword.xhtml", std::regex_constants::icase};
-    const std::regex manga_regex             {"text/manga", std::regex_constants::icase};
-    const std::regex poll_regex              {"text/poll", std::regex_constants::icase};
-    const std::regex bonus_regex             {"text/bonus", std::regex_constants::icase};
-    const std::regex copyright_regex         {"text/copyright", std::regex_constants::icase};
-    const std::regex ncx_regex               {"dtbncx", std::regex_constants::icase}; // mediatype
-    const std::regex stylesheet_regex        {"css", std::regex_constants::icase};
-    const std::regex image_regex             {"image/", std::regex_constants::icase}; //mediatype
-    const std::regex toc_regex               {"toc.xhtml", std::regex_constants::icase};
-    const std::regex characters_regex        {"text/character", std::regex_constants::icase};
-    const std::regex signup_regex            {"text/signup", std::regex_constants::icase};
+    const std::regex cover_regex                   {"cover.xhtml", std::regex_constants::icase};
+    const std::regex frontmatter_regex             {"text/front", std::regex_constants::icase};
+    const std::regex chapter_regex                 {"(cover.xhtml|text/character|chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
+    const std::regex map_ehrenfest_label_regex     {"Map of Ehrenfest", std::regex_constants::icase}; // can also use toc_label but this works for now
+    const std::regex map_yurgenschmidt_label_regex {"Map of Yurgenschmidt", std::regex_constants::icase};
+    const std::regex map_ehrenfest_href_regex      {"map.xhtml", std::regex_constants::icase}; // can also use toc_label but this works for now
+    const std::regex map_yurgenschmidt_href_regex  {"map2.xhtml", std::regex_constants::icase};
+    const std::regex family_tree_regex             {"tree.xhtml", std::regex_constants::icase};
+    const std::regex afterword_regex               {"afterword.xhtml", std::regex_constants::icase};
+    const std::regex manga_regex                   {"text/manga", std::regex_constants::icase};
+    const std::regex poll_regex                    {"text/poll", std::regex_constants::icase};
+    const std::regex bonus_regex                   {"text/bonus", std::regex_constants::icase};
+    const std::regex copyright_regex               {"text/copyright", std::regex_constants::icase};
+    const std::regex ncx_regex                     {"dtbncx", std::regex_constants::icase}; // mediatype
+    const std::regex stylesheet_regex              {"css", std::regex_constants::icase};
+    const std::regex image_regex                   {"image/", std::regex_constants::icase}; //mediatype
+    const std::regex toc_regex                     {"toc.xhtml", std::regex_constants::icase};
+    const std::regex characters_regex              {"text/character", std::regex_constants::icase};
+    const std::regex signup_regex                  {"text/signup", std::regex_constants::icase};
 }
 
 std::string_view to_string_view(volume vol)
@@ -116,7 +118,6 @@ get_uniqueness(chapter_type c)
 {
     switch (c)
     {
-        case COVER:
         case TOC:
         case NCX:
         case MAP_EHRENFEST:
@@ -124,6 +125,7 @@ get_uniqueness(chapter_type c)
         case FAMILY_TREE:
         case SIGNUP:
         case COPYRIGHT: return chapter_uniqueness::SINGLE;
+        case COVER:
         case CHARACTERS:
         case CHAPTER:
         case IMAGE:
@@ -154,16 +156,27 @@ volume_definition::get_chapter_type() const
         return CHAPTER;
     }
     if (std::regex_search(href.begin(), href.end(), cover_regex)) {
-        return COVER;
+        return COVER; // after chapter, so actually they are classified as chapter for now
     }
+
+    if (toc_label) {
+        if (std::regex_search(toc_label.value().begin(), toc_label.value().end(), map_ehrenfest_label_regex)) {
+            return MAP_EHRENFEST;
+        }
+        if (std::regex_search(toc_label.value().begin(), toc_label.value().end(), map_yurgenschmidt_label_regex)) {
+            return MAP_YURGENSCHMIDT;
+        }
+    } else {
+        if (std::regex_search(href.begin(), href.end(), map_ehrenfest_href_regex)) {
+            return MAP_EHRENFEST;
+        }
+        if (std::regex_search(href.begin(), href.end(), map_yurgenschmidt_href_regex)) {
+            return MAP_YURGENSCHMIDT;
+        }
+    }
+
     if (std::regex_search(href.begin(), href.end(), frontmatter_regex)) {
-        return FRONTMATTER;
-    }
-    if (std::regex_search(href.begin(), href.end(), map_ehrenfest_regex)) {
-        return MAP_EHRENFEST;
-    }
-    if (std::regex_search(href.begin(), href.end(), map_yurgenschmidt_regex)) {
-        return MAP_YURGENSCHMIDT;
+        return FRONTMATTER; // must be after maps
     }
     if (std::regex_search(href.begin(), href.end(), family_tree_regex)) {
         return FAMILY_TREE;
@@ -187,7 +200,7 @@ volume_definition::get_chapter_type() const
         return TOC;
     }
     if (std::regex_search(href.begin(), href.end(), characters_regex)) {
-        return CHARACTERS;
+        return CHARACTERS; // after chapter, so actually they are classified as chapter for now
     }
     if (std::regex_search(href.begin(), href.end(), signup_regex)) {
         return SIGNUP;

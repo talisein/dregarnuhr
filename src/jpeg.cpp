@@ -92,7 +92,7 @@ namespace jpeg
             cinfo.image_width = decompressor.cinfo.output_width;
             cinfo.image_height = decompressor.cinfo.output_height;
             if (scale) {
-                log_info("Scaling from ", decompressor.cinfo.image_height, "x", decompressor.cinfo.image_width, " to ",decompressor.cinfo.output_height, "x", decompressor.cinfo.output_width);
+                log_verbose("Scaling from ", decompressor.cinfo.image_height, "x", decompressor.cinfo.image_width, " to ",decompressor.cinfo.output_height, "x", decompressor.cinfo.output_width);
                 std::cout << std::flush;
             }
             cinfo.input_components = decompressor.cinfo.output_components;
