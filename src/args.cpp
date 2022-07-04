@@ -171,23 +171,23 @@ parse(int argc, char **argv)
         const auto filters = it->substr(it->find("="sv)+1);
         // Size
         if (const auto pos = filters.find("size="sv); std::string::npos != pos) {
-            auto end = filters.find(":", pos);
-            auto count = std::string::npos;
-            if (std::string::npos != end) {
-                count = end - pos - 5;
+            auto it = filters.find(":", pos);
+            auto cnt = std::string::npos;
+            if (std::string::npos != it) {
+                cnt = it - pos - 5;
             }
-            options.size_filter = std::stoull(std::string(filters.substr(pos + 5, count)));
+            options.size_filter = std::stoull(std::string(filters.substr(pos + 5, cnt)));
             log_info("Size filter: ", *options.size_filter);
         }
         // Name
         if (const auto pos = filters.find("name="sv); std::string::npos != pos) {
             try {
-                auto end = filters.find(":", pos);
-                auto count = std::string::npos;
-                if (std::string::npos != end) {
-                    count = end - pos - 5;
+                auto it = filters.find(":", pos);
+                auto cnt = std::string::npos;
+                if (std::string::npos != it) {
+                    cnt = it - pos - 5;
                 }
-                options.name_filter = std::make_optional<std::regex>(std::string(filters.substr(pos + 5, count)), std::regex_constants::icase);
+                options.name_filter = std::make_optional<std::regex>(std::string(filters.substr(pos + 5, cnt)), std::regex_constants::icase);
             } catch (std::system_error &e) {
                 log_error("Failed to prepare regex name filter: ", e.what());
                 return e.code();
