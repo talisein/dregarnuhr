@@ -104,8 +104,8 @@ struct volume_definition
 
     chapter_type get_chapter_type() const;
 
-    bool is_in_spine(const std::map<volume, std::unique_ptr<epub::book_reader>>& src_readers) {
-        return true;
+    bool is_in_spine(const std::map<volume, std::unique_ptr<epub::book_reader>>&) {
+        return in_spine;
     }
 
     inline friend bool operator==(const volume_definition& lhs, const volume_definition& rhs)

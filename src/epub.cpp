@@ -155,7 +155,7 @@ namespace epub
 //        OUTCOME_TRY(auto raw, zip.extract_raw(idx));
         OUTCOME_TRY(auto stream, zip.extract_stream(idx));
         try {
-            return std::move(stream);
+            return stream;
         } catch (...) {
             return handle_xmlpp_exception(path).as_failure();
         }

@@ -728,7 +728,7 @@ namespace epub
 
         try {
             auto res = std::visit(overloaded {
-                    [&](omnibus o) { book_writer writer(view.begin()->vol, src_books, src_readers, view); return writer.make_book(); },
+                    [&](omnibus) { book_writer writer(view.begin()->vol, src_books, src_readers, view); return writer.make_book(); },
                     [&](volume v) { book_writer writer(v, src_books, src_readers, view); return writer.make_book();}
                 }, base);
             if (res.has_error()) {
