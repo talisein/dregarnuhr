@@ -8,6 +8,8 @@
 #include "log.h"
 
 namespace {
+    static constexpr time_t ZIP_TIME_UNSET = 312796800;
+
     extern "C" {
         size_t
         _extract_to_std_string(void *opaque, mz_uint64, const void *buf, size_t n)
@@ -327,7 +329,8 @@ namespace zip
             if (flags & MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE) ss << "MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE ";
             log_verbose("File: ", filename, " Level: ", level, " Flags: 0x", std::hex, (flags & 0xF0), std::dec, " ", ss.view(),
                         " crc: ", std::hex, stat.m_crc32, std::dec, " comp_size: ", stat.m_comp_size, " uncomp_size: ", stat.m_uncomp_size,
-                        " method: ", stat.m_method, " external_attr: ", std::hex, stat.m_external_attr, std::dec);
+                        " method: ", stat.m_method, " external_attr: ", std::hex, stat.m_external_attr, std::dec,
+                        " modified: ", stat.m_time, " hex modified: ", std::hex, stat.m_time, std::dec);
         }
     }
 
@@ -356,7 +359,7 @@ namespace zip
                                                    0 == level ? 0 : (level | MZ_ZIP_FLAG_COMPRESSED_DATA),
                                                    0 == level ? 0 : stat.m_uncomp_size,
                                                    0 == level ? 0 : stat.m_crc32,
-                                                   &modified,
+                                                   modified == ZIP_TIME_UNSET ? NULL : &modified,
                                                    nullptr, 0, nullptr, 0);
             if (modified != stat.m_time) {
                 log_verbose("Writer changed the modified time?? from ", stat.m_time, " to ", modified);
