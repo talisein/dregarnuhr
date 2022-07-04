@@ -1,6 +1,6 @@
 [wrap-git]
-url = https://github.com/talisein/libxmlplusplus.git
-revision = b59449d9aca2cae644fd513cf56d9ab5be35e2fa
+url = https://github.com/libxmlplusplus/libxmlplusplus.git
+revision = 178a7e5127dc74f8c2c4cab68bdb929517cc8683
 
 [provide]
 dependency_names = libxml++-5.0
