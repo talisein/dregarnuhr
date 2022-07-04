@@ -464,6 +464,8 @@ namespace epub
                     return std::errc::resource_unavailable_try_again;
                 }
                 OUTCOME_TRY(writer.add(dst, std::span<const char>(buf.get(), len)));;
+            } catch (std::system_error& e) {
+                return e.code();
             } catch (std::exception& e) {
                 log_error("Couldn't insert omnibus cover image: ", e.what());
                 return outcome::error_from_exception();
@@ -545,19 +547,19 @@ namespace epub
                 src_parser.parse_stream(src_stream);
                 xmlpp::Document doc;
                 auto src_root = src_parser.get_document()->get_root_node();
-                auto root = doc.create_root_node_by_import(src_root, false);
-                root->set_namespace_declaration(src_root->get_namespace_uri());
-                root->set_namespace_declaration("http://www.idpf.org/2007/ops", "epub");
+                auto nav_root = doc.create_root_node_by_import(src_root, false);
+                nav_root->set_namespace_declaration(src_root->get_namespace_uri());
+                nav_root->set_namespace_declaration("http://www.idpf.org/2007/ops", "epub");
                 for (auto attr : src_root->get_attributes()) {
-                    root->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+                    nav_root->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
                 }
                 auto dtd = src_parser.get_document()->get_internal_subset();
                 doc.set_internal_subset(dtd->get_name(), dtd->get_external_id(), dtd->get_system_id());
                 for (const auto& src_root_child : src_root->get_children()) {
                     if (src_root_child->get_name() == "head") {
-                        root->import_node(src_root_child, true);
+                        nav_root->import_node(src_root_child, true);
                     } else if (src_root_child->get_name() == "body") {
-                        auto body = dynamic_cast<xmlpp::Element*>(root->import_node(src_root_child, false));
+                        auto body = dynamic_cast<xmlpp::Element*>(nav_root->import_node(src_root_child, false));
                         for (const auto &src_iter : src_root_child->get_children()) {
                             if (src_iter->get_name() == "nav") {
                                 auto srcattr = dynamic_cast<xmlpp::Element*>(src_iter)->get_attribute("type", "epub");
@@ -682,6 +684,10 @@ namespace epub
                 cleanup_dangling(vol, filename);
                 return res.as_failure();
             }
+        } catch (std::system_error& e) {
+            cleanup_dangling(vol, filename);
+            log_error("make_book: ", e.what());
+            return e.code();
         } catch (std::exception& e) {
             cleanup_dangling(vol, filename);
             log_error("make_book: ", e.what());
@@ -738,6 +744,9 @@ namespace epub
                 std::visit([&](auto&& arg) { log_info("Created chronologically ordered ", arg, ": ", res.value() ); }, base);
                 return outcome::success();
             }
+        } catch (std::system_error& e) {
+            std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg, ": ", e.what(), ". Moving on..."); }, base);
+            return e.code();
         } catch (std::exception& e) {
             std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg, ": ", e.what(), ". Moving on..."); }, base);
             return outcome::error_from_exception();

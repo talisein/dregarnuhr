@@ -8,6 +8,8 @@
 #include <outcome/utils.hpp>
 #include "epub.h"
 #include "log.h"
+#include "utils.h"
+
 namespace
 {
     constexpr bool verify_mimetype(std::string_view mimetype)
@@ -33,6 +35,9 @@ namespace
         } catch (xmlpp::exception &e) {
             log_error(filename, ": xml parse_error from ", src.function_name(), ":", src.line(), ": ", e.what());
             return std::errc::invalid_argument;
+        } catch (std::system_error &e) {
+            log_error(filename, ": exception from ", src.function_name(), ":", src.line(), ": ", e.what());
+            return e.code();
         } catch (std::exception &e) {
             log_error(filename, ": exception from ", src.function_name(), ":", src.line(), ": ", e.what());
             return outcome::error_from_exception();
@@ -149,15 +154,15 @@ namespace epub
     }
 
     result<epub::file_reader>
-    book_reader::get_file_reader(const char* path)
+    book_reader::get_file_reader(const char* filepath)
     {
-        OUTCOME_TRY(auto idx, zip.locate_file(path));
+        OUTCOME_TRY(auto idx, zip.locate_file(filepath));
 //        OUTCOME_TRY(auto raw, zip.extract_raw(idx));
         OUTCOME_TRY(auto stream, zip.extract_stream(idx));
         try {
             return stream;
         } catch (...) {
-            return handle_xmlpp_exception(path).as_failure();
+            return handle_xmlpp_exception(filepath).as_failure();
         }
     }
 
@@ -377,7 +382,7 @@ namespace epub
         parser(std::make_unique<xmlpp::DomParser>())
     {
         parser->set_substitute_entities(true);
-        parser->parse_memory_raw(raw->data(), raw->size());
+        parser->parse_memory_raw(raw->data(), utils::safe_int_cast<xmlpp::Parser::size_type>(raw->size()));
     }
 
     file_reader::file_reader(zip::zipstreambuf &&in) :

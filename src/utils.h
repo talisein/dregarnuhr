@@ -1,5 +1,8 @@
 #pragma once
 
+#include <concepts>
+#include <limits>
+#include <stdexcept>
 #include <sstream>
 #include <string_view>
 #include <set>
@@ -34,4 +37,16 @@ namespace utils
     private:
         std::optional<std::string_view> prev_label;
     };
+
+
+    template<std::integral To, std::integral From>
+    auto safe_int_cast(From from) -> std::remove_cvref_t<To> {
+        auto res = static_cast<std::remove_cvref_t<To>>(from);
+        if (std::cmp_not_equal(res, from)) [[unlikely]] {
+            std::stringstream ss;
+            ss << "Trying to cast from " << from << " to a type that would become " << res;
+            throw std::range_error(ss.str());
+        }
+        return res;
+    }
 }

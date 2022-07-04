@@ -188,6 +188,9 @@ parse(int argc, char **argv)
                     count = end - pos - 5;
                 }
                 options.name_filter = std::make_optional<std::regex>(std::string(filters.substr(pos + 5, count)), std::regex_constants::icase);
+            } catch (std::system_error &e) {
+                log_error("Failed to prepare regex name filter: ", e.what());
+                return e.code();
             } catch (std::exception &e) {
                 log_error("Failed to prepare regex name filter: ", e.what());
                 return outcome::error_from_exception();

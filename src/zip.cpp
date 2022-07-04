@@ -6,6 +6,7 @@
 #include "outcome/utils.hpp"
 #include "outcome/try.hpp"
 #include "log.h"
+#include "utils.h"
 
 namespace {
     static constexpr time_t ZIP_TIME_UNSET = 312796800;
@@ -18,7 +19,7 @@ namespace {
             try {
                 str->append(static_cast<const char*>(buf), n);
                 return n;
-            } catch (std::exception &e) {
+            } catch (...) {
                 return 0;
             }
         }
@@ -30,7 +31,7 @@ namespace {
             try {
                 str->append(static_cast<const unsigned char*>(buf), n);
                 return n;
-            } catch (std::exception &e) {
+            } catch (...) {
                 return 0;
             }
         }
@@ -96,7 +97,9 @@ namespace zip
             }
 
             return true;
-        } catch (std::exception &e) {
+        } catch (std::system_error &e) {
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
     }
@@ -111,7 +114,9 @@ namespace zip
                 std::cout << "File: " << st.m_filename << "\n";
             }
             return outcome::success();
-        } catch (std::exception &e) {
+        } catch (std::system_error &e) {
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
     }
@@ -126,7 +131,9 @@ namespace zip
                 res.push_back(st.m_filename);
             }
             return res;
-        } catch (std::exception &e) {
+        } catch (std::system_error &e) {
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
     }
@@ -146,7 +153,9 @@ namespace zip
                 }
             }
             return outcome::success(idx);
-        } catch (std::exception& e) {
+        } catch (std::system_error& e) {
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
     }
@@ -165,7 +174,9 @@ namespace zip
             } else {
                 return res;
             }
-        } catch (std::exception &e) {
+        } catch (std::system_error &e) {
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
     }
@@ -178,7 +189,9 @@ namespace zip
         std::basic_string<unsigned char> res;
         try {
             res.reserve(st.m_uncomp_size);
-        } catch (std::exception &e) {
+        } catch (std::system_error &e) {
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
 
@@ -189,7 +202,9 @@ namespace zip
             } else {
                 return res;
             }
-        } catch (std::exception &e) {
+        } catch (std::system_error &e) {
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
     }
@@ -265,7 +280,9 @@ namespace zip
     {
         try {
             return zipstreambuf(&zip, idx, flags);
-        } catch (std::exception &e) {
+        } catch (std::system_error &e) {
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
     }
@@ -279,7 +296,9 @@ namespace zip
                 return mz_zip_get_last_error(&zip);
             }
             return st;
-        } catch (std::exception &e) {
+        } catch (std::system_error &e) {
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
     }
@@ -355,7 +374,7 @@ namespace zip
                                                    buf.data(),
                                                    buf.size(),
                                                    stat.m_comment,
-                                                   stat.m_comment_size,
+                                                   utils::safe_int_cast<mz_uint16>(stat.m_comment_size),
                                                    0 == level ? 0 : (level | MZ_ZIP_FLAG_COMPRESSED_DATA),
                                                    0 == level ? 0 : stat.m_uncomp_size,
                                                    0 == level ? 0 : stat.m_crc32,
@@ -369,8 +388,10 @@ namespace zip
                 log_error("returned false: ", e.code(), ' ', e.what());
                 return mz_zip_get_last_error(&zip);
             }
-        } catch (std::exception& e) {
-            log_error("Exception, ", e.what());
+        } catch (std::system_error& e) {
+            log_error("Exception: ", e.what());
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
 
@@ -387,8 +408,10 @@ namespace zip
                 log_error("Finalization error: ", e.code(), ' ', e.what());
                 return err;
             }
-        } catch (std::exception& e) {
+        } catch (std::system_error& e) {
             log_error("Exception: ", e.what());
+            return e.code();
+        } catch (...) {
             return outcome::error_from_exception();
         }
         return outcome::success();

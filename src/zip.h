@@ -99,7 +99,9 @@ namespace zip
                 if (MZ_FALSE == res) {
                     return mz_zip_get_last_error(&zip);
                 }
-            } catch (std::exception &e) {
+            } catch (std::system_error &e) {
+                return e.code();
+            } catch (...) {
                 return outcome::error_from_exception();
             }
             return outcome::success();
@@ -129,10 +131,11 @@ namespace zip
             try {
                 if (MZ_FALSE == mz_zip_writer_add_mem(&zip, filename.c_str(), data.data(), data.size_bytes(), 8)) {
                     auto err = mz_zip_get_last_error(&zip);
-                    std::system_error e(err);
                     return err;
                 }
-            } catch (std::exception &e) {
+            } catch (std::system_error &e) {
+                return e.code();
+            } catch (...) {
                 return outcome::error_from_exception();
             }
 
