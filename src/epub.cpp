@@ -26,7 +26,7 @@ namespace
             log_error(filename, ": xml internal_error from ", src.function_name(), ":", src.line(), ": ", e.what());
             return std::errc::invalid_argument;
         } catch (xmlpp::validity_error &e) {
-
+            log_error(filename, ": xml validity_error from ", src.function_name(), ":", src.line(), ": ", e.what());
             return std::errc::invalid_argument;
         } catch (xmlpp::parse_error &e) {
             log_error(filename, ": xml parse_error from ",
@@ -167,9 +167,9 @@ namespace epub
     }
 
     result<epub::file_reader>
-    book_reader::get_file_reader(const std::string& path)
+    book_reader::get_file_reader(const std::string& filepath)
     {
-        return get_file_reader(path.c_str());
+        return get_file_reader(filepath.c_str());
     }
 
     result<book>

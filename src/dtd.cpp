@@ -1,10 +1,11 @@
 #include <string_view>
 #include <libxml/relaxng.h>
 #include "dtd.h"
+#include "utils.h"
 
 namespace
 {
-    constexpr std::string_view NCX = R"xml(<!-- NCX 2005-1 DTD  2005-06-26
+    constexpr std::string_view NCXDTD = R"xml(<!-- NCX 2005-1 DTD  2005-06-26
 file: ncx-2005-1.dtd
 
   Authors: Mark Hakkinen, George Kerscher, Tom McLaughlin, James Pritchett, and Michael Moodie
@@ -399,12 +400,12 @@ namespace DTD
 
     xmlpp::ustring get_ncx()
     {
-        return xmlpp::ustring(NCX.begin(), NCX.end());
+        return xmlpp::ustring(NCXDTD.begin(), NCXDTD.end());
     }
 
     xmlpp::RelaxNGSchema get_package()
     {
-      auto ptr = xmlRelaxNGNewMemParserCtxt(package_nvdl.data(), package_nvdl.size());
+      auto ptr = xmlRelaxNGNewMemParserCtxt(package_nvdl.data(), utils::safe_int_cast<int>(package_nvdl.size()));
       auto parse = xmlRelaxNGParse(ptr);
       return xmlpp::RelaxNGSchema(parse);
     }

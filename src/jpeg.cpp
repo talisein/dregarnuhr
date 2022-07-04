@@ -2,6 +2,7 @@
 #include <string_view>
 #include <map>
 #include "outcome/utils.hpp"
+#include "utils.h"
 
 #include "jpeg.h"
 
@@ -123,7 +124,7 @@ namespace jpeg
         cinfo.client_data = this;
         jpeg_create_decompress(&cinfo);
         cinfo_p.reset(&cinfo);
-        jpeg_mem_src(&cinfo, src.data(), src.size_bytes());
+        jpeg_mem_src(&cinfo, src.data(), utils::safe_int_cast<unsigned long>(src.size_bytes()));
     }
 
 }
