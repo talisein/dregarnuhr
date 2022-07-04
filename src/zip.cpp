@@ -271,7 +271,7 @@ namespace zip
     result<mz_zip_archive_file_stat>
     reader::stat(mz_uint idx)
     {
-        mz_zip_archive_file_stat st;
+        mz_zip_archive_file_stat st{};
         try {
             if (MZ_FALSE == mz_zip_reader_file_stat(&zip, idx, &st)) {
                 return mz_zip_get_last_error(&zip);
@@ -311,10 +311,11 @@ namespace zip
     }
 
     namespace {
-        void _log_level_and_flags(std::string_view filename, mz_uint16 flags)
+        void _log_level_and_flags(std::string_view filename, mz_zip_archive_file_stat stat)
         {
+            mz_uint16 flags = stat.m_bit_flag;
             std::stringstream ss;
-//            mz_uint level = flags & 0xF;
+            mz_uint level = flags & 0xF;
             if (flags & MZ_ZIP_FLAG_IGNORE_PATH) ss << "MZ_ZIP_FLAG_IGNORE_PATH" << ' ';
             if (flags & MZ_ZIP_FLAG_COMPRESSED_DATA) ss << "MZ_ZIP_FLAG_COMPRESSED_DATA ";
             if (flags & MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY) ss << "MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY ";
@@ -324,7 +325,9 @@ namespace zip
             if (flags & MZ_ZIP_FLAG_WRITE_ALLOW_READING) ss << "MZ_ZIP_FLAG_WRITE_ALLOW_READING ";
             if (flags & MZ_ZIP_FLAG_ASCII_FILENAME) ss << "MZ_ZIP_FLAG_ASCII_FILENAME ";
             if (flags & MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE) ss << "MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE ";
-//            log_verbose("File: ", filename, " Level: ", level, " Flags: 0x", std::hex, (flags & 0xF0), std::dec, " ", ss.view());
+            log_verbose("File: ", filename, " Level: ", level, " Flags: 0x", std::hex, (flags & 0xF0), std::dec, " ", ss.view(),
+                        " crc: ", std::hex, stat.m_crc32, std::dec, " comp_size: ", stat.m_comp_size, " uncomp_size: ", stat.m_uncomp_size,
+                        " method: ", stat.m_method, " external_attr: ", std::hex, stat.m_external_attr, std::dec);
         }
     }
 
@@ -336,9 +339,9 @@ namespace zip
     {
         OUTCOME_TRY(auto src_idx, reader.locate_file(src_filename.c_str()));
         OUTCOME_TRY(auto stat, reader.stat(src_idx));
-        _log_level_and_flags(src_filename, stat.m_bit_flag);
+        _log_level_and_flags(src_filename, stat);
         auto level = stat.m_bit_flag & 0xF;
-        if (src_filename == "mimetype")
+        if (0 == stat.m_method)
             level = 0;
         OUTCOME_TRY(auto buf, reader.extract(src_idx, (0 == level) ? 0 : MZ_ZIP_FLAG_COMPRESSED_DATA));
 

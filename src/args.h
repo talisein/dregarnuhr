@@ -24,10 +24,10 @@ struct args
     std::optional<std::string> prefix;
     std::optional<std::string> suffix;
     std::optional<std::string> title;
+    std::optional<fs::path> cover;
     fs::path input_file;
     fs::path input_dir;
     fs::path output_dir;
-    std::optional<fs::path> cover;
     bool output_created;
     bool verbose;
     std::optional<std::size_t> size_filter;

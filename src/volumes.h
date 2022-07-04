@@ -4,7 +4,11 @@
 #include <string_view>
 #include <iostream>
 #include <iomanip>
+#include <map>
+#include <memory>
+
 #include "outcome/result.hpp"
+#include "epub.h"
 
 enum class volume
 {
@@ -30,7 +34,19 @@ enum class volume
     P4V8,
     FB1,
     FB2,
-    RA1
+    RA1,
+    MP1V1,
+    MP1V2,
+    MP1V3,
+    MP1V4,
+    MP1V5,
+    MP1V6,
+    MP1V7,
+    MP2V1,
+    MP2V2,
+    MP2V3,
+    MP2V4,
+    MP2V5,
 };
 
 // The order here determines the sort order
@@ -87,6 +103,10 @@ struct volume_definition
     bool in_spine;
 
     chapter_type get_chapter_type() const;
+
+    bool is_in_spine(const std::map<volume, std::unique_ptr<epub::book_reader>>& src_readers) {
+        return true;
+    }
 
     inline friend bool operator==(const volume_definition& lhs, const volume_definition& rhs)
     {

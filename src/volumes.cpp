@@ -30,11 +30,23 @@ namespace {
         {"9781718346338"sv, volume::P4V5},
         {"9781718346352"sv, volume::P4V6},
         {"9781718346376"sv, volume::P4V7},
+        {"9781718338005"sv, volume::MP1V1},
+        {"9781718338029"sv, volume::MP1V2},
+        {"9781718338043"sv, volume::MP1V3},
+        {"9781718338067"sv, volume::MP1V4},
+        {"9781718338081"sv, volume::MP1V5},
+        {"9781718338104"sv, volume::MP1V6},
+        {"9781718338128"sv, volume::MP1V7},
+        {"9781718338142"sv, volume::MP2V1},
+        {"9781718338166"sv, volume::MP2V2},
+        {"9781718338180"sv, volume::MP2V3},
+        {"9781718338203"sv, volume::MP2V4},
+        {"9781718338227"sv, volume::MP2V5},
     };
 
     const std::regex cover_regex                   {"cover.xhtml", std::regex_constants::icase};
     const std::regex frontmatter_regex             {"text/front", std::regex_constants::icase};
-    const std::regex chapter_regex                 {"(cover.xhtml|text/character|chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
+    const std::regex chapter_regex                 {"(xhtml/p-[0-9]*.xhtml|cover.xhtml|text/character|chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
     const std::regex map_ehrenfest_label_regex     {"Map of Ehrenfest", std::regex_constants::icase}; // can also use toc_label but this works for now
     const std::regex map_yurgenschmidt_label_regex {"Map of Yurgenschmidt", std::regex_constants::icase};
     const std::regex map_ehrenfest_href_regex      {"map.xhtml", std::regex_constants::icase}; // can also use toc_label but this works for now
@@ -79,6 +91,18 @@ std::string_view to_string_view(volume vol)
         case volume::FB1:  return "FB1"sv;
         case volume::FB2:  return "FB2"sv;
         case volume::RA1:  return "RA1"sv;
+        case volume::MP1V1:  return "MP1V1"sv;
+        case volume::MP1V2:  return "MP1V2"sv;
+        case volume::MP1V3:  return "MP1V3"sv;
+        case volume::MP1V4:  return "MP1V4"sv;
+        case volume::MP1V5:  return "MP1V5"sv;
+        case volume::MP1V6:  return "MP1V6"sv;
+        case volume::MP1V7:  return "MP1V7"sv;
+        case volume::MP2V1:  return "MP2V1"sv;
+        case volume::MP2V2:  return "MP2V2"sv;
+        case volume::MP2V3:  return "MP2V3"sv;
+        case volume::MP2V4:  return "MP2V4"sv;
+        case volume::MP2V5:  return "MP2V5"sv;
     }
     assert(false);
     return "UNKNOWN"sv;

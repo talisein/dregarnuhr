@@ -128,6 +128,18 @@ namespace {
             case volume::P4V8: [[fallthrough]];
             case volume::FB1: [[fallthrough]];
             case volume::FB2: [[fallthrough]];
+            case volume::MP1V1: [[fallthrough]];
+            case volume::MP1V2: [[fallthrough]];
+            case volume::MP1V3: [[fallthrough]];
+            case volume::MP1V4: [[fallthrough]];
+            case volume::MP1V5: [[fallthrough]];
+            case volume::MP1V6: [[fallthrough]];
+            case volume::MP1V7: [[fallthrough]];
+            case volume::MP2V1: [[fallthrough]];
+            case volume::MP2V2: [[fallthrough]];
+            case volume::MP2V3: [[fallthrough]];
+            case volume::MP2V4: [[fallthrough]];
+            case volume::MP2V5: [[fallthrough]];
             case volume::RA1:
                 assert(false);
               }
@@ -268,10 +280,18 @@ namespace epub
                     auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&def](const auto &item) { return item.href == def.href; });
                     if (src_iter != std::end(src_book->second.manifest.items)) {
                         if (src_iter->spine_properties) {
-                            itemref->set_attribute("properties", src_iter->spine_properties.value());
+                            auto v = src_iter->spine_properties.value();
+//                            if (v != "page-spread-left" && v != "page_spread-right") {
+                                itemref->set_attribute("properties", src_iter->spine_properties.value());
+//                            }
                         }
                         if (src_iter->is_linear) {
-                            itemref->set_attribute("linear", "yes");
+//                            if (!src_iter->spine_properties || (src_iter->spine_properties &&
+//                                                                src_iter->spine_properties.value() != "page-spread-left" &&
+//                                                                src_iter->spine_properties.value() != "page-spread-right"))
+//                            {
+                                itemref->set_attribute("linear", "yes");
+//                            }
                         }
                     }
                 }
@@ -476,6 +496,7 @@ namespace epub
             // }
             if (def.href == base_book.manifest.toc_relpath) {
                 OUTCOME_TRY(add_ncx());
+                log_verbose("Made ncx");
                 continue;
             }
             auto src_reader_iter = src_readers.find(def.vol);
@@ -491,9 +512,9 @@ namespace epub
                 item = std::make_optional<manifest::item>(*src_item);
             }
 
-            // Determine src and dst paths. dst will be e.g. OEBPS/FB1/Text. Basebook is just OEBPS/Text
-            const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
-            auto src {root};
+            // Determine src and dst paths. dst will be e.g. OEBPS/FB1/Text. Basebook dst is just OEBPS/Text
+            const auto srcbook_root = src_book.rootfile_path.substr(0, src_book.rootfile_path.find_first_of('/')+1);
+            auto src {srcbook_root};
             src.append(def.href);
             auto dst {root};
             dst.append(to_string_view(def.vol));
@@ -547,6 +568,7 @@ namespace epub
                                         nav->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
                                     }
                                     make_toc(nav, dynamic_cast<xmlpp::Element*>(src_iter));
+                                    log_verbose("Made toc");
                                 } else {
                                     body->import_node(src_iter, true);
                                 }
@@ -561,7 +583,9 @@ namespace epub
             }
 
             // No special case, just copy it.
+            log_verbose("Copying ", src, " to ", dst);
             OUTCOME_TRY(writer.copy_from(src_reader->zip, src, dst));
+            log_verbose("Copying ", src, " to ", dst, ": done");
             if (def.vol == vol) {
                 auto res = basefiles.remove(src);
                 if (1 != res) [[unlikely]] {
@@ -688,7 +712,6 @@ namespace epub
         }
     }
     template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-    // changes must be mirrored above
     result<void>
     bookmaker::make_books_impl(definition_t view, std::variant<volume, omnibus> base)
     {
