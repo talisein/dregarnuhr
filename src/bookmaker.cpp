@@ -471,31 +471,8 @@ namespace epub
                 return outcome::error_from_exception();
             }
         }
-        // if (get_options()->omnibus_type) {
-        //     std::cout << "[";
-        // }
-        // auto filtered_defs = get_filtered_defs(definition, src_books, src_readers);
-        // const auto count_end = std::distance(filtered_defs.begin(), filtered_defs.end());
-        // const auto step = count_end / 75;
-        // std::remove_const_t<decltype(count_end)> count = 0;
-        // auto next = step;
-        // int next_pct = 20;
         for (const volume_definition& def : get_filtered_defs(definition, src_books, src_readers))
-//                     | std::ranges::views::filter([&base_book](const volume_definition& def) { return def.href != base_book.manifest.toc_relpath; }))
         {
-            // if (get_options()->omnibus_type) {
-            //     ++count;
-            //     if (std::cmp_equal(count, next)) {
-            //         auto pct = (count * 100) / count_end;
-            //         if (std::cmp_greater_equal(pct, next_pct)) {
-            //             std::cout << next_pct << '%';
-            //             next_pct += 20;
-            //         } else {
-            //             std::cout << '.';
-            //         }
-            //         next += step;
-            //     }
-            // }
             if (def.href == base_book.manifest.toc_relpath) {
                 OUTCOME_TRY(add_ncx());
                 log_verbose("Made ncx");
@@ -533,7 +510,7 @@ namespace epub
                 jpeg::compressor comp;
                 jpeg::decompressor decomp {buf};
                 OUTCOME_TRY(const auto outbuf, comp.compress_from(decomp, get_options()->jpg_quality, get_options()->jpg_scale));
-                OUTCOME_TRY(writer.add(dst, outbuf));
+                OUTCOME_TRY(writer.add(dst, outbuf, false));
                 basefiles.remove(src);
                 continue;
             }
@@ -596,9 +573,6 @@ namespace epub
             }
             continue;
         }
-//        if (get_options()->omnibus_type) {
-//            std::cout << "100%]\n";
-//        }
         static const std::list<std::pair<volume, std::string>> expected_leftovers {
             std::make_pair(volume::P2V4, "OEBPS/Text/extra8.xhtml"),
             std::make_pair(volume::P4V2, "OEBPS/Text/chapter21.xhtml")

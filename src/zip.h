@@ -59,7 +59,7 @@ namespace zip
     using zip_ptr = std::unique_ptr<mz_zip_archive, archive_deleter>;
 
 
-    class zipstreambuf : public std::streambuf {
+    class zipstreambuf final : public std::streambuf {
     public:
         zipstreambuf(mz_zip_archive *pZip, mz_uint idx, mz_uint flags);
 
@@ -126,10 +126,11 @@ namespace zip
 
         template <typename T>
         result<void> add(const std::string& filename,
-                         std::span<const T> data)
+                         std::span<const T> data,
+                         bool compress = true)
         {
             try {
-                if (MZ_FALSE == mz_zip_writer_add_mem(&zip, filename.c_str(), data.data(), data.size_bytes(), 8)) {
+                if (MZ_FALSE == mz_zip_writer_add_mem(&zip, filename.c_str(), data.data(), data.size_bytes(), compress ? 8 : 0)) {
                     auto err = mz_zip_get_last_error(&zip);
                     return err;
                 }

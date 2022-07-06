@@ -76,8 +76,7 @@ namespace zip
         zip.m_pRead = _zip_file_read_func;
         zip.m_pIO_opaque = &istream;
         if (MZ_FALSE == mz_zip_reader_init(&zip, file_size, 0)) [[unlikely]] {
-            mz_zip_error err = mz_zip_get_last_error(&zip);
-            throw std::system_error(err);
+            throw std::system_error(mz_zip_get_last_error(&zip));
         }
         p_zip.reset(&zip);
     }
@@ -111,7 +110,7 @@ namespace zip
             auto num_files = mz_zip_reader_get_num_files(&zip);
             for (decltype(num_files) i = 0U; i < num_files; ++i) {
                 OUTCOME_TRY(auto st, stat(i));
-                std::cout << "File: " << st.m_filename << "\n";
+                log_info("File: ", st.m_filename);
             }
             return outcome::success();
         } catch (std::system_error &e) {
@@ -325,8 +324,7 @@ namespace zip
         zip.m_pWrite = _file_write_func;
         zip.m_pIO_opaque = &ostream;
         if (MZ_FALSE == mz_zip_writer_init(&zip, 0)) [[unlikely]] {
-            mz_zip_error err = mz_zip_get_last_error(&zip);
-            throw std::system_error(err);
+            throw std::system_error(mz_zip_get_last_error(&zip));
         }
         p_zip.reset(&zip);
     }
@@ -384,12 +382,12 @@ namespace zip
                 log_verbose("Writer changed the modified time?? from ", stat.m_time, " to ", modified);
             }
             if (MZ_FALSE == res) {
-                std::system_error e(mz_zip_get_last_error(&zip));
-                log_error("returned false: ", e.code(), ' ', e.what());
-                return mz_zip_get_last_error(&zip);
+                std::error_code e(mz_zip_get_last_error(&zip));
+                log_error("Failed to copy ", src_filename, ": ", e);
+                return e;
             }
         } catch (std::system_error& e) {
-            log_error("Exception: ", e.what());
+            log_error("Exception: ", e.code(), ' ', e.what());
             return e.code();
         } catch (...) {
             return outcome::error_from_exception();
@@ -403,13 +401,12 @@ namespace zip
     {
         try {
             if (MZ_FALSE == mz_zip_writer_finalize_archive(&zip)) {
-                auto err = mz_zip_get_last_error(&zip);
-                std::system_error e(err);
-                log_error("Finalization error: ", e.code(), ' ', e.what());
-                return err;
+                std::error_code e{mz_zip_get_last_error(&zip)};
+                log_error("Finalization error: ", e);
+                return e;
             }
         } catch (std::system_error& e) {
-            log_error("Exception: ", e.what());
+            log_error("Exception: ", e);
             return e.code();
         } catch (...) {
             return outcome::error_from_exception();
@@ -421,9 +418,8 @@ namespace zip
     archive_deleter::operator()(mz_zip_archive *zip) const noexcept
     {
         if (!mz_zip_end(zip)) {
-            std::system_error err {mz_zip_get_last_error(zip)};
-            std::cerr << "Unable to close zip_reader: " << err.code()
-                      << ' ' << err.what() << '\n';
+            std::error_code e {mz_zip_get_last_error(zip)};
+            log_error("Unable to close zip_reader: ", e);
         }
     }
 }

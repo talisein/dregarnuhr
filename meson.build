@@ -18,10 +18,15 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_source_location', required:
 cpp_compiler.has_header_symbol('version', '__cpp_concepts', required: true)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_functions', required: true)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip')
+cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace')
 
 jpeg_dep = dependency('libjpeg', version: '>=2.1.0', fallback: ['libjpeg-turbo'])
 
 zlib_dep = dependency('zlib', fallback: ['zlib'])
+
+miniz_dep = dependency('miniz', fallback: ['miniz', 'miniz_dep'])
+
+outcome_dep = dependency('outcome-2.0', fallback: ['outcome'])
 
 libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
 
@@ -32,11 +37,5 @@ libxmlpp_dep = dependency('libxml++-5.0',
                                             'build-examples=false',
                                             'validation=false',
                                             'maintainer-mode=false'])
-
-miniz_dep = dependency('miniz',
-                       fallback: ['miniz', 'miniz_dep'])
-
-outcome_dep = dependency('outcome-2.0',
-                         fallback: ['outcome'])
 
 subdir('src')

@@ -10,7 +10,11 @@
 template <typename T>
 void _log_helper(std::ostream& out, bool autonl, T t)
 {
-    if constexpr (std::is_same_v<std::remove_cvref_t<T>, char>) {
+    if constexpr (std::is_same_v<std::remove_cvref_t<T>, std::error_code>) {
+        out << t << ' ' << t.message();
+    } else if constexpr (std::is_same_v<std::remove_cvref_t<T>, std::system_error>) {
+        out << t.code() << ' ' << t.what();
+    } else if constexpr (std::is_same_v<std::remove_cvref_t<T>, char>) {
         if (!autonl || '\n' == t) {
             out << t;
         } else {

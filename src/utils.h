@@ -39,12 +39,16 @@ namespace utils
 
 
     template<std::integral To, std::integral From>
-    auto safe_int_cast(From from) -> std::remove_cvref_t<To> {
+    [[nodiscard]] auto safe_int_cast(From from) -> std::remove_cvref_t<To> {
         auto res = static_cast<std::remove_cvref_t<To>>(from);
         if (std::cmp_not_equal(res, from)) [[unlikely]] {
             std::stringstream ss;
             ss << "Trying to cast from " << from << " to a type that would become " << res;
-            throw std::range_error(ss.str());
+            if (std::cmp_greater(from, res)) {
+                throw std::overflow_error(ss.str());
+            } else {
+                throw std::range_error(ss.str());
+            }
         }
         return res;
     }

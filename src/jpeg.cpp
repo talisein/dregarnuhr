@@ -9,36 +9,43 @@
 namespace
 {
     using namespace std::string_view_literals;
-    typedef std::pair<const std::string_view, const std::string_view> _pair_t;
-#define JCOPYRIGHT_SHORT "Copyright (C) @COPYRIGHT_YEAR@ The libjpeg-turbo Project and many others"
-#define JCOPYRIGHT "Copyright (C) @COPYRIGHT_YEAR@ The libjpeg-turbo Project and many others"
-#define JVERSION "8d  15-Jan-2012"
-#define JMESSAGE(code, string)  { code, std::make_pair(#code, string) },
-    const std::map<J_MESSAGE_CODE, const _pair_t> _error_map {
+#define JMESSAGE(code, string)  { code, #code },
+    const std::map<J_MESSAGE_CODE, const std::string_view> _error_map {
 #include "jerror.h"
     };
-#undef JMESSAGE
-#undef JVERSION
-#undef JCOPYRIGHT
-#undef JCOPYRIGHT_SHORT
 
+    std::string _format_message (j_common_ptr cinfo) {
+        char buf[JMSG_LENGTH_MAX + 1] = {0};
+        jpeg_error_mgr *err = cinfo->err;
+        err->format_message(cinfo, buf);
+        return buf;
+    }
 
     extern "C"
     {
         void _error_exit (j_common_ptr cinfo)
         {
-            jpeg_error_mgr *err = cinfo->err;
-            std::system_error e(static_cast<J_MESSAGE_CODE>(err->msg_code));
+            std::system_error e(static_cast<J_MESSAGE_CODE>(cinfo->err->msg_code), _format_message(cinfo));
             throw e;
         }
 
         void _output_message (j_common_ptr cinfo)
         {
-            jpeg_error_mgr *err = cinfo->err;
-            log_error("JPEG ", cinfo->is_decompressor ? "decompression" : "compression", " error: ", err->last_jpeg_message);
+            log_error("JPEG ", cinfo->is_decompressor ? "decompression" : "compression", ": ", _format_message(cinfo));
         }
-        void _format_message (j_common_ptr cinfo, char *buffer);
-        void _emit_message (j_common_ptr cinfo, int msg_level);
+
+        void _emit_message (j_common_ptr cinfo, int msg_level)
+        {
+            jpeg_error_mgr *err = cinfo->err;
+            if (msg_level < 0) [[unlikely]] { // Warning
+                if (err->num_warnings == 0) {
+                    log_info("JPEG Warning: ", _format_message(cinfo));
+                }
+                ++err->num_warnings;
+            } else if (err->trace_level >= msg_level) [[unlikely]] {
+                log_info("JPEG Info: ", _format_message(cinfo));
+            }
+        }
     }
 
 }
@@ -49,7 +56,7 @@ detail::JpegErrc_category::message(int c) const
     std::stringstream ss;
     auto it = _error_map.find(static_cast<J_MESSAGE_CODE>(c));
     if (it != _error_map.end()) {
-        ss << it->second.first << ": " << it->second.second;
+        ss << it->second;
     } else {
         ss << "Unknown JPEG error " << c;
     }
@@ -76,6 +83,7 @@ namespace jpeg
         cinfo.err = jpeg_std_error(&jerr);
         cinfo.err->error_exit = _error_exit;
         cinfo.err->output_message = _output_message;
+        cinfo.err->emit_message = _emit_message;
         cinfo.client_data = this;
         jpeg_create_compress(&cinfo);
         cinfo_p.reset(&cinfo);
@@ -94,7 +102,6 @@ namespace jpeg
             cinfo.image_height = decompressor.cinfo.output_height;
             if (scale) {
                 log_verbose("Scaling from ", decompressor.cinfo.image_height, "x", decompressor.cinfo.image_width, " to ",decompressor.cinfo.output_height, "x", decompressor.cinfo.output_width);
-                std::cout << std::flush;
             }
             cinfo.input_components = decompressor.cinfo.output_components;
             cinfo.in_color_space = decompressor.cinfo.out_color_space;
@@ -121,6 +128,7 @@ namespace jpeg
         cinfo.err = jpeg_std_error(&jerr);
         cinfo.err->error_exit = _error_exit;
         cinfo.err->output_message = _output_message;
+        cinfo.err->emit_message = _emit_message;
         cinfo.client_data = this;
         jpeg_create_decompress(&cinfo);
         cinfo_p.reset(&cinfo);

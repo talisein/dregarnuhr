@@ -67,15 +67,14 @@ result<void> print_books(const fs::path& input_dir)
 }
 
 
-[[noreturn]] void do_dump()
+void do_dump()
 {
     auto reader = epub::book_reader(get_options()->input_file);
 
     auto res = reader.dump();
     if (!res) {
-        std::system_error e(res.error());
-        if (e.code() == std::errc::identifier_removed) std::exit(EXIT_SUCCESS);
-        std::cerr << "Error: " << e.code() << ' ' << e.what() << std::endl;
+        log_error(res.error());
+        return;
     }
     auto book = res.value();
     using namespace std::string_view_literals;
@@ -92,15 +91,12 @@ result<void> print_books(const fs::path& input_dir)
                   << std::quoted(item.id) <<  "sv, " <<  std::quoted(item.href) << "sv, "
                   << std::quoted(item.media_type) <<  "sv, ";
         if (item.toc_label) {
-            std::cout << "std::make_optional<std::string_view>(" << std::quoted(*item.toc_label) << "sv)";
+            std::cout << std::quoted(*item.toc_label) << "sv";
         } else {
             std::cout << "std::nullopt";
         }
         std::cout << ", " << std::boolalpha << item.in_spine <<  " },\n";
     }
-
-
-    std::exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char* argv[])
@@ -118,21 +114,18 @@ int main(int argc, char* argv[])
 
     if (args::command::DUMP == get_options()->command) {
         do_dump();
-    }
-
-    if (args::command::NORMAL == get_options()->command) {
+    } else if (args::command::NORMAL == get_options()->command) {
         auto res = print_books(get_options()->input_dir);
 
-        bool everything_done = !res.has_error();
-        if (!everything_done) {
+        if (res.has_error()) {
+            log_error("Failed to make books: ", res.error());
             if (get_options()->output_created) {
                 std::error_code ec;
                 if (std::filesystem::is_empty(get_options()->output_dir, ec) && !ec) {
                     log_verbose("No ebooks created successfully. Cleaning up created directory.");
                     fs::remove(get_options()->output_dir, ec);
                     if (ec) {
-                        std::system_error e{ec};
-                        log_error("Error: unable to delete empty output directory ", get_options()->output_dir, ": ", e.code(), ' ', e.what());
+                        log_error("unable to delete empty output directory ", get_options()->output_dir, ": ", ec);
                     }
                 }
             }

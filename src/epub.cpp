@@ -218,7 +218,7 @@ namespace epub
         auto is_dregarnuhr = find_quiet("/opf:package/opf:metadata/dc:contributor[text()='talisein']", map, root, rootfile_path);
         if (is_dregarnuhr.has_value()) {
             log_info("Info: ", path, " is produced by this program. Skipping!");
-            return std::errc::identifier_removed;
+            return std::errc::invalid_argument;
         }
 
         OUTCOME_TRY(auto tocncx, find_attr_required("/opf:package/opf:spine/@toc", map, root, rootfile_path));
@@ -397,10 +397,10 @@ namespace epub
     void
     file_reader::print_raw()
     {
-        if (raw.has_value())
-            std::cout << raw->c_str() << std::endl;
-        else {
-            parser->get_document()->write_to_stream(std::cout);
+        if (raw.has_value()) {
+            log_info(raw->c_str());
+        } else {
+            log_info(parser->get_document()->write_to_string());
         }
     }
 }
