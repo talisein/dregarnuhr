@@ -7,8 +7,10 @@ if cpp_compiler.has_header_symbol('ios', 'std::ios_base::noreplace')
   conf_data.set('NOREPLACE', 'std::ios_base::noreplace')
 elif cpp_compiler.has_header_symbol('ios', 'std::ios_base::__noreplace')
   conf_data.set('NOREPLACE', 'std::ios_base::__noreplace')
-elif conf_data.set('NOREPLACE', 'std::ios_base::_Noreplace', required: true)
+elif cpp_compiler.has_header_symbol('ios', 'std::ios_base::_Noreplace')
   conf_data.set('NOREPLACE', 'std::ios_base::_Noreplace')
+else
+  error('No std::ios_base::noreplace available on this platform?')
 endif
 
 config = configure_file(input: 'config.h.in',
