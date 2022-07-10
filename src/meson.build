@@ -3,6 +3,14 @@
 conf_data = configuration_data()
 conf_data.set('IS_WINDOWS', host_machine.system() == 'windows')
 
+if cpp_compiler.has_header_symbol('ios', 'std::ios_base::noreplace')
+  conf_data.set('NOREPLACE', 'std::ios_base::noreplace')
+elif cpp_compiler.has_header_symbol('ios', 'std::ios_base::__noreplace')
+  conf_data.set('NOREPLACE', 'std::ios_base::__noreplace')
+elif conf_data.set('NOREPLACE', 'std::ios_base::_Noreplace', required: true)
+  conf_data.set('NOREPLACE', 'std::ios_base::_Noreplace')
+endif
+
 config = configure_file(input: 'config.h.in',
                         output: 'config.h',
                         configuration: conf_data)

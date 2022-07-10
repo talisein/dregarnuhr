@@ -7,6 +7,7 @@
 #include "outcome/try.hpp"
 #include "log.h"
 #include "utils.h"
+#include "config.h"
 
 namespace {
     static constexpr time_t ZIP_TIME_UNSET = 312796800;
@@ -320,7 +321,7 @@ namespace zip
     {
         mz_zip_zero_struct(&zip);
         ostream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
-        ostream.open(filename, std::ios_base::out | std::ios_base::binary);
+        ostream.open(filename, std::ios_base::out | std::ios_base::binary | NOREPLACE);
         zip.m_pWrite = _file_write_func;
         zip.m_pIO_opaque = &ostream;
         if (MZ_FALSE == mz_zip_writer_init(&zip, 0)) [[unlikely]] {

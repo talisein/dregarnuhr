@@ -1,1 +1,3 @@
+#include <ios>
 #mesondefine IS_WINDOWS
+static constexpr auto NOREPLACE { @NOREPLACE@ };
