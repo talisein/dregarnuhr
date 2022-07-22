@@ -101,11 +101,11 @@ void do_dump()
 
 int main(int argc, char* argv[])
 {
-    #ifdef IS_WINDOWS
-    std::locale::global(std::locale(".utf8"));
-    #else
-    std::locale::global(std::locale(""));
-    #endif
+    if (IS_WINDOWS) {
+        std::locale::global(std::locale(".utf8"));
+    } else {
+        std::locale::global(std::locale(""));
+    }
 
     if (auto res = parse(argc, argv); res.has_failure()) {
         log_error("Failed to parse arguments: ", res.error().message());

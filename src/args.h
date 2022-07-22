@@ -35,6 +35,7 @@ struct args
     std::optional<int> jpg_quality;
     std::optional<int> jpg_scale;
     std::optional<omnibus> omnibus_type;
+    std::optional<unsigned int> compression_level;
 };
 
 

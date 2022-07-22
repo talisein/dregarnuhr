@@ -243,7 +243,7 @@ namespace epub
         const std::string rootfile_path = base_book.rootfile_path;
         basefiles.remove(base_book.rootfile_path);
         OUTCOME_TRY(const auto rootfile_buf, create_rootfile());
-        OUTCOME_TRY(writer.add(rootfile_path, std::span<const char>(rootfile_buf)));
+        OUTCOME_TRY(writer.add(rootfile_path, std::span<const char>(rootfile_buf), get_options()->compression_level));
         return outcome::success();
     }
 
@@ -381,7 +381,7 @@ namespace epub
         if (it == basefiles.end()) { log_error("Couldn't find toc in original?"); return std::errc::no_such_file_or_directory; }
         basefiles.remove(toc_fullpath);
         OUTCOME_TRY(auto toc_buf, create_ncx(toc_fullpath));
-        OUTCOME_TRY(writer.add(toc_fullpath, std::span<const char>(toc_buf)));
+        OUTCOME_TRY(writer.add(toc_fullpath, std::span<const char>(toc_buf), get_options()->compression_level));
         return outcome::success();
     }
 
@@ -449,7 +449,7 @@ namespace epub
             auto dst {root};
             dst.append(USER_COVER_XHTML_PATH);
             std::span<const char> span { USER_COVER_XHTML_BODY.data(), USER_COVER_XHTML_BODY.size() };
-            OUTCOME_TRY(writer.add(dst, span));
+            OUTCOME_TRY(writer.add(dst, span, get_options()->compression_level));
             dst.assign(root);
             dst.append(USER_COVER_JPG_PATH);
             try {
@@ -463,7 +463,7 @@ namespace epub
                     log_error("Incomplete read of omnibus cover: expected ", len, " not ", cover_stream.tellg());
                     return std::errc::resource_unavailable_try_again;
                 }
-                OUTCOME_TRY(writer.add(dst, std::span<const char>(buf.get(), len)));;
+                OUTCOME_TRY(writer.add(dst, std::span<const char>(buf.get(), len), get_options()->compression_level));
             } catch (std::system_error& e) {
                 return e.code();
             } catch (std::exception& e) {
@@ -510,7 +510,7 @@ namespace epub
                 jpeg::compressor comp;
                 jpeg::decompressor decomp {buf};
                 OUTCOME_TRY(const auto outbuf, comp.compress_from(decomp, get_options()->jpg_quality, get_options()->jpg_scale));
-                OUTCOME_TRY(writer.add(dst, outbuf, false));
+                OUTCOME_TRY(writer.add(dst, outbuf, std::nullopt));
                 basefiles.remove(src);
                 continue;
             }
@@ -556,7 +556,7 @@ namespace epub
                     }
                 }
                 auto str = doc.write_to_string();
-                OUTCOME_TRY(writer.add(dst, std::span<const char>(str)));
+                OUTCOME_TRY(writer.add(dst, std::span<const char>(str), get_options()->compression_level));
                 basefiles.remove(src);
                 continue;
             }

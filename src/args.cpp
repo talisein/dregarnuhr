@@ -6,10 +6,12 @@
 #include <iostream>
 #include <system_error>
 #include <cctype>
+#include "config.h"
 #include "outcome/try.hpp"
 #include "outcome/utils.hpp"
 #include "args.h"
 #include "log.h"
+#include "miniz.h"
 
 struct args options;
 
@@ -23,6 +25,7 @@ namespace {
     constinit std::string_view DEFAULT_OMNIBUS_PART3_TITLE { "Ascendence of a Bookworm: Part 3 Chronological Omnibus"sv };
     constinit std::string_view DEFAULT_OMNIBUS_PART4_TITLE { "Ascendence of a Bookworm: Part 4 Chronological Omnibus"sv };
     constinit std::string_view DEFAULT_OMNIBUS_TITLE { "Ascendence of a Bookworm: Chronological Omnibus"sv };
+    constinit mz_uint DEFAULT_COMPRESSION_LEVEL = MZ_DEFAULT_LEVEL;
 }
 
 namespace {
@@ -40,7 +43,9 @@ namespace {
                  "--verbose\t: Print a lot of debugging information\n",
                  "--jpg-scale=N\t: Scale jpg images down by 1/N, where N is between 1-16\n",
                  "--jpg-quality=N\t: Low jpg quality to n, where N is between 1-100\n"
+                 "--compression-level=[0-10,fastest,smallest]\t: Set compression level; only for generated files.\n"
                  "--mode=dump\t: Dump spine and toc data. Give a path to an epub file instead of a directory. This is mostly for development."
+
             );
     }
 
@@ -290,11 +295,26 @@ parse(int argc, char **argv)
         }
         options.cover = path;
     }
+    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--compression-level="sv); }); it != args_options.end()) {
+        auto pos = it->find("="sv);
+        auto level = fs::path(it->substr(pos+1));
+        if (level == "smallest"sv) {
+            options.compression_level = MZ_BEST_COMPRESSION;
+        } else if (level == "fastest"sv) {
+            options.compression_level = MZ_BEST_SPEED;
+        } else {
+            auto l = std::stoi(level);
+            options.compression_level = std::clamp<mz_uint>(l, MZ_NO_COMPRESSION, MZ_UBER_COMPRESSION);
+        }
+        log_info("Compression level set to ", *options.compression_level);
+    }
 
     if (!options.prefix && !options.suffix) {
         options.prefix = std::make_optional<std::string>(DEFAULT_PREFIX);
     }
-
+    if (!options.compression_level) {
+        options.compression_level = DEFAULT_COMPRESSION_LEVEL;
+    }
 
 
     if (args::command::DUMP == options.command) {

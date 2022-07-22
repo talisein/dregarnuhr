@@ -1,3 +1,5 @@
+#pragma once
 #include <ios>
-#mesondefine IS_WINDOWS
+
+static constexpr bool IS_WINDOWS { @IS_WINDOWS@ };
 static constexpr auto NOREPLACE { @NOREPLACE@ };

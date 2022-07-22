@@ -5,6 +5,8 @@
 #include <fstream>
 #include <system_error> // bring in std::error_code et al
 #include <span>
+#include <optional>
+#include "config.h"
 #include "miniz.h"
 #include "outcome/result.hpp"
 #include "outcome/utils.hpp"
@@ -127,10 +129,10 @@ namespace zip
         template <typename T>
         result<void> add(const std::string& filename,
                          std::span<const T> data,
-                         bool compress = true)
+                         std::optional<mz_uint> compression_level)
         {
             try {
-                if (MZ_FALSE == mz_zip_writer_add_mem(&zip, filename.c_str(), data.data(), data.size_bytes(), compress ? 8 : 0)) {
+                if (MZ_FALSE == mz_zip_writer_add_mem(&zip, filename.c_str(), data.data(), data.size_bytes(), compression_level.value_or(0))) {
                     auto err = mz_zip_get_last_error(&zip);
                     return err;
                 }
