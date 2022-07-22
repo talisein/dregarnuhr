@@ -695,6 +695,14 @@ namespace epub
     result<void>
     bookmaker::make_books_impl(definition_t view, std::variant<volume, omnibus> base)
     {
+        if (std::holds_alternative<volume>(base)) {
+            auto basebook = src_books.find(std::get<volume>(base));
+            if (std::end(src_books) == basebook) {
+                log_verbose("Info: ", std::get<volume>(base), " unavailable, skipping.");
+                return std::errc::no_such_file_or_directory;
+            }
+        }
+
         std::set<volume> located_inputs;
         for (const auto& def : view) {
             if (src_books.end() != src_books.find(def.vol))
