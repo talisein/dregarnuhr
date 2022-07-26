@@ -11,6 +11,7 @@ namespace {
     const std::map<std::string_view, volume> volume_map {
         {"9781718344631"sv, volume::FB1},
         {"9781718344648"sv, volume::FB2},
+        {"9781718346734"sv, volume::RA1},
         {"9781718346017"sv, volume::P1V1},
         {"9781718346031"sv, volume::P1V2},
         {"9781718346055"sv, volume::P1V3},
