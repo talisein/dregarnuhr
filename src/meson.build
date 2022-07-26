@@ -9,6 +9,8 @@ elif cpp_compiler.has_header_symbol('ios', 'std::ios_base::__noreplace')
   conf_data.set('NOREPLACE', 'std::ios_base::__noreplace')
 elif cpp_compiler.has_header_symbol('ios', 'std::ios_base::_Noreplace')
   conf_data.set('NOREPLACE', 'std::ios_base::_Noreplace')
+else
+  conf_data.set('NOREPLACE', 'std::ios_base::binary')
 endif
 
 config = configure_file(input: 'config.h.in',
