@@ -716,7 +716,13 @@ namespace epub
 
         try {
             auto res = std::visit(overloaded {
-                    [&](omnibus) { book_writer writer(view.begin()->vol, src_books, src_readers, view); return writer.make_book(); },
+                    [&](omnibus) -> result<fs::path> {
+                        if (std::end(src_books) == src_books.find(view.begin()->vol)) {
+                            log_error("First book in the omnibus ", view.begin()->vol, " must be available.");
+                            return std::errc::no_such_file_or_directory;
+                        }
+                        book_writer writer(view.begin()->vol, src_books, src_readers, view);
+                        return writer.make_book(); },
                     [&](volume v) { book_writer writer(v, src_books, src_readers, view); return writer.make_book();}
                 }, base);
             if (res.has_error()) {
