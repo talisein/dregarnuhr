@@ -321,7 +321,11 @@ namespace zip
     {
         mz_zip_zero_struct(&zip);
         ostream.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+        #ifdef NOREPLACE
         ostream.open(filename, std::ios_base::out | std::ios_base::binary | NOREPLACE);
+        #else
+        ostream.open(filename, std::ios_base::out | std::ios_base::binary);
+        #endif
         zip.m_pWrite = _file_write_func;
         zip.m_pIO_opaque = &ostream;
         if (MZ_FALSE == mz_zip_writer_init(&zip, 0)) [[unlikely]] {
