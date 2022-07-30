@@ -38,10 +38,6 @@ libxmlpp_dep = dependency('libxml++-5.0',
                                             'validation=false',
                                             'maintainer-mode=false'])
 
-date_dep = dependency('date',
-                      fallback: ['hinnant-date', 'tz_dep'],
-                      default_options: ['default_library=static'])
-
 cmake = import('cmake')
 opt_var = cmake.subproject_options()
 opt_var.add_cmake_defines({
@@ -54,5 +50,9 @@ opt_var.set_install(false)
 curl_proj = cmake.subproject('libcurl', options: opt_var)
 message(curl_proj.target_list())
 curl_dep = curl_proj.dependency('libcurl')
+
+date_dep = dependency('date',
+                      fallback: ['hinnant-date', 'tz_dep'],
+                      default_options: ['default_library=static'])
 
 subdir('src')
