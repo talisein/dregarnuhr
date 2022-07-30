@@ -88,7 +88,7 @@ void do_dump()
               <<  dump_volume << "},\n";
     for (const auto& item : book.manifest.items) {
         std::cout << "{ volume::" << dump_volume << ", "
-                  << std::quoted(item.id) <<  "sv, " <<  std::quoted(item.href) << "sv, "
+                  <<  std::quoted(item.href) << "sv, "
                   << std::quoted(item.media_type) <<  "sv, ";
         if (item.toc_label) {
             std::cout << std::quoted(*item.toc_label) << "sv";

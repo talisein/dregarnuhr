@@ -76,6 +76,9 @@ jobs:
   build-mac:
     # The type of runner that the job will run on
     runs-on: macos-latest
+    env:
+      CC: gcc-12
+      CXX: g++-12
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -99,7 +102,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Configure
-        run: CC=gcc-12 CXX=g++-12 meson setup --warnlevel 3 --buildtype release --default-library static build-mac
+        run: meson setup --warnlevel 3 --buildtype release --default-library static build-mac
 
       # Runs a set of commands using the runners shell
       - name: Compile

@@ -14,24 +14,21 @@
 
 namespace
 {
+    const auto _omnibus_list { std::to_array({
+                part_1::get_part_1(),
+                part_2::get_part_2(),
+                part_3::get_part_3(),
+                part_4::get_part_4()
+            })
+    };
 
-    std::vector<volume_definition> _make_omnibus()
-    {
-        std::array _omnibus_list = std::to_array<std::span<const volume_definition>>({
-                part_1::get_part_1(), part_2::get_part_2(), part_3::get_part_3(), part_4::get_part_4()
-            });
+    const std::ranges::join_view _omnibus_view { _omnibus_list };
 
-        std::vector<volume_definition> x;
-        auto view { std::ranges::views::filter(std::ranges::join_view(_omnibus_list), utils::filter_chapter_stylesheet{}) };
-        std::ranges::copy(view, std::back_inserter(x));
-//        std::ranges::transform(view, std::back_inserter(x), utils::transform_unique_ids{string_set, "part4"});
-        std::ranges::stable_sort(x);
-        std::ranges::for_each(x, utils::foreach_label{}); // Must be done in order after sort
-        return x;
-    }
-
-    const std::vector<volume_definition> _omnibus = _make_omnibus();
-
+    const std::vector<volume_definition> _omnibus = utils::make_omnibus_def(_omnibus_view,
+                                                                            part_1::get_reservation() +
+                                                                            part_2::get_reservation() +
+                                                                            part_3::get_reservation() +
+                                                                            part_4::get_reservation());
 
 }
 

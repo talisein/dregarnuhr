@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <source_location>
 #include <cassert>
+#include <chrono>
 #include <libxml++/libxml++.h>
 #include <outcome/try.hpp>
 #include <outcome/utils.hpp>
@@ -221,6 +222,19 @@ namespace epub
             return std::errc::invalid_argument;
         }
 
+        // Get modified
+        manifest manifest;
+        auto modified_set = find_quiet("/opf:package/opf:metadata/opf:meta[@property='dcterms:modified']/text()", map, root, rootfile_path);
+        if (modified_set.has_value()) {
+            auto textnode = dynamic_cast<const xmlpp::TextNode*>(modified_set.value().front());
+            if (textnode) {
+                log_info("Modified: ", textnode->get_content());
+                std::istringstream iss(textnode->get_content());
+                date::utc_seconds tp;
+                iss >> date::parse("%Y-%m-%dT%H:%M:%SZ", manifest.modified);
+            }
+        }
+
         OUTCOME_TRY(auto tocncx, find_attr_required("/opf:package/opf:spine/@toc", map, root, rootfile_path));
         log_verbose(rootfile_path, ": toc: ", tocncx);
 
@@ -231,7 +245,6 @@ namespace epub
         std::string toc_path = prefix + "/"s + toc_href;
         log_verbose(rootfile_path, ": toc_href: ", toc_href, ", toc_path: ", toc_path);
 
-        manifest manifest;
         OUTCOME_TRY(manifest.toc, dump_toc(prefix + "/"s + toc_href));
         manifest.toc_relpath = toc_href;
         OUTCOME_TRY(auto items, find("/opf:package/opf:manifest/opf:item", map, root, rootfile_path));

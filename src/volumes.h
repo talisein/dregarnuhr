@@ -87,26 +87,36 @@ enum class omnibus
 
 OUTCOME_V2_NAMESPACE::result<volume> identify_volume(std::string_view uid);
 std::string_view to_string_view(volume vol);
+std::string_view to_string_view(omnibus vol);
 
-std::ostream& operator<<(std::ostream& os, const volume& v);
-std::ostream& operator<<(std::ostream& os, const omnibus& v);
+std::ostream& operator<<(std::ostream& os, volume v);
+std::ostream& operator<<(std::ostream& os, omnibus v);
 
-struct volume_definition;
-chapter_type get_chapter_type(const volume_definition& v);
 struct volume_definition
 {
     volume vol;
-    std::string_view id;
     std::string_view href;
     std::string_view mediatype;
     std::optional<std::string_view> toc_label;
     bool in_spine;
 
-    chapter_type get_chapter_type() const;
-
-    bool is_in_spine(const std::map<volume, std::unique_ptr<epub::book_reader>>&) {
-        return in_spine;
+    void print_id(std::ostream &os) const {
+        auto pos = href.find_last_of('/');
+        os << vol << '-';
+        if (pos == std::string_view::npos) {
+            os << href;
+        } else {
+            os << href.substr(pos+1);
+        }
     }
+
+    std::string get_id() const {
+        std::stringstream ss;
+        print_id(ss);
+        return ss.str();
+    }
+
+    chapter_type get_chapter_type() const;
 
     inline friend bool operator==(const volume_definition& lhs, const volume_definition& rhs)
     {
@@ -118,6 +128,29 @@ struct volume_definition
     }
 };
 
-chapter_uniqueness get_uniqueness(chapter_type c);
+constexpr chapter_uniqueness
+get_uniqueness(chapter_type c) {
+    switch (c)
+    {
+        case TOC:
+        case NCX:
+        case MAP_EHRENFEST:
+        case MAP_YURGENSCHMIDT:
+        case FAMILY_TREE:
+        case SIGNUP:
+        case COPYRIGHT: return chapter_uniqueness::SINGLE;
+        case COVER:
+        case CHARACTERS:
+        case CHAPTER:
+        case IMAGE:
+        case STYLESHEET:
+        case MANGA:
+        case AFTERWORD:
+        case POLL:
+        case BONUS:
+        case FRONTMATTER: return chapter_uniqueness::MULTIPLE;
+    }
+    return chapter_uniqueness::MULTIPLE;
+}
 
 std::ostream& operator<<(std::ostream& os, const volume_definition& v);

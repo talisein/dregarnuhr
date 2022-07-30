@@ -11,4 +11,5 @@ namespace part_3
     std::span<const volume_definition> get_vol_4();
     std::span<const volume_definition> get_vol_5();
     std::span<const volume_definition> get_part_3();
+    size_t get_reservation();
 }

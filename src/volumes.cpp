@@ -1,3 +1,4 @@
+#include <system_error>
 #include <string_view>
 #include <map>
 #include <regex>
@@ -120,7 +121,7 @@ identify_volume(std::string_view uid)
     return iter->second;
 }
 
-std::ostream& operator<<(std::ostream& os, const volume& v)
+std::ostream& operator<<(std::ostream& os, volume v)
 {
     os << to_string_view(v);
     return os;
@@ -128,7 +129,7 @@ std::ostream& operator<<(std::ostream& os, const volume& v)
 
 std::ostream& operator<<(std::ostream& os, const volume_definition& v)
 {
-    os << "{ volume::" << v.vol << ", " << std::quoted(v.id) << ", " << std::quoted(v.href)
+    os << "{ volume::" << v.vol << ", " << std::quoted(v.href)
        << ", " << std::quoted(v.mediatype) << ", ";
     if (v.toc_label)
         os << std::quoted(v.toc_label.value());
@@ -136,33 +137,6 @@ std::ostream& operator<<(std::ostream& os, const volume_definition& v)
         os << "std::nullopt";
     os << ", " << std::boolalpha << v.in_spine << " }";
     return os;
-}
-
-chapter_uniqueness
-get_uniqueness(chapter_type c)
-{
-    switch (c)
-    {
-        case TOC:
-        case NCX:
-        case MAP_EHRENFEST:
-        case MAP_YURGENSCHMIDT:
-        case FAMILY_TREE:
-        case SIGNUP:
-        case COPYRIGHT: return chapter_uniqueness::SINGLE;
-        case COVER:
-        case CHARACTERS:
-        case CHAPTER:
-        case IMAGE:
-        case STYLESHEET:
-        case MANGA:
-        case AFTERWORD:
-        case POLL:
-        case BONUS:
-        case FRONTMATTER: return chapter_uniqueness::MULTIPLE;
-    }
-    assert(false);
-    return chapter_uniqueness::MULTIPLE;
 }
 
 chapter_type
@@ -231,29 +205,25 @@ volume_definition::get_chapter_type() const
         return SIGNUP;
     }
 
+    throw std::system_error();
     log_error("Unclassified chapter type in ", vol, " for ", href);
     return CHAPTER;
 }
 
-std::ostream& operator<<(std::ostream& os, const omnibus& v)
+std::string_view to_string_view(omnibus v)
 {
     switch (v) {
-        case omnibus::PART1:
-            os << "Part 1";
-            break;
-        case omnibus::PART2:
-            os << "Part 2";
-            break;
-        case omnibus::PART3:
-            os << "Part 3";
-            break;
-        case omnibus::PART4:
-            os << "Part 4";
-            break;
-        case omnibus::ALL:
-            os << "All";
-            break;
+        case omnibus::PART1: return "Part 1"sv;
+        case omnibus::PART2: return "Part 2"sv;
+        case omnibus::PART3: return "Part 3"sv;
+        case omnibus::PART4: return "Part 4"sv;
+        case omnibus::ALL: return "All"sv;
     }
+    return "UnknownOmnibus"sv;
+}
 
+std::ostream& operator<<(std::ostream& os, omnibus v)
+{
+    os << to_string_view(v);
     return os;
 }

@@ -247,6 +247,18 @@ namespace epub
         return outcome::success();
     }
 
+    std::string
+    book_writer::get_ncx_id() const
+    {
+        auto defs = get_filtered_defs(definition, src_books, src_readers);
+        auto it = std::ranges::find(defs, NCX, &volume_definition::get_chapter_type);
+        if (defs.end() == it) {
+            throw std::system_error();
+        } else {
+            return it->get_id();
+        }
+    }
+
     // TODO: filters, and missing volumes like fanbook, should be excluded in the rootfile and toc
     result<std::string>
     book_writer::create_rootfile()
@@ -266,18 +278,24 @@ namespace epub
             if (base_child->get_name() == "spine") {
                 auto spine = dynamic_cast<xmlpp::Element*>(root->import_node(base_child, false));
                 for (auto attr : base_child->get_first_child()->get_parent()->get_attributes()) {
-                    spine->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+                    if (attr->get_name() == "toc") {
+                        spine->set_attribute(attr->get_name(),
+                                             get_ncx_id(),
+                                             attr->get_namespace_prefix());
+                    } else {
+                        spine->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+                    }
                 }
                 // Insert cover first
                 if (get_options()->omnibus_type && get_options()->cover) {
                     auto itemref = spine->add_child_element("itemref");
                     itemref->set_attribute("idref", xmlpp::ustring(USER_COVER_XHTML_ID));
                 }
-                for (const auto &def : get_filtered_defs(definition, src_books, src_readers) | std::ranges::views::filter([](const auto& x){return x.in_spine;})) {
+                for (const auto &def : get_filtered_defs(definition, src_books, src_readers) | std::ranges::views::filter(&volume_definition::in_spine)) {
                     auto itemref = spine->add_child_element("itemref");
-                    itemref->set_attribute("idref", xmlpp::ustring(def.id));
+                    itemref->set_attribute("idref", def.get_id());
                     auto src_book = src_books.find(def.vol);
-                    auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&def](const auto &item) { return item.href == def.href; });
+                    auto src_iter = std::ranges::find(src_book->second.manifest.items, def.href, &manifest::item::href);
                     if (src_iter != std::end(src_book->second.manifest.items)) {
                         if (src_iter->spine_properties) {
                             auto v = src_iter->spine_properties.value();
@@ -329,7 +347,7 @@ namespace epub
                 for (const auto &def : get_filtered_defs(definition, src_books, src_readers)) {
                     const auto src_book = src_books.find(def.vol);
                     auto item = manifest->add_child_element("item");
-                    item->set_attribute("id", xmlpp::ustring(def.id));
+                    item->set_attribute("id", def.get_id());
                     // basebook just stay in normal place
                     if (def.vol == base_vol) {
                         // toc.ncx will stay in OEBPS
@@ -344,9 +362,7 @@ namespace epub
                     item->set_attribute("media-type", xmlpp::ustring(def.mediatype));
 
                     // TODO: Maybe just use the source for most of the above properties
-                    auto src_iter = std::ranges::find_if(src_book->second.manifest.items, [&def](const auto &item) {
-                            return def.href == item.href;
-                        });
+                    auto src_iter = std::ranges::find(src_book->second.manifest.items, def.href, &manifest::item::href);
                     if (src_iter != src_book->second.manifest.items.end() && src_iter->properties) {
                         if (src_iter->properties.value() != "cover-image" || !get_options()->omnibus_type.has_value()) {
                             item->set_attribute("properties", src_iter->properties.value());
@@ -369,7 +385,6 @@ namespace epub
             }
         }
 
-        // TODO: Validation
         return doc.write_to_string_formatted();
     }
 
@@ -378,7 +393,7 @@ namespace epub
     {
         const auto toc_fullpath = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1).append(base_book.manifest.toc_relpath);
         auto it = std::ranges::find(basefiles, toc_fullpath);
-        if (it == basefiles.end()) { log_error("Couldn't find toc in original?"); return std::errc::no_such_file_or_directory; }
+        if (it == basefiles.end()) { log_error("Couldn't find toc in original? Basebook ", vol, "  Wasn't at ", toc_fullpath); return std::errc::no_such_file_or_directory; }
         basefiles.remove(toc_fullpath);
         OUTCOME_TRY(auto toc_buf, create_ncx(toc_fullpath));
         OUTCOME_TRY(writer.add(toc_fullpath, std::span<const char>(toc_buf), get_options()->compression_level));
@@ -485,7 +500,7 @@ namespace epub
             }
             const auto& src_reader = src_reader_iter->second;
             const auto& src_book = src_books.find(def.vol)->second;
-            const auto& src_item = std::ranges::find_if(src_book.manifest.items, [&id = def.id](const auto &item) { return id == item.id; });
+            const auto& src_item = std::ranges::find(src_book.manifest.items, def.href, &manifest::item::href);
             std::optional<manifest::item> item;
             if (std::end(src_book.manifest.items) != src_item) {
                 item = std::make_optional<manifest::item>(*src_item);

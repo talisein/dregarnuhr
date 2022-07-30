@@ -111,7 +111,7 @@ namespace jpeg
             jpeg_start_decompress(&decompressor.cinfo);
             jpeg_start_compress(&cinfo, TRUE);
             const auto row_stride = decompressor.cinfo.output_width * decompressor.cinfo.output_components;
-            auto buffer = (*decompressor.cinfo.mem->alloc_sarray) ((j_common_ptr)&decompressor.cinfo, JPOOL_IMAGE, row_stride, 1);
+            auto buffer = (*decompressor.cinfo.mem->alloc_sarray) (reinterpret_cast<j_common_ptr>(&decompressor.cinfo), JPOOL_IMAGE, row_stride, 1);
             while (decompressor.cinfo.output_scanline < decompressor.cinfo.output_height) {
                 auto dim_read = jpeg_read_scanlines(&decompressor.cinfo, buffer, 1);
                 auto dim_wrote [[maybe_unused]] = jpeg_write_scanlines(&cinfo, buffer, dim_read);
