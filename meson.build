@@ -44,12 +44,14 @@ opt_var.add_cmake_defines({
   'BUILD_CURL_EXE': false,
   'BUILD_TESTING': false,
   'BUILD_SHARED_LIBS': false,
+  'HTTP_ONLY': true,
 })
 opt_var.set_install(false)
 
 curl_proj = cmake.subproject('libcurl', options: opt_var)
 message(curl_proj.target_list())
 curl_dep = curl_proj.dependency('libcurl')
+meson.override_dependency('libcurl', curl_dep)
 
 date_dep = dependency('date',
                       fallback: ['hinnant-date', 'tz_dep'],
