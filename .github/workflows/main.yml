@@ -112,7 +112,8 @@ jobs:
         run: ninja -C build-mac
 
       - name: ldd
-        run: dyld_info build-mac/src/dregarnuhr
+        run: dyldinfo build-mac/src/dregarnuhr
+        continue-on-error: true
 
       # Tests
       - name: Test
