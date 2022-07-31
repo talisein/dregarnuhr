@@ -112,7 +112,7 @@ jobs:
         run: ninja -C build-mac
 
       - name: ldd
-        run: ldd build-mac/src/dregarnuhr
+        run: dyld_info build-mac/src/dregarnuhr
 
       # Tests
       - name: Test
