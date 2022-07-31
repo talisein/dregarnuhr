@@ -4,14 +4,17 @@
 #include <optional>
 #include <algorithm>
 #include <system_error>
-#include <chrono>
 #include "libxml++/document.h"
 #include "libxml++/parsers/domparser.h"
 #include "outcome/result.hpp"
-#include "date/date.h"
 #include "zip.h"
 #include "config.h"
 
+#if HAVE_CHRONO
+#include <chrono>
+#else
+#include "date/date.h"
+#endif
 
 namespace epub
 {
