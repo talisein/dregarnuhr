@@ -20,6 +20,8 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_function
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip')
 cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace')
 
+has_chrono = 0 != cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>')
+
 jpeg_dep = dependency('libjpeg', version: '>=2.1.0', fallback: ['libjpeg-turbo'])
 
 zlib_dep = dependency('zlib', fallback: ['zlib'])
@@ -38,10 +40,12 @@ libxmlpp_dep = dependency('libxml++-5.0',
                                             'validation=false',
                                             'maintainer-mode=false'])
 
+if not has_chrono
 date_dep = dependency('date',
                       fallback: ['hinnant-date', 'date_dep'],
                       default_options: ['default_library=static',
                                         'use_manual_tzdb=true'])
+endif
 
 http_dep = dependency('cpp-httplib',
                       fallback: ['cpp-httplib'],

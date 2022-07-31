@@ -3,9 +3,9 @@
 #include "updates.h"
 #include "log.h"
 
-std::map<volume, date::sys_seconds> get_updated()
+update_map_t get_updated()
 {
-    std::map<volume, date::sys_seconds> map;
+    update_map_t map;
     httplib::Client cli("http://aoabmonitor.talinet.net");
     cli.set_follow_location(true);
     auto res = cli.Get("/updates.json");

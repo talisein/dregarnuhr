@@ -2,7 +2,8 @@
 
 conf_data = configuration_data()
 conf_data.set('IS_WINDOWS', host_machine.system() == 'windows' ? 'true' : 'false')
-
+conf_data.set10('HAVE_CHRONO', has_chrono)
+conf_data.set10('HAVE_FORMAT', cpp_compiler.has_header_symbol('version', '__cpp_lib_format'))
 if cpp_compiler.has_header_symbol('ios', 'std::ios_base::noreplace')
   conf_data.set('NOREPLACE', 'std::ios_base::noreplace')
 elif cpp_compiler.has_header_symbol('ios', 'std::ios_base::__noreplace')
@@ -17,7 +18,12 @@ config = configure_file(input: 'config.h.in',
                         output: 'config.h',
                         configuration: conf_data)
 
-deps = [zlib_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep, date_dep, http_dep]
+deps = [zlib_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep, http_dep]
+
+if not has_chrono
+  deps += date_dep
+endif
+
 inc = []
 src = ['main.cpp',
        'zip.cpp',

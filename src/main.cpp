@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <cstdlib>
+#include <chrono>
 #include <system_error>
 
 #include "outcome/result.hpp"
@@ -13,6 +14,11 @@
 #include "bookmaker.h"
 #include "updates.h"
 
+#if HAVE_FORMAT
+#include <format>
+#else
+#include <ctime>
+#endif
 
 namespace fs = std::filesystem;
 
@@ -72,8 +78,21 @@ result<void> print_books(const fs::path& input_dir)
         auto jnc_updated = tag->second;
         auto epub_updated = it.second.manifest.modified;
         if ((jnc_updated - std::chrono::days(10)) > epub_updated) {
+            #if HAVE_CHRONO
+            using namespace std::chrono;
+            #if HAVE_FORMAT
+            log_info("UPDATE AVAILABLE: ", it.first, " has an updated epub as of ", std::format("{0:%c}", jnc_updated));
+            log_info("Book updated: ", std::format("{0:%c}", epub_updated));
+            #else
+            auto jnc_time = system_clock::to_time_t(clock_cast<system_clock>(jnc_updated));
+            log_info("UPDATE AVAILABLE: ", it.first, " has an updated epub as of ", std::ctime(&jnc_time));
+            auto epub_time = system_clock::to_time_t(clock_cast<system_clock>(epub_updated));
+            log_info("Book updated: ", std::ctime(&epub_updated));
+            #endif
+            #else
             log_info("UPDATE AVAILABLE: ", it.first, " has an updated epub as of ", date::format("%c", jnc_updated));
             log_info("Book updated: ", date::format("%c", epub_updated));
+            #endif
             need_updates = true;
         }
     }

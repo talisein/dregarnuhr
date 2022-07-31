@@ -7,6 +7,7 @@
 #include <libxml++/libxml++.h>
 #include <outcome/try.hpp>
 #include <outcome/utils.hpp>
+#include "config.h"
 #include "epub.h"
 #include "log.h"
 #include "utils.h"
@@ -231,7 +232,11 @@ namespace epub
                 log_verbose("Modified: ", textnode->get_content());
                 std::istringstream iss(textnode->get_content());
                 static const std::basic_string<std::istringstream::char_type> format("%Y-%m-%dT%H:%M:%SZ");
+                #if HAVE_CHRONO
+                std::chrono::from_stream(iss, format.c_str(), manifest.modified);
+                #else
                 date::from_stream(iss, format.c_str(), manifest.modified);
+                #endif
             }
         }
 

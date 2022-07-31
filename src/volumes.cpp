@@ -262,4 +262,5 @@ get_volume_from_slug(std::string_view sv)
     }
     log_error("Unknown volume for slug ", sv);
     assert(false);
+    return volume::P1V1;
 }

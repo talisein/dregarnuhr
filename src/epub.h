@@ -4,11 +4,13 @@
 #include <optional>
 #include <algorithm>
 #include <system_error>
+#include <chrono>
 #include "libxml++/document.h"
 #include "libxml++/parsers/domparser.h"
 #include "outcome/result.hpp"
 #include "date/date.h"
 #include "zip.h"
+#include "config.h"
 
 
 namespace epub
@@ -43,7 +45,11 @@ namespace epub
 
     struct manifest {
         std::string toc_relpath;
+        #if HAVE_CHRONO
+        std::chrono::sys_seconds modified;
+        #else
         date::sys_seconds modified;
+        #endif
         struct toc toc;
         struct item {
             std::string id;
