@@ -231,7 +231,6 @@ volume_definition::get_chapter_type() const
         return SIGNUP;
     }
 
-    throw std::system_error();
     log_error("Unclassified chapter type in ", vol, " for ", href);
     return CHAPTER;
 }
