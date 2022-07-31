@@ -31,8 +31,8 @@ outcome_dep = dependency('outcome-2.0', fallback: ['outcome'])
 
 libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
 
-http_dep = dependency('httplib',
-                      fallback: ['cpp-httplib'])
+http_dep = dependency('httplib', 'cpp-httplib',
+                      fallback: ['cpp-httplib', 'cpp_httplib_dep'])
 
 libxmlpp_dep = dependency('libxml++-5.0',
                           version : '>=5.0.0',
@@ -47,7 +47,6 @@ if not has_chrono
 date_dep = dependency('date',
                       fallback: ['hinnant-date', 'date_dep'],
                       default_options: ['use_manual_tzdb=true'])
-
 endif
 
 subdir('src')
