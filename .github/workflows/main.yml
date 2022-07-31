@@ -36,7 +36,7 @@ jobs:
       - name: Install deps
         run: |
           sudo apt-get update
-          sudo apt-get install meson g++-12 ninja-build libcpp-httplib-dev libhowardhinnant-date-dev
+          sudo apt-get install meson g++-12 ninja-build libhowardhinnant-date-dev
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
