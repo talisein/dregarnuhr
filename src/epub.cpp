@@ -230,7 +230,8 @@ namespace epub
             if (textnode) {
                 log_verbose("Modified: ", textnode->get_content());
                 std::istringstream iss(textnode->get_content());
-                iss >> date::parse("%Y-%m-%dT%H:%M:%SZ", manifest.modified);
+                static const std::basic_string<std::istringstream::char_type> format("%Y-%m-%dT%H:%M:%SZ");
+                date::from_stream(iss, format.c_str(), manifest.modified);
             }
         }
 

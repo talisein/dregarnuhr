@@ -247,13 +247,14 @@ namespace epub
         return outcome::success();
     }
 
-    std::string
+    result<std::string>
     book_writer::get_ncx_id() const
     {
         auto defs = get_filtered_defs(definition, src_books, src_readers);
         auto it = std::ranges::find(defs, NCX, &volume_definition::get_chapter_type);
         if (defs.end() == it) {
-            throw std::system_error();
+            log_error("No NCX found in volume definition");
+            return std::errc::invalid_argument;
         } else {
             return it->get_id();
         }
@@ -279,8 +280,9 @@ namespace epub
                 auto spine = dynamic_cast<xmlpp::Element*>(root->import_node(base_child, false));
                 for (auto attr : base_child->get_first_child()->get_parent()->get_attributes()) {
                     if (attr->get_name() == "toc") {
+                        OUTCOME_TRY(auto ncx_id, get_ncx_id());
                         spine->set_attribute(attr->get_name(),
-                                             get_ncx_id(),
+                                             ncx_id,
                                              attr->get_namespace_prefix());
                     } else {
                         spine->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
