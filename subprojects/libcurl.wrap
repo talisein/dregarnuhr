@@ -1,9 +1,0 @@
-[wrap-file]
-source_url = https://github.com/curl/curl/releases/download/curl-7_84_0/curl-7.84.0.tar.xz
-source_filename = curl-7.84.0.tar.xz
-directory = curl-7.84.0
-source_hash = 2d118b43f547bfe5bae806d8d47b4e596ea5b25a6c1f080aef49fbcd817c5db8
-
-
-[provide]
-dependency_names = libcurl

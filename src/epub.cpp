@@ -228,9 +228,8 @@ namespace epub
         if (modified_set.has_value()) {
             auto textnode = dynamic_cast<const xmlpp::TextNode*>(modified_set.value().front());
             if (textnode) {
-                log_info("Modified: ", textnode->get_content());
+                log_verbose("Modified: ", textnode->get_content());
                 std::istringstream iss(textnode->get_content());
-                date::utc_seconds tp;
                 iss >> date::parse("%Y-%m-%dT%H:%M:%SZ", manifest.modified);
             }
         }

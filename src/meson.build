@@ -17,7 +17,7 @@ config = configure_file(input: 'config.h.in',
                         output: 'config.h',
                         configuration: conf_data)
 
-deps = [zlib_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep, date_dep, curl_dep]
+deps = [zlib_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep, date_dep, http_dep]
 inc = []
 src = ['main.cpp',
        'zip.cpp',
@@ -33,7 +33,7 @@ src = ['main.cpp',
        'part4.cpp',
        'omnibus.cpp',
        'utils.cpp',
-       'curl.cpp'
+       'updates.cpp',
       ]
 
 exe = executable('dregarnuhr', src,

@@ -46,6 +46,32 @@ namespace {
         {"9781718338227"sv, volume::MP2V5},
     };
 
+    const std::map<std::string_view, volume> slug_map {
+        {"ascendance-of-a-bookworm-royal-academy-stories-first-year"sv, volume::RA1},
+        {"ascendance-of-a-bookworm-fanbook-1"sv, volume::FB1},
+        {"ascendance-of-a-bookworm-fanbook-2"sv, volume::FB2},
+        {"ascendance-of-a-bookworm"sv, volume::P1V1},
+        {"ascendance-of-a-bookworm-volume-2"sv, volume::P1V2},
+        {"ascendance-of-a-bookworm-part-1-volume-3"sv, volume::P1V3},
+        {"ascendance-of-a-bookworm-part-2-volume-1"sv, volume::P2V1},
+        {"ascendance-of-a-bookworm-part-2-volume-2"sv, volume::P2V2},
+        {"ascendance-of-a-bookworm-part-2-volume-3"sv, volume::P2V3},
+        {"ascendance-of-a-bookworm-part-2-volume-4"sv, volume::P2V4},
+        {"ascendance-of-a-bookworm-part-3-volume-1"sv, volume::P3V1},
+        {"ascendance-of-a-bookworm-part-3-volume-2"sv, volume::P3V2},
+        {"ascendance-of-a-bookworm-part-3-volume-3"sv, volume::P3V3},
+        {"ascendance-of-a-bookworm-part-3-volume-4"sv, volume::P3V4},
+        {"ascendance-of-a-bookworm-part-3-volume-5"sv, volume::P3V5},
+        {"ascendance-of-a-bookworm-part-4-volume-1"sv, volume::P4V1},
+        {"ascendance-of-a-bookworm-part-4-volume-2"sv, volume::P4V2},
+        {"ascendance-of-a-bookworm-part-4-volume-3"sv, volume::P4V3},
+        {"ascendance-of-a-bookworm-part-4-volume-4"sv, volume::P4V4},
+        {"ascendance-of-a-bookworm-part-4-volume-5"sv, volume::P4V5},
+        {"ascendance-of-a-bookworm-part-4-volume-6"sv, volume::P4V6},
+        {"ascendance-of-a-bookworm-part-4-volume-7"sv, volume::P4V7},
+//        {"ascendance-of-a-bookworm-part-4-volume-8"sv, volume::P4V8},
+    };
+
     const std::regex cover_regex                   {"cover.xhtml", std::regex_constants::icase};
     const std::regex frontmatter_regex             {"text/front", std::regex_constants::icase};
     const std::regex chapter_regex                 {"(xhtml/p-[0-9]*.xhtml|cover.xhtml|text/character|chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
@@ -226,4 +252,15 @@ std::ostream& operator<<(std::ostream& os, omnibus v)
 {
     os << to_string_view(v);
     return os;
+}
+
+volume
+get_volume_from_slug(std::string_view sv)
+{
+    auto it = slug_map.find(sv);
+    if (it != slug_map.end()) {
+        return it->second;
+    }
+    log_error("Unknown volume for slug ", sv);
+    assert(false);
 }

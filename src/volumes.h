@@ -154,3 +154,5 @@ get_uniqueness(chapter_type c) {
 }
 
 std::ostream& operator<<(std::ostream& os, const volume_definition& v);
+
+volume get_volume_from_slug(std::string_view sv);

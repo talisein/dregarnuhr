@@ -24,15 +24,10 @@ void _log_helper(std::ostream& out, bool autonl, T t)
         std::string_view sv {t};
         if (!autonl || (!sv.empty() && '\n' == sv.back())) {
             out << sv;
+            return;
         } else {
             out << sv << '\n';
-        }
-        if (0 != strcmp("\n", t)) {
-            out << t;
-            if (autonl)
-                out << '\n';
-        } else if (autonl) {
-            out << '\n';
+            return;
         }
     } else {
         out << t;

@@ -8,7 +8,6 @@
 #include "libxml++/parsers/domparser.h"
 #include "outcome/result.hpp"
 #include "date/date.h"
-#include "date/tz.h"
 #include "zip.h"
 
 
@@ -44,7 +43,7 @@ namespace epub
 
     struct manifest {
         std::string toc_relpath;
-        date::utc_seconds modified;
+        date::sys_seconds modified;
         struct toc toc;
         struct item {
             std::string id;

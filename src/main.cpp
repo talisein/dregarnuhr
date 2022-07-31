@@ -11,6 +11,7 @@
 #include "log.h"
 #include "config.h"
 #include "bookmaker.h"
+#include "updates.h"
 
 
 namespace fs = std::filesystem;
@@ -59,6 +60,26 @@ result<void> print_books(const fs::path& input_dir)
     }
     if (books.end() == books.find(volume::FB2)) {
         log_info("Couldn't find Fanbook 2, so those chapters will be skipped in the new epubs.");
+    }
+    auto tags = get_updated();
+    bool need_updates = false;
+    for (const auto &it : books) {
+        auto tag = tags.find(it.first);
+        if (tag == tags.end()) {
+            log_verbose(it.first, " has no entry in updates.json");
+            continue;
+        }
+        auto jnc_updated = tag->second;
+        auto epub_updated = it.second.manifest.modified;
+        if ((jnc_updated - std::chrono::days(10)) > epub_updated) {
+            log_info("UPDATE AVAILABLE: ", it.first, " has an updated epub as of ", date::format("%c", jnc_updated));
+            log_info("Book updated: ", date::format("%c", epub_updated));
+            need_updates = true;
+        }
+    }
+
+    if (need_updates) {
+        log_info("Updates are available from JNC: https://j-novel.club/user");
     }
 
     epub::bookmaker bookmaker(std::move(books), std::move(book_readers));
