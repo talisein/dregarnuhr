@@ -4,4 +4,3 @@
 static constexpr bool IS_WINDOWS { @IS_WINDOWS@ };
 static constexpr auto NOREPLACE { @NOREPLACE@ };
 #mesondefine HAVE_CHRONO
-#mesondefine HAVE_FORMAT

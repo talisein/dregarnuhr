@@ -4,6 +4,7 @@ project('dregarnuhr', ['c', 'cpp'],
         default_options : ['c_std=gnu17',
                            'cpp_std=gnu++20',
                            'buildtype=release',
+                           'default_library=static',
                            'cpp_eh=a'])
 
 if host_machine.system() == 'linux'
@@ -24,13 +25,14 @@ has_chrono = 0 != cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix
 
 jpeg_dep = dependency('libjpeg', version: '>=2.1.0', fallback: ['libjpeg-turbo'])
 
-zlib_dep = dependency('zlib', fallback: ['zlib'])
-
 miniz_dep = dependency('miniz', fallback: ['miniz', 'miniz_dep'])
 
 outcome_dep = dependency('outcome-2.0', fallback: ['outcome'])
 
 libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
+
+http_dep = dependency('httplib',
+                      fallback: ['cpp-httplib'])
 
 libxmlpp_dep = dependency('libxml++-5.0',
                           version : '>=5.0.0',
@@ -40,14 +42,12 @@ libxmlpp_dep = dependency('libxml++-5.0',
                                             'validation=false',
                                             'maintainer-mode=false'])
 
+
 if not has_chrono
 date_dep = dependency('date',
                       fallback: ['hinnant-date', 'date_dep'],
-                      default_options: ['default_library=static',
-                                        'use_manual_tzdb=true'])
+                      default_options: ['use_manual_tzdb=true'])
+
 endif
 
-http_dep = dependency('cpp-httplib',
-                      fallback: ['cpp-httplib'],
-                      default_options: ['default_library=static'])
 subdir('src')

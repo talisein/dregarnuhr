@@ -1,4 +1,6 @@
 #include <sstream>
+#undef CPPHTTPLIB_BROTLI_SUPPORT
+#undef CPPHTTPLIB_OPENSSL_SUPPORT
 #include "httplib.h"
 #include "updates.h"
 #include "log.h"

@@ -2,6 +2,7 @@
 
 #include <numeric>
 #include <concepts>
+#include <algorithm>
 #include <stdexcept>
 #include <sstream>
 #include <string_view>

@@ -8,7 +8,6 @@
 #include <memory>
 
 #include "outcome/result.hpp"
-#include "epub.h"
 
 enum class volume
 {

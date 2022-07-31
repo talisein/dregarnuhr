@@ -12,6 +12,11 @@
 #include "log.h"
 #include "utils.h"
 
+#if !HAVE_CHRONO
+#include "date/date.h"
+#endif
+
+
 namespace
 {
     constexpr bool verify_mimetype(std::string_view mimetype)

@@ -36,7 +36,7 @@ jobs:
       - name: Install deps
         run: |
           sudo apt-get update
-          sudo apt-get install meson g++-12 ninja-build
+          sudo apt-get install meson g++-12 ninja-build libcpp-httplib-dev libhowardhinnant-date-dev
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -58,6 +58,9 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Compile
         run: ninja -C build-linux
+
+      - name: ldd
+        run: ldd build-linux/src/dregarnuhr
 
       # Tests
       - name: Test
@@ -107,6 +110,9 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Compile
         run: ninja -C build-mac
+
+      - name: ldd
+        run: ldd build-mac/src/dregarnuhr
 
       # Tests
       - name: Test
