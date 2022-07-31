@@ -8,10 +8,10 @@
 
 #if HAVE_CHRONO
 #include <chrono>
-using std::map<volume, std::chrono::sys_seconds> = update_map_t;
+using update_map_t = std::map<volume, std::chrono::sys_seconds>;
 #else
 #include "date/date.h"
-using std::map<volume, date::sys_seconds> = update_map_t;
+using update_map_t = std::map<volume, date::sys_seconds>;
 #endif
 
 update_map_t get_updated();
