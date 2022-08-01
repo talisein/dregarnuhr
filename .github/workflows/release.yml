@@ -40,6 +40,9 @@ jobs:
       - name: Compile
         run: ninja -C build-linux
 
+      - name: ldd
+        run: ldd build-linux/src/dregarnuhr
+
       - name: Test
         run: ninja -C build-linux test
 

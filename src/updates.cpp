@@ -1,6 +1,4 @@
 #include <sstream>
-#undef CPPHTTPLIB_BROTLI_SUPPORT
-#undef CPPHTTPLIB_OPENSSL_SUPPORT
 #include "httplib.h"
 #include "updates.h"
 #include "log.h"
@@ -8,11 +6,19 @@
 update_map_t get_updated()
 {
     update_map_t map;
+// Support https if someone builds from source
+#ifdef CPPHTTPLIB_OPENSSL_SUPPORT
+    httplib::Client cli("https://aoabmonitor.talinet.net");
+#else
     httplib::Client cli("http://aoabmonitor.talinet.net");
+#endif
     cli.set_follow_location(true);
+    cli.set_connection_timeout(5, 0); // 5 seconds
+    cli.set_read_timeout(5, 0);
+    cli.set_write_timeout(5, 0);
     auto res = cli.Get("/updates.json");
-    if (res->status < 200 || res->status >= 300) {
-        log_error("Couldn't fetch updates.json: ", res->status);
+    if (!res) {
+        log_error("Couldn't fetch updates.json: ", res.error());
         return map;
     }
     std::istringstream iss(res->body);

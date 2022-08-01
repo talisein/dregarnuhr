@@ -13,6 +13,27 @@ version at [mldriscoll/AOAB](https://github.com/mldriscoll/AOAB/). Their version
 is a Windows-only application, but offers perhaps a more curated
 output. Dregarnuhr is available for Windows, Mac, and Linux.
 
+This program leverages [aoab-monitor](https://github.com/talisein/aoab-monitor)
+to alert you if there are updates available for your epub files. FYI it will fetch [updates.json](https://aoabmonitor.talinet.net/updates.json) from the web.
+
+# Dependencies
+There is a meson wrap for all dependencies, but if you'd like to build from
+source and avoid what you can, install the following packages.
+
+- Ubuntu
+  - `libhowardhinnant-date-dev libcpp-httplib-dev libxml2-dev libjpeg-turbo8-dev meson ninja-build`
+- Fedora
+  - `libjpeg-turbo-devel miniz-devel libxml2-devel libxml++-devel cpp-httplib-devel date-devel meson ninja-build`
+
+# Building
+Its easiest to just grab a binary from the [releases](https://github.com/talisein/dregarnuhr/releases) page, but if you are interested in building:
+
+```
+# meson setup build && ninja -C build
+# # Invoke with:
+# build/src/dregarnuhr ~/Documents/epub_in_dir ~/Documents/epub_out_dir
+```
+
 # Limitations (TODOs)
 
 - If you make an omnibus, you need the first book.
@@ -26,15 +47,15 @@ long as your epubs have a ".epub" extension, the metadata will be read to
 identify the volume.
 
 ```
-# dregarnuhr ../../../Documents/Myne ../../../Documents/Myne_out
-Output directory "../../../Documents/Myne_out" doesn't exist. Creating.
-Found P1V1: "../../../Documents/Myne/a-great-first-book.epub"
-Found P1V2: "../../../Documents/Myne/any-epub-name-works.epub"
-Found P1V3: "../../../Documents/Myne/ascendance-of-a-bookworm-part-1-volume-3.epub"
+# dregarnuhr Documents/Myne Documents/Myne_out
+Output directory "Documents/Myne_out" doesn't exist. Creating.
+Found P1V1: "Documents/Myne/a-great-first-book.epub"
+Found P1V2: "Documents/Myne/any-epub-name-works.epub"
+Found P1V3: "Documents/Myne/ascendance-of-a-bookworm-part-1-volume-3.epub"
 <snip>
-Created chronologically ordered P1V1: "../../../Documents/Myne_out/chronological-a-great-first-book.epub"
-Created chronologically ordered P1V2: "../../../Documents/Myne_out/chronological-any-epub-name-works.epub"
-Created chronologically ordered P1V3: "../../../Documents/Myne_out/chronological-ascendance-of-a-bookworm-part-1-volume-3.epub"
+Created chronologically ordered P1V1: "Documents/Myne_out/chronological-a-great-first-book.epub"
+Created chronologically ordered P1V2: "Documents/Myne_out/chronological-any-epub-name-works.epub"
+Created chronologically ordered P1V3: "Documents/Myne_out/chronological-ascendance-of-a-bookworm-part-1-volume-3.epub"
 ```
 
 If you want to create a slimmed down set of volumes to read on your phone, you
@@ -47,6 +68,7 @@ are about 3MiB large, a good improvement over the 30MiB originals.
 # src/dregarnuhr --jpg-quality=75 --jpg-scale=2 '--filter=name=bonus[0-9].(jpg|xhtml)'  ~/Documents/Myne ~/Documents/Myne_out
 ```
 
+## Omnibus
 To create a single epub omnibus containing all your volumes:
 ```
 # dregarnuhr --omnibus --prefix=omnibus- ~/Documents/Myne out
@@ -64,43 +86,22 @@ covers/ directory of this repo. Custom covers are only for an omnibus.
 dregarnuhr --omnibus --cover=cover.jpg ~/Documents/Myne out
 ```
 
+## Other examples
 If you invoke the program several times, output files are never overwritten.
 ```
-# dregarnuhr ../../../Documents/Myne ../../../Documents/Myne_out
+# dregarnuhr Documents/Myne Documents/Myne_out
 <snip>
-Created chronologically ordered P1V1: "../../../Documents/Myne_out/chronological-a-great-first-book (2).epub"
+Created chronologically ordered P1V1: "Documents/Myne_out/chronological-a-great-first-book (2).epub"
 ```
 
 You can specify a prefix and/or a suffix for the generated filenames
 
 ```
-# dregarnuhr --prefix=linear- --suffix=-dregarnuhr-edition ../../../Documents/Myne ../../../Documents/Myne_out
+# dregarnuhr --prefix=linear- --suffix=-dregarnuhr-edition Documents/Myne Documents/Myne_out
 Info: Filename suffix set to "-dregarnuhr-edition"
 Info: Filename prefix set to "linear-"
 <snip>
-Created chronologically ordered P1V1: "../../../Documents/Myne_out/linear-a-great-first-book-dregarnuhr-edition.epub"
-```
-
-If it can't identify your volumes for some reason, pass the verbose flag and
-share the output by creating an issue here on github, or tag me on the J-Novel
-forums (@talisein).
-
-```
-# dregarnuhr ../../../Documents/Myne ../../../Documents/Myne_out --verbose
-Verified input dir: ../../../Documents/Myne
-Verified output dir: ../../../Documents/Myne_out
-Info: Looking for epubs in ../../../Documents/Myne
-Info: considering ../../../Documents/Myne/ascendance-of-a-bookworm-fanbook-1.epub
-mimetype: application/epub+zip
-META-INF/container.xml
-META-INF/container.xml: rootfile: OEBPS/content.opf
-OEBPS/content.opf: toc: ncx
-OEBPS/content.opf: toc_href: toc.ncx, toc_path: OEBPS/toc.ncx
-OEBPS/toc.ncx: dtb_uid: 9781718344631
-OEBPS/toc.ncx: dtb_depth: 1
-OEBPS/toc.ncx: title: Ascendance of a Bookworm: Official Fanbook Volume 1
-Info: considering ../../../Documents/Myne/ascendance-of-a-bookworm-fanbook-2.epub
-<snip>
+Created chronologically ordered P1V1: "Documents/Myne_out/linear-a-great-first-book-dregarnuhr-edition.epub"
 ```
 
 For safety, this program will automatically ignore any input that it had
@@ -118,6 +119,29 @@ Info: "out/chronological-ascendance-of-a-bookworm-part-1-volume-3.epub" is produ
 Couldn't find Fanbook 1, so those chapters will be skipped in the new epubs.
 Couldn't find Fanbook 2, so those chapters will be skipped in the new epubs.
 Sorry, no books could be created.
+```
+
+## Bug reports
+If it can't identify your volumes for some reason, pass the verbose flag and
+share the output by creating an issue here on github, or tag me on the J-Novel
+forums (@talisein).
+
+```
+# dregarnuhr Documents/Myne Documents/Myne_out --verbose
+Verified input dir: Documents/Myne
+Verified output dir: Documents/Myne_out
+Info: Looking for epubs in Documents/Myne
+Info: considering Documents/Myne/ascendance-of-a-bookworm-fanbook-1.epub
+mimetype: application/epub+zip
+META-INF/container.xml
+META-INF/container.xml: rootfile: OEBPS/content.opf
+OEBPS/content.opf: toc: ncx
+OEBPS/content.opf: toc_href: toc.ncx, toc_path: OEBPS/toc.ncx
+OEBPS/toc.ncx: dtb_uid: 9781718344631
+OEBPS/toc.ncx: dtb_depth: 1
+OEBPS/toc.ncx: title: Ascendance of a Bookworm: Official Fanbook Volume 1
+Info: considering Documents/Myne/ascendance-of-a-bookworm-fanbook-2.epub
+<snip>
 ```
 
 Finally, this is completely unrelated to Ascendence of a Bookworm, but [Miku is

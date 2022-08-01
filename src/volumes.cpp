@@ -72,25 +72,6 @@ namespace {
 //        {"ascendance-of-a-bookworm-part-4-volume-8"sv, volume::P4V8},
     };
 
-    const std::regex cover_regex                   {"cover.xhtml", std::regex_constants::icase};
-    const std::regex frontmatter_regex             {"text/front", std::regex_constants::icase};
-    const std::regex chapter_regex                 {"(xhtml/p-[0-9]*.xhtml|cover.xhtml|text/character|chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
-    const std::regex map_ehrenfest_label_regex     {"Map of Ehrenfest", std::regex_constants::icase}; // can also use toc_label but this works for now
-    const std::regex map_yurgenschmidt_label_regex {"Map of Yurgenschmidt", std::regex_constants::icase};
-    const std::regex map_ehrenfest_href_regex      {"map.xhtml", std::regex_constants::icase}; // can also use toc_label but this works for now
-    const std::regex map_yurgenschmidt_href_regex  {"map2.xhtml", std::regex_constants::icase};
-    const std::regex family_tree_regex             {"tree.xhtml", std::regex_constants::icase};
-    const std::regex afterword_regex               {"afterword.xhtml", std::regex_constants::icase};
-    const std::regex manga_regex                   {"text/manga", std::regex_constants::icase};
-    const std::regex poll_regex                    {"text/poll", std::regex_constants::icase};
-    const std::regex bonus_regex                   {"text/bonus", std::regex_constants::icase};
-    const std::regex copyright_regex               {"text/copyright", std::regex_constants::icase};
-    const std::regex ncx_regex                     {"dtbncx", std::regex_constants::icase}; // mediatype
-    const std::regex stylesheet_regex              {"css", std::regex_constants::icase};
-    const std::regex image_regex                   {"image/", std::regex_constants::icase}; //mediatype
-    const std::regex toc_regex                     {"toc.xhtml", std::regex_constants::icase};
-    const std::regex characters_regex              {"text/character", std::regex_constants::icase};
-    const std::regex signup_regex                  {"text/signup", std::regex_constants::icase};
 }
 
 std::string_view to_string_view(volume vol)
@@ -136,6 +117,17 @@ std::string_view to_string_view(volume vol)
     return "UNKNOWN"sv;
 }
 
+std::string_view to_string_view(omnibus v)
+{
+    switch (v) {
+        case omnibus::PART1: return "Part 1"sv;
+        case omnibus::PART2: return "Part 2"sv;
+        case omnibus::PART3: return "Part 3"sv;
+        case omnibus::PART4: return "Part 4"sv;
+        case omnibus::ALL: return "All"sv;
+    }
+    return "UnknownOmnibus"sv;
+}
 
 OUTCOME_V2_NAMESPACE::result<volume>
 identify_volume(std::string_view uid)
@@ -168,6 +160,26 @@ std::ostream& operator<<(std::ostream& os, const volume_definition& v)
 chapter_type
 volume_definition::get_chapter_type() const
 {
+    static const std::regex cover_regex                   {"cover.xhtml", std::regex_constants::icase};
+    static const std::regex frontmatter_regex             {"text/front", std::regex_constants::icase};
+    static const std::regex chapter_regex                 {"(xhtml/p-[0-9]*.xhtml|cover.xhtml|text/character|chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
+    static const std::regex map_ehrenfest_label_regex     {"Map of Ehrenfest", std::regex_constants::icase}; // can also use toc_label but this works for now
+    static const std::regex map_yurgenschmidt_label_regex {"Map of Yurgenschmidt", std::regex_constants::icase};
+    static const std::regex map_ehrenfest_href_regex      {"map.xhtml", std::regex_constants::icase}; // can also use toc_label but this works for now
+    static const std::regex map_yurgenschmidt_href_regex  {"map2.xhtml", std::regex_constants::icase};
+    static const std::regex family_tree_regex             {"tree.xhtml", std::regex_constants::icase};
+    static const std::regex afterword_regex               {"afterword.xhtml", std::regex_constants::icase};
+    static const std::regex manga_regex                   {"text/manga", std::regex_constants::icase};
+    static const std::regex poll_regex                    {"text/poll", std::regex_constants::icase};
+    static const std::regex bonus_regex                   {"text/bonus", std::regex_constants::icase};
+    static const std::regex copyright_regex               {"text/copyright", std::regex_constants::icase};
+    static const std::regex ncx_regex                     {"dtbncx", std::regex_constants::icase}; // mediatype
+    static const std::regex stylesheet_regex              {"css", std::regex_constants::icase};
+    static const std::regex image_regex                   {"image/", std::regex_constants::icase}; //mediatype
+    static const std::regex toc_regex                     {"toc.xhtml", std::regex_constants::icase};
+    static const std::regex characters_regex              {"text/character", std::regex_constants::icase};
+    static const std::regex signup_regex                  {"text/signup", std::regex_constants::icase};
+
     if (std::regex_search(mediatype.begin(), mediatype.end(), image_regex)) {
         return IMAGE;
     }
@@ -233,18 +245,6 @@ volume_definition::get_chapter_type() const
 
     log_error("Unclassified chapter type in ", vol, " for ", href);
     return CHAPTER;
-}
-
-std::string_view to_string_view(omnibus v)
-{
-    switch (v) {
-        case omnibus::PART1: return "Part 1"sv;
-        case omnibus::PART2: return "Part 2"sv;
-        case omnibus::PART3: return "Part 3"sv;
-        case omnibus::PART4: return "Part 4"sv;
-        case omnibus::ALL: return "All"sv;
-    }
-    return "UnknownOmnibus"sv;
 }
 
 std::ostream& operator<<(std::ostream& os, omnibus v)
