@@ -205,7 +205,9 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
-      - run: dregarnuhr-macos/dregarnuhr --check
+      - run: |
+          chmod u+x dregarnuhr-macos/dregarnuhr
+          dregarnuhr-macos/dregarnuhr --check
 
   check-run-win:
     needs: build-win
