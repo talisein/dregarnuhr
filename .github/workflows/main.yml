@@ -53,7 +53,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Configure
-        run: meson setup  --warnlevel 3 --buildtype release --default-library static  build-linux
+        run: meson setup  --warnlevel 3 --buildtype release --default-library static -Dcpp_link_args=-static-libstdc++ build-linux
 
       # Runs a set of commands using the runners shell
       - name: Compile
@@ -91,7 +91,7 @@ jobs:
       - name: Install deps
         run: |
           brew update
-          brew install meson libxml2 gcc@12 ninja
+          brew install meson gcc@12 ninja
 
       - name: Cache subprojects
         id: meson-cache
@@ -105,7 +105,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Configure
-        run: meson setup --warnlevel 3 --buildtype release --default-library static build-mac
+        run: meson setup --warnlevel 3 --buildtype release --default-library static -Dcpp_link_args=-static-libstdc++ --force-fallback-for libjpeg build-mac
 
       # Runs a set of commands using the runners shell
       - name: Compile
@@ -174,3 +174,30 @@ jobs:
         with:
           name: dregarnuhr-win
           path: build-win/src/dregarnuhr.exe
+
+  check-run-linux:
+    needs: build-linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      - run: dregarnuhr-linux/dregarnuhr --check
+
+  check-run-mac:
+    needs: build-mac
+    runs-on: macos-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      - run: dregarnuhr-mac/dregarnuhr --check
+
+  check-run-win:
+    needs: build-win
+    runs-on: windows-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      - run: dregarnuhr-win/dregarnuhr.exe --check

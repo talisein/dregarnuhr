@@ -12,6 +12,7 @@
 #include "args.h"
 #include "log.h"
 #include "miniz.h"
+#include "updates.h"
 
 struct args options;
 
@@ -307,6 +308,16 @@ parse(int argc, char **argv)
             options.compression_level = std::clamp<mz_uint>(l, MZ_NO_COMPRESSION, MZ_UBER_COMPRESSION);
         }
         log_info("Compression level set to ", *options.compression_level);
+    }
+    if (find (args_options, "--check"sv) != args_options.end()) {
+        auto map = get_updated();
+        if (map.size() > 0) {
+            log_info("Got updates.json, size ", map.size());
+        } else {
+            log_info("Failed to get updates.json");
+        }
+        log_info("This executable works.");
+        exit(0);
     }
 
     if (!options.prefix && !options.suffix) {

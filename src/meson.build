@@ -46,3 +46,5 @@ exe = executable('dregarnuhr', src,
                  include_directories: inc,
                  dependencies: deps,
                  install: true)
+
+test('Simple', exe, args: ['--check'])

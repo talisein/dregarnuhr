@@ -22,7 +22,7 @@ jobs:
       - name: Install deps
         run: |
           sudo apt-get update
-          sudo apt-get install meson g++-12 ninja-build
+          sudo apt-get install meson g++-12 ninja-build libhowardhinnant-date-dev
 
       - name: Cache subprojects
         id: meson-cache
@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Configure
-        run: meson setup --buildtype release --default-library static  build-linux
+        run: meson setup --buildtype release --default-library static -Dcpp_link_args=-static-libstdc++ build-linux
 
       - name: Compile
         run: ninja -C build-linux
@@ -64,7 +64,7 @@ jobs:
       - name: Install deps
         run: |
           brew update
-          brew install meson libxml2 gcc@12 ninja
+          brew install meson gcc@12 ninja
 
       - name: Cache subprojects
         id: meson-cache
@@ -77,10 +77,14 @@ jobs:
             ${{ runner.os }}-
 
       - name: Configure
-        run: meson setup --buildtype release --default-library static build-mac
+        run: meson setup --buildtype release --default-library static -Dcpp_link_args=-static-libstdc++ --force-fallback-for libjpeg build-mac
 
       - name: Compile
         run: ninja -C build-mac
+
+      - name: ldd
+        run: otool -L build-mac/src/dregarnuhr
+        continue-on-error: true
 
       - name: Test
         run: ninja -C build-mac test
@@ -133,8 +137,35 @@ jobs:
           name: dregarnuhr-win
           path: build-win/src/dregarnuhr.exe
 
+  check-run-linux:
+    needs: build-linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      - run: dregarnuhr-linux/dregarnuhr --check
+
+  check-run-mac:
+    needs: build-mac
+    runs-on: macos-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      - run: dregarnuhr-mac/dregarnuhr --check
+
+  check-run-win:
+    needs: build-win
+    runs-on: windows-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      - run: dregarnuhr-win/dregarnuhr.exe --check
+
   release:
-    needs: [build-linux, build-mac, build-win]
+    needs: [check-run-linux, check-run-mac, check-run-win]
     name: Create Release
     runs-on: ubuntu-latest
     steps:
@@ -159,7 +190,7 @@ jobs:
           REF: ${{ github.event.ref }}
         run: echo "::set-output name=MYREF::`echo $REF | tr -d refs/tags`"
 
-      - run: tar -C ./dregarnuhr-linux -czvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
+      - run: tar -C ./dregarnuhr-linux -cJvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz" dregarnuhr
       - run: tar -C ./dregarnuhr-macos -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
       - run: zip -j ./dregarnuhr-win dregarnuhr-win/dregarnuhr.exe
       - run: mv ./dregarnuhr-win.zip "./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip"
