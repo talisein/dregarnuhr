@@ -143,9 +143,9 @@ parse(int argc, char **argv)
     using namespace std::ranges;
     const std::vector<std::string_view> args_sv { argv + 1, argv + argc};
 
-    if (argc < 3) {
+    if (argc < 2) {
         usage(argv[0]);
-        return outcome::failure(std::errc::invalid_argument);
+        exit(0);
     }
     options.command = args::command::NORMAL;
     auto args_options { views::filter(args_sv, [](const auto &sv) { return sv.starts_with("--"sv); }) };
@@ -332,7 +332,7 @@ parse(int argc, char **argv)
         const auto num_files = std::distance(args_files.begin(), args_files.end());
         if (num_files == 0) {
             usage(argv[0]);
-            return outcome::failure(std::errc::invalid_argument);
+            exit(0);
         }
         auto it = args_files.begin();
 
@@ -349,7 +349,7 @@ parse(int argc, char **argv)
     if (args::command::NORMAL == options.command) {
         if (std::distance(args_files.begin(), args_files.end()) != 2) {
             usage(argv[0]);
-            return outcome::failure(std::errc::invalid_argument);
+            exit(0);
         }
 
         auto it = args_files.begin();

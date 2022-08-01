@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <chrono>
 #include <system_error>
+#include <locale>
+#include <clocale>
 
 #include "outcome/result.hpp"
 #include "outcome/try.hpp"
@@ -134,10 +136,16 @@ void do_dump()
 
 int main(int argc, char* argv[])
 {
-    if (IS_WINDOWS) {
-        std::locale::global(std::locale(".utf8"));
-    } else {
-        std::locale::global(std::locale(""));
+    try {
+        if (IS_WINDOWS) {
+            std::locale::global(std::locale(".utf8"));
+        } else {
+            std::locale::global(std::locale(""));
+        }
+    } catch (std::exception &e) {
+        // MacOS has issues
+        std::setlocale(LC_ALL, "");
+        log_info("Warning: Couldn't set locale, but we will continue.");
     }
 
     if (auto res = parse(argc, argv); res.has_failure()) {
