@@ -21,7 +21,7 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_function
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip')
 cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace')
 
-has_chrono = 0 != cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>')
+has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>')
 
 # Fedora libjpeg-turbo-devel, Ubuntu libjpeg-turbo8-dev
 jpeg_dep = dependency('libjpeg', version: '>=2.1.0', fallback: ['libjpeg-turbo'])
