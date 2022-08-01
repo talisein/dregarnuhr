@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Configure
-        run: meson setup --buildtype release --default-library static -Dcpp_link_args=-static-libstdc++ build-linux
+        run: meson setup --buildtype release --default-library static build-linux
 
       - name: Compile
         run: ninja -C build-linux
@@ -155,7 +155,9 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
-      - run: dregarnuhr-macos/dregarnuhr --check
+      - run: |
+          chmod u+x dregarnuhr-macos/dregarnuhr
+          dregarnuhr-macos/dregarnuhr --check
 
   check-run-win:
     needs: build-win
@@ -194,6 +196,7 @@ jobs:
 
       - run: chmod u+x dregarnuhr-linux/dregarnuhr
       - run: tar -C ./dregarnuhr-linux -cJvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz" dregarnuhr
+      - run: chmod u+x dregarnuhr-macos/dregarnuhr
       - run: tar -C ./dregarnuhr-macos -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
       - run: zip -j ./dregarnuhr-win dregarnuhr-win/dregarnuhr.exe
       - run: mv ./dregarnuhr-win.zip "./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip"
