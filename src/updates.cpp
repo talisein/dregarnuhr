@@ -24,7 +24,8 @@ namespace {
             if (colon_it == std::ranges::end(colon_split)) continue;
             auto no_ws = std::views::drop_while(*colon_it, [](unsigned char c) {return std::isspace(c);});
             std::chrono::seconds::rep ts;
-            auto [ptr, ec] = std::from_chars(std::ranges::begin(no_ws), std::ranges::end(no_ws), ts);
+            auto [ptr, ec] = std::from_chars(std::to_address(std::ranges::begin(no_ws)),
+                                             std::to_address(std::ranges::end(no_ws)), ts);
             if (ec != std::errc()) continue;
             auto it = map.emplace(get_volume_from_slug(slug_sv), std::chrono::seconds(ts));
             log_verbose("Emplaced ", it.first->first, ": ", it.first->second.time_since_epoch());
