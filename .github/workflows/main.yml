@@ -57,7 +57,7 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Configure
-        run: meson setup  --warnlevel 3 --buildtype release --default-library static build-linux
+        run: meson setup  --warnlevel 3 --buildtype release --default-library static --force-fallback-for libjpeg build-linux
 
       # Runs a set of commands using the runners shell
       - name: Compile
@@ -196,7 +196,7 @@ jobs:
 
       - run: |
           chmod u+x dregarnuhr-linux/dregarnuhr
-          dregarnuhr-linux/dregarnuhr --check
+          dregarnuhr-linux/dregarnuhr --check --verbose
 
   check-run-mac:
     needs: build-mac
@@ -207,7 +207,7 @@ jobs:
 
       - run: |
           chmod u+x dregarnuhr-macos/dregarnuhr
-          dregarnuhr-macos/dregarnuhr --check
+          dregarnuhr-macos/dregarnuhr --check --verbose
 
   check-run-win:
     needs: build-win
@@ -216,4 +216,4 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
-      - run: dregarnuhr-win/dregarnuhr.exe --check
+      - run: dregarnuhr-win/dregarnuhr.exe --check --verbose
