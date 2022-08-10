@@ -43,10 +43,25 @@ namespace utils
 
     struct foreach_label
     {
-        void operator()(volume_definition &def);
+        void operator()(volume_definition &def)
+        {
+            if (!prev_label) {
+                prev_label = def.toc_label;
+                return;
+            }
+
+            if (def.toc_label) {
+                if (prev_label.value() == def.toc_label.value()) {
+                    def.toc_label = std::nullopt;
+                } else {
+                    prev_label = def.toc_label;
+                }
+            }
+        }
     private:
         std::optional<std::string_view> prev_label;
     };
+
 
 
     template<std::integral To, std::integral From>
@@ -63,6 +78,21 @@ namespace utils
         }
         return res;
     }
+
+    template <size_t N, size_t... I>
+    consteval std::array<volume_definition, N>
+    vec_to_arr_impl(const std::vector<volume_definition>& v, std::index_sequence<I...>)
+    {
+        return { {v[I]...} };
+    }
+
+    template<size_t N>
+    consteval auto vec_to_arr(const std::vector<volume_definition>& v)
+    {
+        return vec_to_arr_impl<N>(v, std::make_index_sequence<N>{});
+    }
+
+
 
     template<std::ranges::input_range T>
     [[nodiscard]] std::vector<volume_definition>

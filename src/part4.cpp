@@ -685,7 +685,90 @@ namespace
         });
 
     constexpr std::array vol_8 = std::to_array<volume_definition>({
-            {},
+            { volume::P4V8, "toc.ncx"sv, "application/x-dtbncx+xml"sv, std::nullopt, false },
+{ volume::P4V8, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+{ volume::P4V8, "Images/jnovelclubCMYK.png"sv, "image/png"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Characters1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Characters2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Characters3.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Cover.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Insert1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Insert2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Insert3.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Insert4.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Insert5.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Insert6.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Insert7.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Insert8.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Insert9.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Insert10.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Manga1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Manga2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Map.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Map2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Bonus1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/Bonus2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/FrontMatter1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Images/FrontMatter2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V8, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, "Cover"sv, true },
+{ volume::P4V8, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
+{ volume::P4V8, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/characters1.xhtml"sv, "application/xhtml+xml"sv, "Characters"sv, true },
+{ volume::P4V8, "Text/characters2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/characters3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/toc.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/prologue.xhtml"sv, "application/xhtml+xml"sv, "Prologue"sv, true },
+{ volume::P4V8, "Text/chapter1.xhtml"sv, "application/xhtml+xml"sv, "The Return and a Dinner Meeting"sv, true },
+{ volume::P4V8, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "The Winter Playroom and Judithe’s Younger Brother"sv, true },
+{ volume::P4V8, "Text/insert1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter2_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Discussion with the Plantin Company"sv, true },
+{ volume::P4V8, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Melchior’s Baptism"sv, true },
+{ volume::P4V8, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter4_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, "Ahrensbach’s Fish Cuisine"sv, true },
+{ volume::P4V8, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, "Returning to the Temple and the Meeting with the Gutenbergs"sv, true },
+{ volume::P4V8, "Text/insert3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter6_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter7.xhtml"sv, "application/xhtml+xml"sv, "Dissecting Fish"sv, true },
+{ volume::P4V8, "Text/insert4.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter7_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter8.xhtml"sv, "application/xhtml+xml"sv, "Spring Prayer and Leaving for Leisegang"sv, true },
+{ volume::P4V8, "Text/chapter9.xhtml"sv, "application/xhtml+xml"sv, "Giebe Leisegang"sv, true },
+{ volume::P4V8, "Text/chapter10.xhtml"sv, "application/xhtml+xml"sv, "Visiting Great-Grandfather"sv, true },
+{ volume::P4V8, "Text/chapter11.xhtml"sv, "application/xhtml+xml"sv, "Sitting Out the Archduke Conference"sv, true },
+{ volume::P4V8, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter11_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter21.xhtml"sv, "application/xhtml+xml"sv, "Clearing Regrets from Ten Years Ago"sv, true },
+{ volume::P4V8, "Text/chapter12.xhtml"sv, "application/xhtml+xml"sv, "Report on the Archduke Conference (Second Year)"sv, true },
+{ volume::P4V8, "Text/chapter13.xhtml"sv, "application/xhtml+xml"sv, "A More Private Meeting (Second Year)"sv, true },
+{ volume::P4V8, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter13_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, "Decisions"sv, true },
+{ volume::P4V8, "Text/insert7.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter14_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter22.xhtml"sv, "application/xhtml+xml"sv, "Ten Years of Change"sv, true },
+{ volume::P4V8, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "Successors"sv, true },
+{ volume::P4V8, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "Another Discussion and Making Rejuvenation Potions"sv, true },
+{ volume::P4V8, "Text/chapter17.xhtml"sv, "application/xhtml+xml"sv, "Hartmut’s First Ceremony and Another Jureve"sv, true },
+{ volume::P4V8, "Text/insert8.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter17_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter18.xhtml"sv, "application/xhtml+xml"sv, "A Visitor and Counterstrategies"sv, true },
+{ volume::P4V8, "Text/chapter19.xhtml"sv, "application/xhtml+xml"sv, "The Welcoming Feast"sv, true },
+{ volume::P4V8, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "Ferdinand’s Estate"sv, true },
+{ volume::P4V8, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/chapter20_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/epilogue.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
+{ volume::P4V8, "Text/insert10.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
+{ volume::P4V8, "Text/map2.xhtml"sv, "application/xhtml+xml"sv, "Map of Yurgenschmidt"sv, true },
+{ volume::P4V8, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
+{ volume::P4V8, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
+{ volume::P4V8, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
+{ volume::P4V8, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V8, "Text/signup.xhtml"sv, "application/xhtml+xml"sv, "About J-Novel Club"sv, true },
+{ volume::P4V8, "Text/copyright.xhtml"sv, "application/xhtml+xml"sv, "Copyright"sv, true },
     });
 
     constexpr auto _part_4_list { std::to_array<std::span<const volume_definition>>({
@@ -695,11 +778,21 @@ namespace
                 std::span(vol_4),
                 std::span(vol_5),
                 std::span(vol_6),
-                std::span(vol_7)
+                std::span(vol_7),
+                std::span(vol_8)
             })
     };
 
-    constexpr std::ranges::join_view _part_4_view {_part_4_list};
+    consteval auto _get_part4_view()
+    {
+        constexpr std::ranges::join_view l{_part_4_list};
+        constexpr auto sz = std::distance(l.begin(), l.end());
+        std::vector<volume_definition> v(l.begin(),
+                                         l.end());// { r.begin(), r.end() };
+        return utils::vec_to_arr<sz>(v);
+    }
+
+    constexpr std::array _part_4_view = _get_part4_view();
 
     const std::vector<volume_definition> _part_4 = utils::make_omnibus_def(_part_4_view, utils::calc_reservation(_part_4_list));
 
@@ -750,6 +843,13 @@ namespace part_4
     get_vol_7()
     {
         return std::span<const volume_definition>(vol_7);
+    }
+
+
+    std::span<const volume_definition>
+    get_vol_8()
+    {
+        return std::span<const volume_definition>(vol_8);
     }
 
 

@@ -12,7 +12,7 @@ namespace
 {
     using namespace std::string_view_literals;
 
-    constinit std::array vol_1 = std::to_array<volume_definition>({
+    constexpr std::array vol_1 = std::to_array<volume_definition>({
 { volume::P2V1, "toc.ncx"sv, "application/x-dtbncx+xml"sv, std::nullopt, false },
 { volume::P2V1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
 { volume::FB2, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
@@ -214,7 +214,7 @@ namespace
         });
 
 
-constinit std::array vol_2 = std::to_array<volume_definition>({
+constexpr std::array vol_2 = std::to_array<volume_definition>({
 { volume::P2V2, "toc.ncx"sv, "application/x-dtbncx+xml"sv, std::nullopt, false },
 { volume::P2V2, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
 { volume::FB2, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
@@ -320,7 +320,7 @@ constinit std::array vol_2 = std::to_array<volume_definition>({
         });
 
 
-    constinit std::array vol_3 = std::to_array<volume_definition>({
+    constexpr std::array vol_3 = std::to_array<volume_definition>({
 { volume::P2V3, "toc.ncx"sv, "application/x-dtbncx+xml"sv, std::nullopt, false },
 { volume::P2V3, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
 { volume::P2V4, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
@@ -398,7 +398,7 @@ constinit std::array vol_2 = std::to_array<volume_definition>({
         });
 
 
-constinit std::array vol_4 = std::to_array<volume_definition>({
+constexpr std::array vol_4 = std::to_array<volume_definition>({
 { volume::P2V4, "toc.ncx"sv, "application/x-dtbncx+xml"sv, std::nullopt, false },
 { volume::P2V4, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
 { volume::FB2, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
@@ -489,9 +489,18 @@ constinit std::array vol_4 = std::to_array<volume_definition>({
             std::span(vol_1), std::span(vol_2), std::span(vol_3), std::span(vol_4)
     });
 
-    constexpr std::ranges::join_view _part_2_view {_part_2_list};
+    consteval auto _get_part2_view()
+    {
+        constexpr std::ranges::join_view l{_part_2_list};
+        constexpr auto sz = std::distance(l.begin(), l.end());
+        std::vector<volume_definition> v(l.begin(),
+                                         l.end());
+        return utils::vec_to_arr<sz>(v);
+    }
 
-    const std::vector<volume_definition> _part_2 = utils::make_omnibus_def(_part_2_view, utils::calc_reservation(_part_2_list));
+    constexpr std::array _part_2_view = _get_part2_view();
+
+    const std::vector<volume_definition> _part_2 = utils::make_omnibus_def(_part_2_view, _part_2_view.size());
 } // namespace
 
 namespace part_2

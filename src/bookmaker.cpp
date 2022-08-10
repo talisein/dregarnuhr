@@ -62,6 +62,7 @@ namespace {
             volume::P4V5,
             volume::P4V6,
             volume::P4V7,
+            volume::P4V8,
         });
 
     constexpr epub::definition_t get_definition_view(omnibus o)
@@ -125,7 +126,8 @@ namespace {
                 return part_4::get_vol_6();
             case volume::P4V7:
                 return part_4::get_vol_7();
-            case volume::P4V8: [[fallthrough]];
+            case volume::P4V8:
+                return part_4::get_vol_8();
             case volume::FB1: [[fallthrough]];
             case volume::FB2: [[fallthrough]];
             case volume::MP1V1: [[fallthrough]];
@@ -720,6 +722,7 @@ namespace epub
             }
         }
 
+        log_verbose("The defined view is size ", view.size());
         std::set<volume> located_inputs;
         for (const auto& def : view) {
             if (src_books.end() != src_books.find(def.vol))
@@ -764,9 +767,12 @@ namespace epub
         int created_books = 0;
 
         if (get_options()->omnibus_type) {
-            auto res = make_books_impl(get_definition_view(get_options()->omnibus_type.value()), *get_options()->omnibus_type);
+            auto res = make_books_impl(get_definition_view(get_options()->omnibus_type.value()),
+                                       *get_options()->omnibus_type);
             if (res) {
                 ++created_books;
+            } else {
+                log_info(res.error());
             }
         } else {
             for (auto defined_volume : defined_volumes) {

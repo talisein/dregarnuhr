@@ -442,7 +442,16 @@ constexpr std::array vol_5 = std::to_array<const volume_definition>({
         std::span(vol_1), std::span(vol_2), std::span(vol_3), std::span(vol_4), std::span(vol_5)
     });
 
-    constexpr std::ranges::join_view _part_3_view {_part_3_list};
+    consteval auto _get_part3_view()
+    {
+        constexpr std::ranges::join_view l{_part_3_list};
+        constexpr auto sz = std::distance(l.begin(), l.end());
+        std::vector<volume_definition> v(l.begin(),
+                                         l.end());
+        return utils::vec_to_arr<sz>(v);
+    }
+
+    constexpr std::array _part_3_view = _get_part3_view();
 
     const std::vector<volume_definition> _part_3 = utils::make_omnibus_def(_part_3_view, utils::calc_reservation(_part_3_list));
 }
