@@ -23,7 +23,7 @@ BuildRequires:  libxml++50-devel
 Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 %prep
-%autosetup -n dregarnuhr-dregarnuhr-%{version}-%{release} -p1
+%autosetup
 
 %build
 %meson
