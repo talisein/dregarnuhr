@@ -5,11 +5,12 @@ Summary:        Rearrange Ascendence of a Bookworm epubs into Chronological Orde
 
 License:        GPLv3+
 URL:            https://github.com/talisein/dregarnuhr
-Source0:        %{URL}/archive/refs/tags/dregarnuhr-%{version}-%{release}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-c++
 BuildRequires:  meson
 BuildRequires:  ninja-build
+BuildRequires:  cmake
 BuildRequires:  cpp-httplib-devel
 BuildRequires:  date-devel
 BuildRequires:  libjpeg-turbo-devel
