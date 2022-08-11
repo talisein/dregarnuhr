@@ -1,6 +1,6 @@
 project('dregarnuhr', ['c', 'cpp'],
         license : 'GPLv3+',
-        version : '0.9.10',
+        version : '1.0.0',
         default_options : ['c_std=gnu17',
                            'cpp_std=gnu++20',
                            'buildtype=release',
@@ -28,10 +28,20 @@ jpeg_dep = dependency('libjpeg', version: '>=2.1.0', fallback: ['libjpeg-turbo']
 
 # Fedora miniz-devel. Ubuntu unpackaged.
 # Note: Fedora's package has no pkgconfig, so meson doesn't find it.
-miniz_dep = dependency('miniz', fallback: ['miniz', 'miniz_dep'])
+miniz_dep = cpp_compiler.find_library('miniz',
+                                      has_headers: ['miniz.h'],
+                                      required: false)
+
+if not miniz_dep.found()
+  miniz_dep = dependency('miniz', fallback: ['miniz', 'miniz_dep'])
+endif
 
 # Unpackaged
-outcome_dep = dependency('outcome-2.0', fallback: ['outcome'])
+if not cpp_compiler.has_header('outcome/outcome.hpp')
+  outcome_dep = dependency('outcome-2.0', fallback: ['outcome'])
+else
+  outcome_dep = dependency('', required: false)
+endif
 
 # Fedora libxml2-devel, Ubuntu libxml2-dev
 libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
