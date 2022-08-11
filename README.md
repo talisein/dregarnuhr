@@ -3,6 +3,7 @@
 Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 [![CI](https://github.com/talisein/dregarnuhr/actions/workflows/main.yml/badge.svg)](https://github.com/talisein/dregarnuhr/actions/workflows/main.yml)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/talisein/dregarnuhr/package/dregarnuhr/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/talisein/dregarnuhr/package/dregarnuhr/)
 
 This program reads Asendence of a Bookworm epubs volumes, and creates new
 volumes with the chapters rearranged into chronological order, as determined by
@@ -23,10 +24,15 @@ source and avoid what you can, install the following packages.
 - Ubuntu
   - `libhowardhinnant-date-dev libcpp-httplib-dev libxml2-dev libjpeg-turbo8-dev meson ninja-build`
 - Fedora
-  - `libjpeg-turbo-devel miniz-devel libxml2-devel libxml++-devel cpp-httplib-devel date-devel meson ninja-build`
+  - You can install the copr package:
+  ```
+  # sudo dnf copr enable talisein/libxmlplusplus-5.0
+  # sudo dnf copr enable talisein/dregarnuhr
+  # sudo dnf install dregarnuhr
+  ```
 
 # Building
-Its easiest to just grab a binary from the [releases](https://github.com/talisein/dregarnuhr/releases) page, but if you are interested in building:
+Its easiest to just grab a binary from the [releases](https://github.com/talisein/dregarnuhr/releases) page. If you are interested in building:
 
 ```
 # meson setup build && ninja -C build
