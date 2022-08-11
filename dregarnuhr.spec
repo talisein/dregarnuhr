@@ -1,5 +1,5 @@
 Name:           dregarnuhr
-Version:        1.0.3
+Version:        1.0.0
 Release:        1
 Summary:        Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
@@ -47,14 +47,5 @@ Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 
 %changelog
-* Wed Aug 10 2022 Andrew Potter <agpotter@gmail.com> 1.0.3-1
-- spec fixup (agpotter@gmail.com)
-
-* Wed Aug 10 2022 Andrew Potter <agpotter@gmail.com> 1.0.2-2
-- Point spec at tito tags (agpotter@gmail.com)
-
-* Wed Aug 10 2022 Andrew Potter <agpotter@gmail.com> 1.0.1-1
-- new package built with tito
-
-* Wed Aug 10 2022 Andrew Potter <agpotter@gmail.com> - v1.0.0
+* Wed Aug 10 2022 Andrew Potter <agpotter@gmail.com> - v1.0.0-1
 - Initial version of package
