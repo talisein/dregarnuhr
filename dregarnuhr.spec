@@ -11,6 +11,9 @@ BuildRequires:  gcc-c++
 BuildRequires:  meson
 BuildRequires:  ninja-build
 BuildRequires:  cmake
+BuildRequires:  openssl-devel
+BuildRequires:  brotli-devel
+BuildRequires:  zlib-devel
 BuildRequires:  cpp-httplib-devel
 BuildRequires:  date-devel
 BuildRequires:  libjpeg-turbo-devel
