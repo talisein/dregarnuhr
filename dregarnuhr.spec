@@ -1,6 +1,6 @@
 Name:           dregarnuhr
-Version:        1.0.2
-Release:        3
+Version:        1.0.3
+Release:        1
 Summary:        Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 License:        GPLv3+
@@ -44,7 +44,7 @@ Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 
 %changelog
-* Wed Aug 10 2022 Andrew Potter <agpotter@gmail.com> 1.0.2-3
+* Wed Aug 10 2022 Andrew Potter <agpotter@gmail.com> 1.0.3-1
 - spec fixup (agpotter@gmail.com)
 
 * Wed Aug 10 2022 Andrew Potter <agpotter@gmail.com> 1.0.2-2
