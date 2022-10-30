@@ -309,6 +309,55 @@ namespace epub
         return sorted_manifest;
     }
 
+    namespace {
+        result<void>
+        handle_navpoint(const xmlpp::Node* node, auto &entries) {
+            toc::toc_entry entry;
+            const auto label = dynamic_cast<const xmlpp::Element*>(node->get_first_child("navLabel"));
+            if (label) {
+                bool set = false;
+                for (const auto &label_child : label->get_children()) {
+                    auto text = dynamic_cast<const xmlpp::Element*>(label_child);
+                    if (!text) continue;
+                    entry.label = text->get_first_child_text()->get_content();
+                    set = true;
+                }
+                if (!set) {
+                    return std::errc::invalid_seek;
+                }
+            } else {
+                return std::errc::invalid_seek;
+            }
+
+            const xmlpp::Node* content = node->get_first_child("content");
+            if (content) {
+                auto content_ele = dynamic_cast<const xmlpp::Element*>(content);
+                auto attr = content_ele->get_attribute_value("src");
+                xmlpp::Element::const_AttributeList attrs = content_ele->get_attributes();
+                bool set = false;
+                for (const xmlpp::Attribute* attr : attrs) {
+                    if (attr->get_name() == "src") {
+                        entry.content = attr->get_value();
+                        set = true;
+                    }
+                }
+                if (!set) {
+                    return std::errc::invalid_seek;
+                }
+            } else {
+                return std::errc::invalid_seek;
+            }
+
+            entries.push_back(entry);
+
+            for (const auto &child_navpoint : node->get_children("navPoint")) {
+                OUTCOME_TRY(handle_navpoint(child_navpoint, entries));
+            }
+
+            return outcome::success();
+        }
+
+    }
     result<toc>
     book_reader::dump_toc(const std::string& toc_path)
     {
@@ -339,11 +388,7 @@ namespace epub
 
         OUTCOME_TRY(auto navpoint_set, find("/dtb:ncx/dtb:navMap/dtb:navPoint", map, root, toc_path));
         for (const auto &node : navpoint_set) {
-            toc::toc_entry entry;
-            xmlpp::Node::const_NodeSet entryset;
-            OUTCOME_TRY(entry.label, find_textnode("dtb:navLabel/dtb:text/text()", map, node, toc_path));
-            OUTCOME_TRY(entry.content, find_attr_required("dtb:content/@src", map, node, toc_path));
-            toc.entries.push_back(std::move(entry));
+            OUTCOME_TRY(handle_navpoint(node, toc.entries));
         }
 
         return toc;

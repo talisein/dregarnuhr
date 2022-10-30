@@ -33,6 +33,7 @@ namespace {
         {"9781718346352"sv, volume::P4V6},
         {"9781718346376"sv, volume::P4V7},
         {"9781718346390"sv, volume::P4V8},
+        {"9781718346413"sv, volume::P4V9},
         {"9781718338005"sv, volume::MP1V1},
         {"9781718338029"sv, volume::MP1V2},
         {"9781718338043"sv, volume::MP1V3},
@@ -71,6 +72,7 @@ namespace {
         {"ascendance-of-a-bookworm-part-4-volume-6"sv, volume::P4V6},
         {"ascendance-of-a-bookworm-part-4-volume-7"sv, volume::P4V7},
         {"ascendance-of-a-bookworm-part-4-volume-8"sv, volume::P4V8},
+        {"ascendance-of-a-bookworm-part-4-volume-9"sv, volume::P4V9},
     };
 
 }
@@ -98,6 +100,7 @@ std::string_view to_string_view(volume vol)
         case volume::P4V6: return "P4V6"sv;
         case volume::P4V7: return "P4V7"sv;
         case volume::P4V8: return "P4V8"sv;
+        case volume::P4V9: return "P4V9"sv;
         case volume::FB1:  return "FB1"sv;
         case volume::FB2:  return "FB2"sv;
         case volume::RA1:  return "RA1"sv;

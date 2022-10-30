@@ -63,6 +63,7 @@ namespace {
             volume::P4V6,
             volume::P4V7,
             volume::P4V8,
+            volume::P4V9,
         });
 
     constexpr epub::definition_t get_definition_view(omnibus o)
@@ -128,6 +129,8 @@ namespace {
                 return part_4::get_vol_7();
             case volume::P4V8:
                 return part_4::get_vol_8();
+            case volume::P4V9:
+                return part_4::get_vol_9();
             case volume::FB1: [[fallthrough]];
             case volume::FB2: [[fallthrough]];
             case volume::MP1V1: [[fallthrough]];

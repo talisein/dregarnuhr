@@ -642,8 +642,8 @@ namespace
 { volume::P4V7, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V7, "Text/chapter4_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V7, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Winter Life in the Temple"sv), true },
-{ volume::P4V7, "Text/chapter5_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V7, "Text/insert3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V7, "Text/chapter5_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V7, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("This and That in the Castle"sv), true },
 { volume::P4V7, "Text/chapter19.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Speaking at the Gazebo"sv), true },
 { volume::P4V7, "Text/chapter7.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("The Ternisbefallen Inquiry"sv), true },
@@ -771,6 +771,93 @@ namespace
 { volume::P4V8, "Text/copyright.xhtml"sv, "application/xhtml+xml"sv, "Copyright"sv, true },
     });
 
+    constexpr std::array vol_9 = std::to_array<volume_definition>({
+{ volume::P4V9, "toc.ncx"sv, "application/x-dtbncx+xml"sv, std::nullopt, false },
+{ volume::P4V9, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+{ volume::P4V9, "Images/jnovelclubCMYK.png"sv, "image/png"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Bonus1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Bonus2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Characters1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Characters2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Characters3.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Cover.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/FrontMatter1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/FrontMatter2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Insert1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Insert2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Insert3.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Insert4.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Insert5.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Insert6.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Insert7.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Insert8.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Insert9.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Insert10.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Map.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Map2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Manga1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Images/Manga2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P4V9, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, "Cover"sv, true },
+{ volume::P4V9, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
+{ volume::P4V9, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/characters1.xhtml"sv, "application/xhtml+xml"sv, "Characters"sv, true },
+{ volume::P4V9, "Text/characters2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/characters3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/toc.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/prologue.xhtml"sv, "application/xhtml+xml"sv, "Prologue"sv, true },
+{ volume::P4V9, "Text/insert1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/prologue_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter1.xhtml"sv, "application/xhtml+xml"sv, "Rewarding Hartmut’s Hard Work"sv, true },
+{ volume::P4V9, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter1_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "The Harvest Festival and a Meeting"sv, true },
+{ volume::P4V9, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "The Farewell Dinner"sv, true },
+{ volume::P4V9, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Farewell Gifts"sv, true },
+{ volume::P4V9, "Text/insert3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter4_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, "A Stolen Book"sv, true },
+{ volume::P4V9, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, "Commoner Testimonies"sv, true },
+{ volume::P4V9, "Text/chapter7.xhtml"sv, "application/xhtml+xml"sv, "Rescue"sv, true },
+{ volume::P4V9, "Text/insert4.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter7_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter8.xhtml"sv, "application/xhtml+xml"sv, "Evidence"sv, true },
+{ volume::P4V9, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter8_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter9.xhtml"sv, "application/xhtml+xml"sv, "New Perspectives"sv, true },
+{ volume::P4V9, "Text/chapter10.xhtml"sv, "application/xhtml+xml"sv, "Viscount Dahldolf’s Estate"sv, true },
+{ volume::P4V9, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter10_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter11.xhtml"sv, "application/xhtml+xml"sv, "Finding the Book"sv, true },
+{ volume::P4V9, "Text/chapter12.xhtml"sv, "application/xhtml+xml"sv, "A Change of Plans"sv, true },
+{ volume::P4V9, "Text/chapter13.xhtml"sv, "application/xhtml+xml"sv, "Preparing to Leave"sv, true },
+{ volume::P4V9, "Text/insert7.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter13_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter22.xhtml"sv, "application/xhtml+xml"sv, "Memories and Farewells"sv, true },
+{ volume::P4V9, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, "Separation"sv, true },
+{ volume::P4V9, "Text/chapter21.xhtml"sv, "application/xhtml+xml"sv, "My Son’s Departure"sv, true },
+{ volume::P4V9, "Text/epilogue.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
+{ volume::P4V9, "Text/insert8.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "Irreplaceable"sv, true },
+{ volume::P4V9, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "Starting Life in Ahrensbach"sv, true },
+{ volume::P4V9, "Text/chapter17.xhtml"sv, "application/xhtml+xml"sv, "The Start of a Busy Winter"sv, true },
+{ volume::P4V9, "Text/chapter18.xhtml"sv, "application/xhtml+xml"sv, "Out of Time"sv, true },
+{ volume::P4V9, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter18_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter19.xhtml"sv, "application/xhtml+xml"sv, "The New Children"sv, true },
+{ volume::P4V9, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "Winter Resolution"sv, true },
+{ volume::P4V9, "Text/insert10.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/chapter20_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
+{ volume::P4V9, "Text/map2.xhtml"sv, "application/xhtml+xml"sv, "Map of Yurgenschmidt"sv, true },
+{ volume::P4V9, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
+{ volume::P4V9, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
+{ volume::P4V9, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
+{ volume::P4V9, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P4V9, "Text/signup.xhtml"sv, "application/xhtml+xml"sv, "About J-Novel Club"sv, true },
+{ volume::P4V9, "Text/copyright.xhtml"sv, "application/xhtml+xml"sv, "Copyright"sv, true },
+    });
+
     constexpr auto _part_4_list { std::to_array<std::span<const volume_definition>>({
                 std::span(vol_1),
                 std::span(vol_2),
@@ -779,7 +866,8 @@ namespace
                 std::span(vol_5),
                 std::span(vol_6),
                 std::span(vol_7),
-                std::span(vol_8)
+                std::span(vol_8),
+                std::span(vol_9)
             })
     };
 
@@ -850,6 +938,12 @@ namespace part_4
     get_vol_8()
     {
         return std::span<const volume_definition>(vol_8);
+    }
+
+    std::span<const volume_definition>
+    get_vol_9()
+    {
+        return std::span<const volume_definition>(vol_9);
     }
 
 
