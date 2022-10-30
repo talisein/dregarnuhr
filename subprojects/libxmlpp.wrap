@@ -1,6 +1,9 @@
-[wrap-git]
-url = https://github.com/libxmlplusplus/libxmlplusplus.git
-revision = 178a7e5127dc74f8c2c4cab68bdb929517cc8683
+[wrap-file]
+directory = libxml++-5.0.2
+source_url = https://download.gnome.org/sources/libxml++/5.0/libxml++-5.0.2.tar.xz
+source_filename = libxml++-5.0.2.tar.xz
+source_hash = 7c17cc3e5a2214314dee5a1354f4b436f266ded6185232a0534f352a76240d5a
+wrapdb_version = 5.0.2-1
 
 [provide]
-dependency_names = libxml++-5.0
+libxml++ = xmlxx_dep

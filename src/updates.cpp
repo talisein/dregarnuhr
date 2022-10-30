@@ -3,6 +3,7 @@
 #include <cctype>
 #include <charconv>
 
+#undef CPPHTTPLIB_BROTLI_SUPPORT
 #include "httplib.h"
 #include "updates.h"
 #include "log.h"

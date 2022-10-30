@@ -332,7 +332,6 @@ namespace epub
             const xmlpp::Node* content = node->get_first_child("content");
             if (content) {
                 auto content_ele = dynamic_cast<const xmlpp::Element*>(content);
-                auto attr = content_ele->get_attribute_value("src");
                 xmlpp::Element::const_AttributeList attrs = content_ele->get_attributes();
                 bool set = false;
                 for (const xmlpp::Attribute* attr : attrs) {
