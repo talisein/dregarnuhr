@@ -48,6 +48,7 @@ enum class volume
     MP2V3,
     MP2V4,
     MP2V5,
+    MP2V6,
 };
 
 // The order here determines the sort order

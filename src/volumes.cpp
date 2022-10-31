@@ -46,6 +46,7 @@ namespace {
         {"9781718338180"sv, volume::MP2V3},
         {"9781718338203"sv, volume::MP2V4},
         {"9781718338227"sv, volume::MP2V5},
+        {"9781718338241"sv, volume::MP2V6},
     };
 
     const std::map<std::string_view, volume> slug_map {
@@ -116,6 +117,7 @@ std::string_view to_string_view(volume vol)
         case volume::MP2V3:  return "M2V3"sv;
         case volume::MP2V4:  return "M2V4"sv;
         case volume::MP2V5:  return "M2V5"sv;
+        case volume::MP2V6:  return "M2V6"sv;
     }
     assert(false);
     return "UNKNOWN"sv;

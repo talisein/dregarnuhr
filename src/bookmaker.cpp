@@ -145,6 +145,7 @@ namespace {
             case volume::MP2V3: [[fallthrough]];
             case volume::MP2V4: [[fallthrough]];
             case volume::MP2V5: [[fallthrough]];
+            case volume::MP2V6: [[fallthrough]];
             case volume::RA1:
                 assert(false);
               }
