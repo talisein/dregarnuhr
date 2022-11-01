@@ -1,5 +1,5 @@
 Name:           dregarnuhr
-Version:        1.0.0
+Version:        1.0.4
 Release:        1
 Summary:        Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
@@ -19,7 +19,7 @@ BuildRequires:  date-devel
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  miniz-devel
 BuildRequires:  outcome-devel
-BuildRequires:  libxml++50-devel
+BuildRequires:  libxml++50-devel >= 5.0.2
 
 
 %description
@@ -47,5 +47,8 @@ Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 
 %changelog
+* Mon Oct 31 2022 Andrew Potter <agpotter@gmail.com> - v1.0.4-1
+- Add P4V9 and M2V6
+
 * Wed Aug 10 2022 Andrew Potter <agpotter@gmail.com> - v1.0.0-1
 - Initial version of package
