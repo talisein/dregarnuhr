@@ -11,28 +11,38 @@ kuali on the [J-Novel
 forums](https://forums.j-novel.club/topic/5036/alternate-reading-order). Incidently
 we both created a program to do this task independently; you can find their
 version at [mldriscoll/AOAB](https://github.com/mldriscoll/AOAB/). Their version
-is a Windows-only application, but offers perhaps a more curated
-output. Dregarnuhr is available for Windows, Mac, and Linux.
+is a Windows-only application, but offers a more curated output. Dregarnuhr is
+available for Windows, Mac, and Linux.
 
 This program leverages [aoab-monitor](https://github.com/talisein/aoab-monitor)
-to alert you if there are updates available for your epub files. FYI it will fetch [updates.json](https://aoabmonitor.talinet.net/updates.json) from the web.
+to alert you if there are updates available for your epub files. FYI it will
+fetch [updates.json](http://aoabmonitor.talinet.net/updates.json) from the web.
 
 # Dependencies
-There is a meson wrap for all dependencies, but if you'd like to build from
-source and avoid what you can, install the following packages.
 
-- Ubuntu
-  - `libhowardhinnant-date-dev libcpp-httplib-dev libxml2-dev libjpeg-turbo8-dev meson ninja-build`
-- Fedora
-  - You can install the copr package:
-  ```
-  # sudo dnf copr enable talisein/libxmlplusplus-5.0
-  # sudo dnf copr enable talisein/dregarnuhr
-  # sudo dnf install dregarnuhr
-  ```
+- Running the Linux binary from Releases tab
+  - OpenSSL, libxml2, libicu, liblzma, zlib, libstdc++
+- Building from source
+  - Meson
+    - There is a meson wrap for all dependencies, so if you can install python,
+      meson, ninja, and gcc >= 12 you should be good to go.
+  - Ubuntu
+    - If you are building on Ubuntu and want to avoid unnecessary meson wrap
+      downloads, install these packages:
+    - `libhowardhinnant-date-dev libcpp-httplib-dev libxml2-dev libjpeg-turbo8-dev meson ninja-build`
+  - Fedora
+    - You can install the copr package:
+    ```
+    # sudo dnf copr enable talisein/libxmlplusplus-5.0
+    # sudo dnf copr enable talisein/dregarnuhr
+    # sudo dnf install dregarnuhr
+    ```
 
 # Building
-Its easiest to just grab a binary from the [releases](https://github.com/talisein/dregarnuhr/releases) page. If you are interested in building:
+
+Its easiest to just grab a binary from the
+[releases](https://github.com/talisein/dregarnuhr/releases) page. If you are
+interested in building:
 
 ```
 # meson setup build && ninja -C build
@@ -47,6 +57,7 @@ Its easiest to just grab a binary from the [releases](https://github.com/talisei
 - I don't have a mac to test the mac version on. Let me know if it works.
 
 # Examples
+
 The simplest invocation of dregarnuhr takes an input directory with your
 bookworm epubs, and an output directory name to generate the new epubs in. As
 long as your epubs have a ".epub" extension, the metadata will be read to
@@ -75,6 +86,7 @@ are about 3MiB large, a good improvement over the 30MiB originals.
 ```
 
 ## Omnibus
+
 To create a single epub omnibus containing all your volumes:
 ```
 # dregarnuhr --omnibus --prefix=omnibus- ~/Documents/Myne out
@@ -93,6 +105,7 @@ dregarnuhr --omnibus --cover=cover.jpg ~/Documents/Myne out
 ```
 
 ## Other examples
+
 If you invoke the program several times, output files are never overwritten.
 ```
 # dregarnuhr Documents/Myne Documents/Myne_out
@@ -128,6 +141,7 @@ Sorry, no books could be created.
 ```
 
 ## Bug reports
+
 If it can't identify your volumes for some reason, pass the verbose flag and
 share the output by creating an issue here on github, or tag me on the J-Novel
 forums (@talisein).
