@@ -33,8 +33,10 @@ enum class volume
     P4V7,
     P4V8,
     P4V9,
+    P5V1,
     FB1,
     FB2,
+    FB3,
     RA1,
     MP1V1,
     MP1V2,
@@ -84,6 +86,7 @@ enum class omnibus
     PART2,
     PART3,
     PART4,
+    PART5,
     ALL
 };
 

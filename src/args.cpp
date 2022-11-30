@@ -25,6 +25,7 @@ namespace {
     constinit std::string_view DEFAULT_OMNIBUS_PART2_TITLE { "Ascendence of a Bookworm: Part 2 Chronological Omnibus"sv };
     constinit std::string_view DEFAULT_OMNIBUS_PART3_TITLE { "Ascendence of a Bookworm: Part 3 Chronological Omnibus"sv };
     constinit std::string_view DEFAULT_OMNIBUS_PART4_TITLE { "Ascendence of a Bookworm: Part 4 Chronological Omnibus"sv };
+    constinit std::string_view DEFAULT_OMNIBUS_PART5_TITLE { "Ascendence of a Bookworm: Part 5 Chronological Omnibus"sv };
     constinit std::string_view DEFAULT_OMNIBUS_TITLE { "Ascendence of a Bookworm: Chronological Omnibus"sv };
     constinit mz_uint DEFAULT_COMPRESSION_LEVEL = MZ_DEFAULT_LEVEL;
 }
@@ -242,6 +243,8 @@ parse(int argc, char **argv)
                 options.omnibus_type = omnibus::PART3;
             } else if (type == "part4") {
                 options.omnibus_type = omnibus::PART4;
+            } else if (type == "part5") {
+                options.omnibus_type = omnibus::PART5;
             } else if (type == "all") {
                 options.omnibus_type = omnibus::ALL;
             } else {
@@ -263,6 +266,9 @@ parse(int argc, char **argv)
                     break;
                 case omnibus::PART4:
                     options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART4_TITLE);
+                    break;
+                case omnibus::PART5:
+                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART5_TITLE);
                     break;
                 case omnibus::ALL:
                     options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_TITLE);

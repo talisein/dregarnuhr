@@ -9,6 +9,7 @@
 #include "part2.h"
 #include "part3.h"
 #include "part4.h"
+#include "part5.h"
 #include "utils.h"
 
 
@@ -19,7 +20,8 @@ get_omnibus_definition()
                 part_1::get_part_1(),
                 part_2::get_part_2(),
                 part_3::get_part_3(),
-                part_4::get_part_4()
+                part_4::get_part_4(),
+                part_5::get_part_5()
             })
     };
 
@@ -28,7 +30,8 @@ get_omnibus_definition()
                                                                             part_1::get_reservation() +
                                                                             part_2::get_reservation() +
                                                                             part_3::get_reservation() +
-                                                                            part_4::get_reservation());
+                                                                            part_4::get_reservation() +
+                                                                            part_5::get_reservation());
 
     return std::span<const volume_definition>(_omnibus);
 }

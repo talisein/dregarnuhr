@@ -12,6 +12,7 @@ namespace {
     const std::map<std::string_view, volume> volume_map {
         {"9781718344631"sv, volume::FB1},
         {"9781718344648"sv, volume::FB2},
+        {"9781718344655"sv, volume::FB3},
         {"9781718346734"sv, volume::RA1},
         {"9781718346017"sv, volume::P1V1},
         {"9781718346031"sv, volume::P1V2},
@@ -34,6 +35,7 @@ namespace {
         {"9781718346376"sv, volume::P4V7},
         {"9781718346390"sv, volume::P4V8},
         {"9781718346413"sv, volume::P4V9},
+        {"9781718346437"sv, volume::P5V1},
         {"9781718338005"sv, volume::MP1V1},
         {"9781718338029"sv, volume::MP1V2},
         {"9781718338043"sv, volume::MP1V3},
@@ -53,6 +55,7 @@ namespace {
         {"ascendance-of-a-bookworm-royal-academy-stories-first-year"sv, volume::RA1},
         {"ascendance-of-a-bookworm-fanbook-1"sv, volume::FB1},
         {"ascendance-of-a-bookworm-fanbook-2"sv, volume::FB2},
+        {"ascendance-of-a-bookworm-fanbook-3"sv, volume::FB3},
         {"ascendance-of-a-bookworm"sv, volume::P1V1},
         {"ascendance-of-a-bookworm-volume-2"sv, volume::P1V2},
         {"ascendance-of-a-bookworm-part-1-volume-3"sv, volume::P1V3},
@@ -74,6 +77,7 @@ namespace {
         {"ascendance-of-a-bookworm-part-4-volume-7"sv, volume::P4V7},
         {"ascendance-of-a-bookworm-part-4-volume-8"sv, volume::P4V8},
         {"ascendance-of-a-bookworm-part-4-volume-9"sv, volume::P4V9},
+        {"ascendance-of-a-bookworm-part-5-volume-1"sv, volume::P5V1},
     };
 
 }
@@ -102,8 +106,10 @@ std::string_view to_string_view(volume vol)
         case volume::P4V7: return "P4V7"sv;
         case volume::P4V8: return "P4V8"sv;
         case volume::P4V9: return "P4V9"sv;
+        case volume::P5V1: return "P5V1"sv;
         case volume::FB1:  return "FB1"sv;
         case volume::FB2:  return "FB2"sv;
+        case volume::FB3:  return "FB3"sv;
         case volume::RA1:  return "RA1"sv;
         case volume::MP1V1:  return "M1V1"sv;
         case volume::MP1V2:  return "M1V2"sv;
@@ -130,6 +136,7 @@ std::string_view to_string_view(omnibus v)
         case omnibus::PART2: return "Part 2"sv;
         case omnibus::PART3: return "Part 3"sv;
         case omnibus::PART4: return "Part 4"sv;
+        case omnibus::PART5: return "Part 5"sv;
         case omnibus::ALL: return "All"sv;
     }
     return "UnknownOmnibus"sv;

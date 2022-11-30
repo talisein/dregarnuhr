@@ -13,6 +13,7 @@
 #include "part2.h"
 #include "part3.h"
 #include "part4.h"
+#include "part5.h"
 #include "omnibus.h"
 #include "outcome/utils.hpp"
 #include "outcome/try.hpp"
@@ -64,6 +65,7 @@ namespace {
             volume::P4V7,
             volume::P4V8,
             volume::P4V9,
+            volume::P5V1,
         });
 
     constexpr epub::definition_t get_definition_view(omnibus o)
@@ -78,6 +80,8 @@ namespace {
                 return part_3::get_part_3();
             case omnibus::PART4:
                 return part_4::get_part_4();
+            case omnibus::PART5:
+                return part_5::get_part_5();
             case omnibus::ALL:
                 return get_omnibus_definition();
         }
@@ -131,8 +135,11 @@ namespace {
                 return part_4::get_vol_8();
             case volume::P4V9:
                 return part_4::get_vol_9();
+            case volume::P5V1:
+                return part_5::get_vol_1();
             case volume::FB1: [[fallthrough]];
             case volume::FB2: [[fallthrough]];
+            case volume::FB3: [[fallthrough]];
             case volume::MP1V1: [[fallthrough]];
             case volume::MP1V2: [[fallthrough]];
             case volume::MP1V3: [[fallthrough]];

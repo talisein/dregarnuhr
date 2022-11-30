@@ -59,6 +59,18 @@ namespace
 { volume::P3V1, "Text/insert3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/chapter6_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/chapter7.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("How to Make Fluffy Bread"sv), true },
+
+{ volume::FB3, "Text/40.xhtml"sv, "application/xhtml+xml"sv, "“Welcoming a Certain Someone” by Ryo Namino"sv, true },
+{ volume::FB3, "Text/41.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::FB3, "Text/42.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::FB3, "Text/43.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::FB3, "Images/Image40.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::FB3, "Images/Image41.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::FB3, "Images/Image42.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::FB3, "Images/Image43.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::FB3, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
+
 { volume::P3V1, "Text/chapter8.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Starbind Ceremony in the Lower City"sv), true },
 { volume::P3V1, "Text/insert4.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/chapter9.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("The Archduke’s Castle"sv), true },

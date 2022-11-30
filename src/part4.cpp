@@ -58,6 +58,11 @@ namespace
 { volume::P4V1, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter3_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Cramming and Preparations"sv), true },
+
+{ volume::FB3, "Text/45.xhtml"sv, "application/xhtml+xml"sv, "Yurgenschmidt Duchies"sv, true },
+{ volume::FB3, "Images/Image45.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+
+
 { volume::P4V1, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("The Gifting Ceremony"sv), true },
 { volume::P4V1, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("The Winter Playroom and Our Departure"sv), true },
 { volume::P4V1, "Text/chapter7.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("My Retainers and Entering the Dormitory"sv), true },
@@ -91,6 +96,14 @@ namespace
 { volume::P4V1, "Text/insert7.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter20_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter21.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Passing Highbeast Creation"sv), true },
+
+{ volume::FB3, "Text/side.xhtml"sv, "application/xhtml+xml"sv, "A Secret Tour of the Library"sv, true },
+{ volume::FB3, "Text/map.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::FB3, "Text/side_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::FB3, "Images/map.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::FB3, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
+
 { volume::P4V1, "Text/chapter22.xhtml"sv, "application/xhtml+xml"sv, std::make_optional<std::string_view>("Schtappe Fundamentals"sv), true },
 { volume::P4V1, "Text/insert8.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter22_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
