@@ -46,6 +46,16 @@ jobs:
       - name: Test
         run: ninja -C build-linux test
 
+      - name: Save logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-meson-log
+          path: |
+            build-linux/meson-logs/meson-log.txt
+            build-linux/meson-logs/testlog.txt
+          if-no-files-found: ignore
+
       - name: Binary
         uses: actions/upload-artifact@v3
         with:
@@ -104,6 +114,16 @@ jobs:
       - name: Test
         run: ninja -C build-mac test
 
+      - name: Save logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: mac-meson-log
+          path: |
+            build-mac/meson-logs/meson-log.txt
+            build-mac/meson-logs/testlog.txt
+          if-no-files-found: ignore
+
       - name: Binary
         uses: actions/upload-artifact@v3
         with:
@@ -145,6 +165,16 @@ jobs:
 
       - name: Test
         run: ninja -C build-win test
+
+      - name: Save logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: win-meson-log
+          path: |
+            build-win/meson-logs/meson-log.txt
+            build-win/meson-logs/testlog.txt
+          if-no-files-found: ignore
 
       - name: Binary
         uses: actions/upload-artifact@v3
