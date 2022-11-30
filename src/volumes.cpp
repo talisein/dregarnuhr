@@ -176,7 +176,9 @@ volume_definition::get_chapter_type() const
     static const std::regex cover_regex                   {"cover.xhtml", std::regex_constants::icase};
     static const std::regex frontmatter_regex             {"text/front", std::regex_constants::icase};
     static const std::regex chapter_regex                 {"(xhtml/p-[0-9]*.xhtml|cover.xhtml|text/character|chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", std::regex_constants::icase};
-    static const std::regex map_ehrenfest_label_regex     {"Map of Ehrenfest", std::regex_constants::icase}; // can also use toc_label but this works for now
+    // ehrenfest city is frontmatter3.xhtml
+    static const std::regex map_ehrenfest_city_label_regex     {"Map of Ehrenfest", std::regex_constants::icase}; // can also use toc_label but this works for now
+    static const std::regex map_ehrenfest_duchy_label_regex     {"Map of Ehrenfest Duchy", std::regex_constants::icase}; // can also use toc_label but this works for now
     static const std::regex map_yurgenschmidt_label_regex {"Map of Yurgenschmidt", std::regex_constants::icase};
     static const std::regex map_ehrenfest_href_regex      {"map.xhtml", std::regex_constants::icase}; // can also use toc_label but this works for now
     static const std::regex map_yurgenschmidt_href_regex  {"map2.xhtml", std::regex_constants::icase};
@@ -209,16 +211,26 @@ volume_definition::get_chapter_type() const
         return COVER; // after chapter, so actually they are classified as chapter for now
     }
 
+    if (volume::FB3 == vol) { // must be before other maps
+        if (std::regex_search(href.begin(), href.end(), map_ehrenfest_href_regex)) {
+            //return MAP_RA_LIBRARY;
+            return CHAPTER; // Treat the RA Library map as an insert image rather than a map
+        }
+    }
+
     if (toc_label) {
-        if (std::regex_search(toc_label.value().begin(), toc_label.value().end(), map_ehrenfest_label_regex)) {
-            return MAP_EHRENFEST;
+        if (std::regex_search(toc_label.value().begin(), toc_label.value().end(), map_ehrenfest_duchy_label_regex)) {
+            return MAP_EHRENFEST_DUCHY;
         }
         if (std::regex_search(toc_label.value().begin(), toc_label.value().end(), map_yurgenschmidt_label_regex)) {
             return MAP_YURGENSCHMIDT;
         }
+        if (std::regex_search(toc_label.value().begin(), toc_label.value().end(), map_ehrenfest_city_label_regex)) {
+            return MAP_EHRENFEST_CITY;
+        }
     } else {
         if (std::regex_search(href.begin(), href.end(), map_ehrenfest_href_regex)) {
-            return MAP_EHRENFEST;
+            return MAP_EHRENFEST_DUCHY;
         }
         if (std::regex_search(href.begin(), href.end(), map_yurgenschmidt_href_regex)) {
             return MAP_YURGENSCHMIDT;

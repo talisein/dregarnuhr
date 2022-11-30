@@ -63,7 +63,9 @@ enum chapter_type {
   CHARACTERS,
   TOC,
   CHAPTER,
-  MAP_EHRENFEST,
+  MAP_RA_LIBRARY,
+  MAP_EHRENFEST_CITY,
+  MAP_EHRENFEST_DUCHY,
   MAP_YURGENSCHMIDT,
   FAMILY_TREE,
   AFTERWORD,
@@ -139,8 +141,10 @@ get_uniqueness(chapter_type c) {
     {
         case TOC:
         case NCX:
-        case MAP_EHRENFEST:
+        case MAP_EHRENFEST_CITY:
+        case MAP_EHRENFEST_DUCHY:
         case MAP_YURGENSCHMIDT:
+        case MAP_RA_LIBRARY:
         case FAMILY_TREE:
         case SIGNUP:
         case COPYRIGHT: return chapter_uniqueness::SINGLE;
