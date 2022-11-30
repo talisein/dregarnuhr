@@ -163,6 +163,9 @@ jobs:
       - name: Compile
         run: ninja -C build-win
 
+      - name: ldd
+        run: dumpbin /DEPENDENTS build-win/src/dregarnuhr.exe
+
       - name: Test
         run: ninja -C build-win test
 
