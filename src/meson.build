@@ -18,7 +18,7 @@ config = configure_file(input: 'config.h.in',
                         output: 'config.h',
                         configuration: conf_data)
 
-deps = [libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep, http_dep]
+deps = [zlib_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep, http_dep]
 
 if not has_chrono
   deps += date_dep
