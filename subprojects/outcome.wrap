@@ -1,7 +1,7 @@
 [wrap-file]
-source_url = https://github.com/ned14/outcome/releases/download/v2.2.3/outcome-v2-all-sources-99d1aac7779d21d361c8b9010215c0d8836684cb.tar.xz
-source_filename = outcome-v2-all-sources-99d1aac7779d21d361c8b9010215c0d8836684cb.tar.xz
-source_hash = 0b5cac2bce8355a60f92e00f137324b15874febafd1a5f71ab9d22914986472a
+source_url = https://github.com/ned14/outcome/releases/download/v2.2.4/outcome-v2-all-sources-90032f99503b4620f21d8160dc3af06fa343541f.tar.xz
+source_filename = outcome-v2-all-sources-90032f99503b4620f21d8160dc3af06fa343541f.tar.xz
+source_hash = 4a36ba9c23b1fd5f001a3eea733a595d7e0eb9fe82ea0af12c103b2246f9421b
 patch_directory = outcome-patch
 
 [provide]

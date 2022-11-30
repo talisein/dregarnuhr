@@ -3,7 +3,6 @@
 #include <cctype>
 #include <charconv>
 
-#undef CPPHTTPLIB_BROTLI_SUPPORT
 #include "httplib.h"
 #include "updates.h"
 #include "log.h"
@@ -31,6 +30,7 @@ namespace {
             auto it = map.emplace(get_volume_from_slug(slug_sv), std::chrono::seconds(ts));
             log_verbose("Emplaced ", it.first->first, ": ", it.first->second.time_since_epoch());
         }
+
         return map;
     }
 }
