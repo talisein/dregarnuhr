@@ -42,6 +42,7 @@ jobs:
 
       - name: ldd
         run: ldd build-linux/src/dregarnuhr
+        continue-on-error: true
 
       - name: Test
         run: ninja -C build-linux test
@@ -158,13 +159,14 @@ jobs:
 
       - name: Configure
         run: |
-          meson setup --buildtype release -Dc_std=c17 -Dcpp_std=c++20 -Dcpp_eh=a --default-library static build-win
+          meson setup --buildtype release -Dc_std=c17 -Dcpp_std=c++20 -Dcpp_eh=a --default-library static --force-fallback-for zlib,liblzma,libxml2 -Dcpp-httplib:cpp-httplib_openssl=disabled build-win
 
       - name: Compile
         run: ninja -C build-win
 
       - name: ldd
         run: dumpbin /DEPENDENTS build-win/src/dregarnuhr.exe
+        continue-on-error: true
 
       - name: Test
         run: ninja -C build-win test
