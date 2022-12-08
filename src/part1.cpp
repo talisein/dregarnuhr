@@ -438,10 +438,10 @@ namespace part_1
 {
     using namespace std::string_view_literals;
 
-    std::span<const volume_definition>
+    definition_span_view
     get_vol_1()
     {
-        return std::span<const volume_definition>(vol_1);
+        return {std::span<const volume_definition>(vol_1), volume::P1V1};
     }
 
     std::span<const volume_definition>

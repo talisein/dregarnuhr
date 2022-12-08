@@ -5,8 +5,10 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <span>
 #include <map>
 #include <memory>
+#include <variant>
 
 #include "outcome/result.hpp"
 
@@ -134,6 +136,19 @@ struct volume_definition
         return lhs.get_chapter_type() <=> rhs.get_chapter_type();
     }
 };
+
+template<std::ranges::input_range R>
+struct definition_view
+{
+    definition_view(R&& _defs, omnibus o) : defs(std::forward<R>(_defs)), name(o) {};
+    definition_view(R&& _defs, volume v) : defs(std::forward<R>(_defs)), name(v) {};
+
+    R defs;
+    std::variant<omnibus, volume> name;
+};
+
+using definition_span_view = definition_view<std::span<const volume_definition>>;
+using definition_pack_view = definition_view<std::span<std::span<const volume_definition>>>;
 
 constexpr chapter_uniqueness
 get_uniqueness(chapter_type c) {
