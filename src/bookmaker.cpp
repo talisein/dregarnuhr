@@ -73,20 +73,20 @@ namespace {
         switch (o)
         {
             case omnibus::PART1:
-                return part_1::get_part_1();
+                return part_1::get_part_1().defs;
             case omnibus::PART2:
-                return part_2::get_part_2();
+                return part_2::get_part_2().defs;
             case omnibus::PART3:
-                return part_3::get_part_3();
+                return part_3::get_part_3().defs;
             case omnibus::PART4:
-                return part_4::get_part_4();
+                return part_4::get_part_4().defs;
             case omnibus::PART5:
-                return part_5::get_part_5();
+                return part_5::get_part_5().defs;
             case omnibus::ALL:
                 return get_omnibus_definition();
         }
         assert(false);
-        return part_3::get_part_3();
+        return part_3::get_part_3().defs;
     }
 
     constexpr epub::definition_t get_definition_view(volume v)
@@ -94,49 +94,49 @@ namespace {
         switch (v)
         {
             case volume::P1V1:
-                return part_1::get_vol_1();
+                return part_1::get_vol_1().defs;
             case volume::P1V2:
-                return part_1::get_vol_2();
+                return part_1::get_vol_2().defs;
             case volume::P1V3:
-                return part_1::get_vol_3();
+                return part_1::get_vol_3().defs;
             case volume::P2V1:
-                return part_2::get_vol_1();
+                return part_2::get_vol_1().defs;
             case volume::P2V2:
-                return part_2::get_vol_2();
+                return part_2::get_vol_2().defs;
             case volume::P2V3:
-                return part_2::get_vol_3();
+                return part_2::get_vol_3().defs;
             case volume::P2V4:
-                return part_2::get_vol_4();
+                return part_2::get_vol_4().defs;
             case volume::P3V1:
-                return part_3::get_vol_1();
+                return part_3::get_vol_1().defs;
             case volume::P3V2:
-                return part_3::get_vol_2();
+                return part_3::get_vol_2().defs;
             case volume::P3V3:
-                return part_3::get_vol_3();
+                return part_3::get_vol_3().defs;
             case volume::P3V4:
-                return part_3::get_vol_4();
+                return part_3::get_vol_4().defs;
             case volume::P3V5:
-                return part_3::get_vol_5();
+                return part_3::get_vol_5().defs;
             case volume::P4V1:
-                return part_4::get_vol_1();
+                return part_4::get_vol_1().defs;
             case volume::P4V2:
-                return part_4::get_vol_2();
+                return part_4::get_vol_2().defs;
             case volume::P4V3:
-                return part_4::get_vol_3();
+                return part_4::get_vol_3().defs;
             case volume::P4V4:
-                return part_4::get_vol_4();
+                return part_4::get_vol_4().defs;
             case volume::P4V5:
-                return part_4::get_vol_5();
+                return part_4::get_vol_5().defs;
             case volume::P4V6:
-                return part_4::get_vol_6();
+                return part_4::get_vol_6().defs;
             case volume::P4V7:
-                return part_4::get_vol_7();
+                return part_4::get_vol_7().defs;
             case volume::P4V8:
-                return part_4::get_vol_8();
+                return part_4::get_vol_8().defs;
             case volume::P4V9:
-                return part_4::get_vol_9();
+                return part_4::get_vol_9().defs;
             case volume::P5V1:
-                return part_5::get_vol_1();
+                return part_5::get_vol_1().defs;
             case volume::FB1: [[fallthrough]];
             case volume::FB2: [[fallthrough]];
             case volume::FB3: [[fallthrough]];
@@ -157,7 +157,7 @@ namespace {
                 assert(false);
               }
         assert(false);
-        auto x = part_1::get_vol_1();
+        auto x = part_1::get_vol_1().defs;
         return std::span(x.end(), x.end());
     }
 

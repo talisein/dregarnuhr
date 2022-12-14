@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ranges>
 #include <numeric>
 #include <concepts>
 #include <algorithm>
@@ -92,8 +93,6 @@ namespace utils
         return vec_to_arr_impl<N>(v, std::make_index_sequence<N>{});
     }
 
-
-
     template<std::ranges::input_range T>
     [[nodiscard]] std::vector<volume_definition>
     make_omnibus_def(T&& view, size_t reservation = 1000)
@@ -109,7 +108,7 @@ namespace utils
     template<std::ranges::range R>
     constexpr size_t calc_reservation(R&& r)
     {
-        auto op = [](size_t left, auto right) { return left + right.size(); };
-        return std::accumulate(r.begin(), r.end(), 0ULL, op);
+        auto sizes = std::views::transform(std::forward<R>(r), [](const auto &x) {return std::ranges::size(x);});
+        return std::accumulate(sizes.begin(), sizes.end(), 0ULL);
     }
 }

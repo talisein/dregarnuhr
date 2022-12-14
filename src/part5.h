@@ -2,11 +2,12 @@
 
 #include <span>
 #include "volumes.h"
+#include "part5_defs.h"
 
 namespace part_5
 {
-    std::span<const volume_definition> get_vol_1();
+    inline auto get_vol_1() { return part_5_defs::vol_1_def; }
 
-    std::span<const volume_definition> get_part_5();
+    definition_span_view_t get_part_5();
     size_t get_reservation();
 }

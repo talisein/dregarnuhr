@@ -17,11 +17,11 @@ std::span<const volume_definition>
 get_omnibus_definition()
 {
     static const auto _omnibus_list { std::to_array({
-                part_1::get_part_1(),
-                part_2::get_part_2(),
-                part_3::get_part_3(),
-                part_4::get_part_4(),
-                part_5::get_part_5()
+                part_1::get_part_1().defs,
+                part_2::get_part_2().defs,
+                part_3::get_part_3().defs,
+                part_4::get_part_4().defs,
+                part_5::get_part_5().defs
             })
     };
 

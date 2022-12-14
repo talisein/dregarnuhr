@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include <variant>
+#include <ranges>
 
 #include "outcome/result.hpp"
 
@@ -138,17 +139,16 @@ struct volume_definition
 };
 
 template<std::ranges::input_range R>
-struct definition_view
+struct definition_view_t
 {
-    definition_view(R&& _defs, omnibus o) : defs(std::forward<R>(_defs)), name(o) {};
-    definition_view(R&& _defs, volume v) : defs(std::forward<R>(_defs)), name(v) {};
+    constexpr definition_view_t(R&& _defs, omnibus o) : defs(std::forward<R>(_defs)), name(o) {};
+    constexpr definition_view_t(R&& _defs, volume v) : defs(std::forward<R>(_defs)), name(v) {};
 
     R defs;
     std::variant<omnibus, volume> name;
 };
 
-using definition_span_view = definition_view<std::span<const volume_definition>>;
-using definition_pack_view = definition_view<std::span<std::span<const volume_definition>>>;
+using definition_span_view_t = definition_view_t<std::span<const volume_definition>>;
 
 constexpr chapter_uniqueness
 get_uniqueness(chapter_type c) {
