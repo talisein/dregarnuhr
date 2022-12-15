@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <span>
 #include "volumes.h"
 
 namespace part_1_defs
