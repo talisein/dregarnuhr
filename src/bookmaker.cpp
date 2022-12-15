@@ -686,12 +686,10 @@ namespace epub
                 a->add_child_text("Omnibus Cover");
             }
 
-            auto make_li = [map = xmlpp::Element::PrefixNsMap{{"html", "http://www.w3.org/1999/xhtml"}},
-                            ss = std::stringstream{},
-                            vol = volume{vol},
-                            idx = int{1},
-                            src_nav]
-                (xmlpp::Element* parent, const volume_definition& def) mutable -> xmlpp::Element*
+            const auto map = xmlpp::Element::PrefixNsMap{{"html", "http://www.w3.org/1999/xhtml"}};
+            std::stringstream ss;
+            int idx = 1;
+            auto make_li = [&](xmlpp::Element* parent, const volume_definition& def) -> xmlpp::Element*
             {
                 using namespace std::string_literals;
                 xmlpp::Node::const_NodeSet set = src_nav->find("html:ol/html:li/html:a[@href='../"s + std::string(def.href) + "']"s, map);
