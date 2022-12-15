@@ -1,5 +1,5 @@
 Name:           dregarnuhr
-Version:        1.0.5
+Version:        1.0.7
 Release:        1
 Summary:        Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
@@ -47,6 +47,12 @@ Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 
 %changelog
+* Wed Nov 30 2022 Andrew Potter <agpotter@gmail.com> - v1.0.7-1
+- Nested table of contents
+
+* Wed Nov 30 2022 Andrew Potter <agpotter@gmail.com> - v1.0.6-1
+- Fix maps
+
 * Wed Nov 30 2022 Andrew Potter <agpotter@gmail.com> - v1.0.5-1
 - Add FB3 and P5V1
 
