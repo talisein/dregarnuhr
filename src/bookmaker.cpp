@@ -686,7 +686,7 @@ namespace epub
                             ss = std::stringstream{},
                             vol = volume{vol},
                             idx = int{1},
-                            make_link,
+                            &make_link,
                             src_nav]
                 (xmlpp::Element* parent, const auto& def) mutable -> xmlpp::Element*
             {
