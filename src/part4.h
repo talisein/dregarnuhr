@@ -16,5 +16,4 @@ namespace part_4
     inline auto get_vol_8() { return part_4_defs::vol_9_def; }
     inline auto get_vol_9() { return part_4_defs::vol_9_def; }
     definition_span_view_t get_part_4();
-    size_t get_reservation();
 }

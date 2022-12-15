@@ -46,8 +46,8 @@ namespace {
                  "--jpg-scale=N\t: Scale jpg images down by 1/N, where N is between 1-16\n",
                  "--jpg-quality=N\t: Low jpg quality to n, where N is between 1-100\n"
                  "--compression-level=[0-10,fastest,smallest]\t: Set compression level; only for generated files.\n"
+                 "--no-nested\t: Skip created a nested NCX (table of contents) for omnibus outputs\n"
                  "--mode=dump\t: Dump spine and toc data. Give a path to an epub file instead of a directory. This is mostly for development."
-
             );
     }
 
@@ -324,6 +324,12 @@ parse(int argc, char **argv)
         }
         log_info("This executable works.");
         exit(0);
+    }
+    if (options.omnibus_type) {
+        options.do_nested = true;
+        if (find (args_options, "--no-nested"sv) != args_options.end()) {
+            options.do_nested = false;
+        }
     }
 
     if (!options.prefix && !options.suffix) {

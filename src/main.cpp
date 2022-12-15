@@ -22,6 +22,8 @@
 #include "date/date.h"
 #endif
 
+#include "omnibus.h"
+
 namespace fs = std::filesystem;
 
 result<void> print_books(const fs::path& input_dir)

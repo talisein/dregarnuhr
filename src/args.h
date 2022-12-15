@@ -30,6 +30,7 @@ struct args
     fs::path output_dir;
     bool output_created;
     bool verbose;
+    bool do_nested;
     std::optional<std::size_t> size_filter;
     std::optional<std::regex> name_filter;
     std::optional<int> jpg_quality;

@@ -93,22 +93,15 @@ namespace utils
         return vec_to_arr_impl<N>(v, std::make_index_sequence<N>{});
     }
 
-    template<std::ranges::input_range T>
+    template<std::ranges::sized_range T>
     [[nodiscard]] std::vector<volume_definition>
-    make_omnibus_def(T&& view, size_t reservation = 1000)
+    make_omnibus_def(T&& view)
     {
         std::vector<volume_definition> res;
-        res.reserve(reservation);
+        res.reserve(std::ranges::size(view));
         std::ranges::remove_copy_if(view, std::back_inserter(res), utils::filter_chapter_stylesheet{});
         std::ranges::stable_sort(res);
         std::ranges::for_each(res, utils::foreach_label{});
         return res;
-    }
-
-    template<std::ranges::range R>
-    constexpr size_t calc_reservation(R&& r)
-    {
-        auto sizes = std::views::transform(std::forward<R>(r), [](const auto &x) {return std::ranges::size(x);});
-        return std::accumulate(sizes.begin(), sizes.end(), 0ULL);
     }
 }

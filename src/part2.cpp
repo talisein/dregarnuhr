@@ -24,7 +24,7 @@ namespace
 
     constexpr std::array _part_2_view = _get_part2_view();
 
-    const std::vector<volume_definition> _part_2 = utils::make_omnibus_def(_part_2_view, utils::calc_reservation(_part_2_xxx));
+    const std::vector<volume_definition> _part_2 = utils::make_omnibus_def(_part_2_view);
 } // namespace
 
 namespace part_2

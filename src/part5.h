@@ -9,5 +9,4 @@ namespace part_5
     inline auto get_vol_1() { return part_5_defs::vol_1_def; }
 
     definition_span_view_t get_part_5();
-    size_t get_reservation();
 }

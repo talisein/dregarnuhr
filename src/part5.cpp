@@ -21,7 +21,7 @@ namespace {
 
     constexpr std::array _part_5_view = _get_part5_view();
 
-    const std::vector<volume_definition> _part_5 = utils::make_omnibus_def(_part_5_view, utils::calc_reservation(_part_5_xxx));
+    const std::vector<volume_definition> _part_5 = utils::make_omnibus_def(_part_5_view);
 }
 
 namespace part_5
@@ -32,12 +32,6 @@ namespace part_5
     get_part_5()
     {
         return { std::span<const volume_definition>(_part_5), omnibus::PART5 };
-    }
-
-    size_t
-    get_reservation()
-    {
-        return _part_5.size();
     }
 
 } // namespace part_5
