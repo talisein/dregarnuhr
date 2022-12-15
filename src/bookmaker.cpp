@@ -645,6 +645,21 @@ namespace epub
         return outcome::success();
     }
 
+    namespace {
+        xmlpp::ustring
+        make_link(const volume_definition& def, volume vol)
+        {
+            std::stringstream ss;
+            if (def.vol == vol) { // basevol has same path
+                ss << "../" << def.href;
+            } else {
+                ss << "../" << to_string_view(def.vol) << "/" << def.href;
+            }
+
+            return ss.str();
+        }
+    }
+
     void
     book_writer::make_toc(xmlpp::Element *nav, const xmlpp::Element* src_nav)
     {
@@ -671,24 +686,12 @@ namespace epub
                 a->add_child_text("Omnibus Cover");
             }
 
-            auto make_link = [vol = volume{vol}](const auto& def) -> xmlpp::ustring {
-                std::stringstream ss;
-                if (def.vol == vol) { // basevol has same path
-                    ss << "../" << def.href;
-                } else {
-                    ss << "../" << to_string_view(def.vol) << "/" << def.href;
-                }
-
-                return ss.str();
-            };
-
             auto make_li = [map = xmlpp::Element::PrefixNsMap{{"html", "http://www.w3.org/1999/xhtml"}},
                             ss = std::stringstream{},
                             vol = volume{vol},
                             idx = int{1},
-                            &make_link,
                             src_nav]
-                (xmlpp::Element* parent, const auto& def) mutable -> xmlpp::Element*
+                (xmlpp::Element* parent, const volume_definition& def) mutable -> xmlpp::Element*
             {
                 using namespace std::string_literals;
                 xmlpp::Node::const_NodeSet set = src_nav->find("html:ol/html:li/html:a[@href='../"s + std::string(def.href) + "']"s, map);
@@ -708,7 +711,7 @@ namespace epub
                     li->set_attribute("id", ss.str());
                 }
                 auto a = li->add_child_element("a");
-                a->set_attribute("href", make_link(def));
+                a->set_attribute("href", make_link(def, vol));
                 if (get_options()->omnibus_type) {
                     ss.str("");
                     ss << def.vol << ": " << def.toc_label.value();
@@ -721,7 +724,7 @@ namespace epub
             };
 
 
-            auto make_named_ol = [root_ol, make_link](xmlpp::Element* parent, xmlpp::ustring title, xmlpp::ustring link) -> xmlpp::Element* {
+            auto make_named_ol = [root_ol](xmlpp::Element* parent, xmlpp::ustring title, xmlpp::ustring link) -> xmlpp::Element* {
                 auto li = parent->add_child_element("li");
                 li->set_attribute("style", "margin-top: 16px;");
 //                auto span = li->add_child_element("span");
@@ -747,13 +750,13 @@ namespace epub
                     if (!current_part_ol || part != current_part) {
                         current_part = part;
                         current_volume = volume;
-                        current_part_ol = make_named_ol(root_ol, xmlpp::ustring(to_string_view(part)), make_link(def));
-                        current_volume_ol = make_named_ol(current_part_ol, xmlpp::ustring(to_string_view(volume)), make_link(def));
+                        current_part_ol = make_named_ol(root_ol, xmlpp::ustring(to_string_view(part)), make_link(def, vol));
+                        current_volume_ol = make_named_ol(current_part_ol, xmlpp::ustring(to_string_view(volume)), make_link(def, vol));
                     }
 
                     if (volume != current_volume) {
                         current_volume = volume;
-                        current_volume_ol = make_named_ol(current_part_ol, xmlpp::ustring(to_string_view(volume)), make_link(def));
+                        current_volume_ol = make_named_ol(current_part_ol, xmlpp::ustring(to_string_view(volume)), make_link(def, vol));
                     }
 
                     make_li(current_volume_ol, def);
