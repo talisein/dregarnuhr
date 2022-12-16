@@ -100,7 +100,7 @@ namespace utils
     _count_sizes(const T& t)
     {
         if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
-            return std::numeric_limits<T>::digits10 + 1 + std::is_signed<T>::value;
+            return std::min<size_t>(std::numeric_limits<T>::digits10 + 1 + static_cast<size_t>(std::is_signed<T>::value), 10ULL);
         } else {
             return std::size(t);
         }
@@ -111,7 +111,7 @@ namespace utils
     _count_sizes(const T& t, const Stringlikes&... args)
     {
         if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
-            return std::numeric_limits<T>::digits10 + 1 + std::is_signed<T>::value> + _count_sizes(args...);
+            return std::min<size_t>(std::numeric_limits<T>::digits10 + 1 + static_cast<size_t>(std::is_signed<T>::value), 10ULL) + _count_sizes(args...);
         } else {
             return std::size(t) + _count_sizes(args...);
         }
@@ -122,7 +122,7 @@ namespace utils
     _strconcat_append(String& str, T&& t)
     {
         if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
-            std::array<char, std::numeric_limits<T>::digits10 + 1 + std::is_signed<T>::value> buf;
+            std::array<char, std::min<size_t>(std::numeric_limits<T>::digits10 + 1 + static_cast<size_t>(std::is_signed<T>::value), 10ULL)> buf;
             auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), std::forward<T>(t));
             if (ec != std::errc()) {
                 throw std::system_error(std::make_error_code(ec));
@@ -139,7 +139,7 @@ namespace utils
     _strconcat_append(String& str, T&& t, Stringlikes&&... args)
     {
         if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
-            std::array<char, std::numeric_limits<T>::digits10 + 1 + std::is_signed<T>::value> buf;
+            std::array<char, std::min<size_t>(std::numeric_limits<T>::digits10 + 1 + static_cast<size_t>(std::is_signed<T>::value), 10ULL)> buf;
             auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), std::forward<T>(t));
             if (ec != std::errc()) {
                 throw std::system_error(std::make_error_code(ec));
