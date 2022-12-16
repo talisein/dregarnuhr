@@ -21,6 +21,7 @@
 #include "libxml++/validators/dtdvalidator.h"
 #include "libxml++/validators/relaxngvalidator.h"
 #include "dtd.h"
+#include "utils.h"
 
 namespace {
     const std::string_view USER_COVER_JPG_PATH {"Images/OverrideFrontCover.jpg"};
@@ -435,16 +436,14 @@ namespace epub
         }
         auto navmap = root->add_child_element("navMap");
 
-        auto make_nav_point = [vol = vol, point = int{1}, ss = std::stringstream{}](const auto &def, xmlpp::Element* parent,
+        auto make_nav_point = [vol = vol, point = int{1}](const auto &def, xmlpp::Element* parent,
                                                   std::optional<xmlpp::ustring> label = std::nullopt,
                                                   std::optional<xmlpp::ustring> href = std::nullopt)
 
             mutable -> xmlpp::Element*
         {
             auto res = parent->add_child_element("navPoint");
-            ss.str("");
-            ss << "navPoint" << point++;
-            res->set_attribute("id", ss.str());
+            res->set_attribute("id", utils::strcat("navPoint", point++));
 
             auto navLabel = res->add_child_element("navLabel");
             auto text = navLabel->add_child_element("text");
@@ -454,15 +453,15 @@ namespace epub
                 text->add_child_text(xmlpp::ustring(*def.toc_label));
             }
             auto content = res->add_child_element("content");
-            ss.str("");
+            std::string srcattr;
             if (href) {
-                ss << *href;
+                srcattr = *href;
             } else if (vol == def.vol) {
-                ss << def.href;
+                srcattr = def.href;
             } else {
-                ss << to_string_view(def.vol) << "/" << def.href;
+                srcattr = utils::strcat(to_string_view(def.vol), "/", def.href);
             }
-            content->set_attribute("src", ss.str());
+            content->set_attribute("src", srcattr);
 
             return res;
         };
@@ -649,14 +648,11 @@ namespace epub
         xmlpp::ustring
         make_link(const volume_definition& def, volume vol)
         {
-            std::stringstream ss;
             if (def.vol == vol) { // basevol has same path
-                ss << "../" << def.href;
-            } else {
-                ss << "../" << to_string_view(def.vol) << "/" << def.href;
+                return utils::xstrcat("../", def.href);
             }
 
-            return ss.str();
+            return utils::xstrcat("../", to_string_view(def.vol), "/", def.href);//meow
         }
     }
 
@@ -676,22 +672,21 @@ namespace epub
             }
 
             // Insert cover here too
-            if (std::stringstream ss; get_options()->omnibus_type && get_options()->cover) {
+            if (get_options()->omnibus_type && get_options()->cover) {
                 auto li = root_ol->add_child_element("li");
                 li->set_attribute("class", "toc-front");
                 li->set_attribute("id", "toc-omnibus-cover");
                 auto a = li->add_child_element("a");
-                ss << "../" << USER_COVER_XHTML_PATH;
-                a->set_attribute("href", ss.str());
+                a->set_attribute("href", utils::xstrcat("../", USER_COVER_XHTML_PATH));
                 a->add_child_text("Omnibus Cover");
             }
 
             const auto map = xmlpp::Element::PrefixNsMap{{"html", "http://www.w3.org/1999/xhtml"}};
-            std::stringstream ss;
             int idx = 1;
             auto make_li = [&](xmlpp::Element* parent, const volume_definition& def) -> xmlpp::Element*
             {
                 using namespace std::string_literals;
+                using namespace std::string_view_literals;
                 xmlpp::Node::const_NodeSet set = src_nav->find("html:ol/html:li/html:a[@href='../"s + std::string(def.href) + "']"s, map);
                 if (set.empty()) { // Sometimes it is "chapter1.html" instead of "../Text/chapter1.html"
                     set = src_nav->find("html:ol/html:li/html:a[@href='"s + std::string(def.href.substr(def.href.find_last_of('/')+1)) + "']"s, map);
@@ -703,17 +698,13 @@ namespace epub
                         li->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
                     }
                 } else {
-                    ss.str("");
-                    ss << "chrono-chapter" << idx++;
                     li->set_attribute("class", "toc-chapter");
-                    li->set_attribute("id", ss.str());
+                    li->set_attribute("id", utils::strcat<xmlpp::ustring>("chrono-chapter"sv, idx++));
                 }
                 auto a = li->add_child_element("a");
                 a->set_attribute("href", make_link(def, vol));
                 if (get_options()->omnibus_type) {
-                    ss.str("");
-                    ss << def.vol << ": " << def.toc_label.value();
-                    a->add_child_text(ss.str());
+                    a->add_child_text(utils::xstrcat(to_string_view(def.vol), ": ", def.toc_label.value()));
                 } else {
                     a->add_child_text(xmlpp::ustring(def.toc_label.value()));
                 }

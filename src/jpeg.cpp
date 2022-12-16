@@ -53,14 +53,12 @@ namespace
 std::string
 detail::JpegErrc_category::message(int c) const
 {
-    std::stringstream ss;
     auto it = _error_map.find(static_cast<J_MESSAGE_CODE>(c));
     if (it != _error_map.end()) {
-        ss << it->second;
+        return std::string(it->second);
     } else {
-        ss << "Unknown JPEG error " << c;
+        return utils::strcat("Unknown JPEG error "sv, c);
     }
-    return ss.str();
 }
 
 const detail::JpegErrc_category& JpegErrc_category()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ranges>
+#include <charconv>
 #include <numeric>
 #include <concepts>
 #include <algorithm>
@@ -8,6 +9,7 @@
 #include <sstream>
 #include <string_view>
 #include <set>
+#include "libxml++/ustring.h"
 #include "volumes.h"
 #include "log.h"
 
@@ -65,21 +67,6 @@ namespace utils
 
 
 
-    template<std::integral To, std::integral From>
-    [[nodiscard]] auto safe_int_cast(From from) -> std::remove_cvref_t<To> {
-        auto res = static_cast<std::remove_cvref_t<To>>(from);
-        if (std::cmp_not_equal(res, from)) [[unlikely]] {
-            std::stringstream ss;
-            ss << "Trying to cast from " << from << " to a type that would become " << res;
-            if (std::cmp_greater(from, res)) {
-                throw std::overflow_error(ss.str());
-            } else {
-                throw std::range_error(ss.str());
-            }
-        }
-        return res;
-    }
-
     template <size_t N, size_t... I>
     consteval std::array<volume_definition, N>
     vec_to_arr_impl(const std::vector<volume_definition>& v, std::index_sequence<I...>)
@@ -104,4 +91,98 @@ namespace utils
         std::ranges::for_each(res, utils::foreach_label{});
         return res;
     }
+
+    template<typename T>
+    concept nonintegral = std::negation_v<std::is_integral<std::remove_cvref_t<T>>>;
+
+    template<typename T>
+    constexpr std::size_t
+    _count_sizes(const T& t)
+    {
+        if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
+            return std::numeric_limits<T>::digits10 + 1 + std::is_signed<T>::value;
+        } else {
+            return std::size(t);
+        }
+    }
+
+    template<typename T, typename... Stringlikes>
+    constexpr std::size_t
+    _count_sizes(const T& t, const Stringlikes&... args)
+    {
+        if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
+            return std::numeric_limits<T>::digits10 + 1 + std::is_signed<T>::value> + _count_sizes(args...);
+        } else {
+            return std::size(t) + _count_sizes(args...);
+        }
+    }
+
+    template<typename String, typename T>
+    constexpr String&
+    _strconcat_append(String& str, T&& t)
+    {
+        if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
+            std::array<char, std::numeric_limits<T>::digits10 + 1 + std::is_signed<T>::value> buf;
+            auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), std::forward<T>(t));
+            if (ec != std::errc()) {
+                throw std::system_error(std::make_error_code(ec));
+            }
+            str.append(buf.data(), ptr);
+        } else {
+            str.append(std::forward<T>(t));
+        }
+        return str;
+    }
+
+    template<typename String, typename T, typename... Stringlikes>
+    constexpr String&
+    _strconcat_append(String& str, T&& t, Stringlikes&&... args)
+    {
+        if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
+            std::array<char, std::numeric_limits<T>::digits10 + 1 + std::is_signed<T>::value> buf;
+            auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), std::forward<T>(t));
+            if (ec != std::errc()) {
+                throw std::system_error(std::make_error_code(ec));
+            }
+
+            str.append(buf.data(), ptr);
+        } else {
+            str.append(std::forward<T>(t));
+        }
+        _strconcat_append(str, std::forward<Stringlikes>(args)...);
+        return str;
+    }
+
+    template<typename String = std::string, typename... Stringlikes>
+    [[nodiscard]] String
+    strcat(Stringlikes&&... args)
+    {
+        String res;
+        res.reserve(_count_sizes(args...));
+        _strconcat_append(res, std::forward<Stringlikes>(args)...);
+        return res;
+    }
+
+    template<typename... Stringlikes>
+    [[nodiscard]] xmlpp::ustring
+    xstrcat(Stringlikes&&... args)
+    {
+        return strcat<xmlpp::ustring>(std::forward<Stringlikes>(args)...);
+    }
+
+    template<std::integral To, std::integral From>
+    [[nodiscard]] auto safe_int_cast(From from) -> std::remove_cvref_t<To> {
+        using namespace std::string_view_literals;
+        auto res = static_cast<std::remove_cvref_t<To>>(from);
+        if (std::cmp_not_equal(res, from)) [[unlikely]] {
+            std::string error_message = utils::strcat("Trying to cast from ", from, " to a type that would become ", res);
+            if (std::cmp_greater(from, res)) {
+                throw std::overflow_error(error_message);
+            } else {
+                throw std::range_error(error_message);
+            }
+        }
+        return res;
+    }
+
 }
