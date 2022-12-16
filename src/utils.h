@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <ranges>
 #include <charconv>
 #include <numeric>
