@@ -79,4 +79,9 @@ if not has_chrono
                         default_options: ['use_manual_tzdb=true'])
 endif
 
+boostut_proj = subproject('boostut')
+boostut_dep = boostut_proj.get_variable('boostut_dep')
+
+add_project_arguments('-DBOOST_UT_DISABLE_MODULE', language: 'cpp')
+
 subdir('src')

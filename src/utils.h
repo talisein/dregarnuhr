@@ -94,14 +94,14 @@ namespace utils
     }
 
     template<typename T>
-    concept nonintegral = std::negation_v<std::is_integral<std::remove_cvref_t<T>>>;
-
-    template<typename T>
     constexpr std::size_t
     _count_sizes(const T& t)
     {
-        if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
-            return std::max<size_t>(std::numeric_limits<T>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<T>::value), 10ULL);
+        using Type = std::remove_cvref_t<T>;
+        if constexpr(std::is_same_v<Type, char>) {
+            return 1ULL;
+        } else if constexpr(std::is_integral_v<Type>) {
+            return std::max<size_t>(std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value), 10ULL);
         } else {
             return std::size(t);
         }
@@ -111,8 +111,11 @@ namespace utils
     constexpr std::size_t
     _count_sizes(const T& t, const Stringlikes&... args)
     {
-        if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
-            return std::max<size_t>(std::numeric_limits<T>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<T>::value), 10ULL) + _count_sizes(args...);
+        using Type = std::remove_cvref_t<T>;
+        if constexpr(std::is_same_v<Type, char>) {
+            return 1ULL + _count_sizes(args...);
+        } else if constexpr(std::is_integral_v<Type>) {
+            return std::max<size_t>(std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value), 10ULL) + _count_sizes(args...);
         } else {
             return std::size(t) + _count_sizes(args...);
         }
@@ -122,8 +125,11 @@ namespace utils
     constexpr String&
     _strconcat_append(String& str, T&& t)
     {
-        if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
-            std::array<char, std::max<size_t>(std::numeric_limits<T>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<T>::value), 10ULL)> buf;
+        using Type = std::remove_cvref_t<T>;
+        if constexpr(std::is_same_v<Type, char>) {
+            str.push_back(std::forward<T>(t));
+        } else if constexpr(std::is_integral_v<Type>) {
+            std::array<char, std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value)> buf;
             auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), std::forward<T>(t));
             if (ec != std::errc()) {
                 throw std::system_error(std::make_error_code(ec));
@@ -139,8 +145,11 @@ namespace utils
     constexpr String&
     _strconcat_append(String& str, T&& t, Stringlikes&&... args)
     {
-        if constexpr(std::is_integral_v<std::remove_cvref_t<T>>) {
-            std::array<char, std::max<size_t>(std::numeric_limits<T>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<T>::value), 10ULL)> buf;
+        using Type = std::remove_cvref_t<T>;
+        if constexpr(std::is_same_v<Type, char>) {
+            str.push_back(std::forward<T>(t));
+        } else if constexpr(std::is_integral_v<Type>) {
+            std::array<char, std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value)> buf;
             auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), std::forward<T>(t));
             if (ec != std::errc()) {
                 throw std::system_error(std::make_error_code(ec));
