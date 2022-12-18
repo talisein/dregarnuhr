@@ -8,7 +8,7 @@ int main() {
     using namespace std::string_literals;
 
     "simple_int_cast"_test = [] {
-        expect(utils::safe_int_cast<unsigned char>(1) == 1_c);
+        expect(1_c == utils::safe_int_cast<unsigned char>(1));
         expect(throws<std::overflow_error>([] { (void)utils::safe_int_cast<unsigned char>(513); }));
         expect(throws<std::range_error>([] { (void)utils::safe_int_cast<unsigned char>(-1); }));
     };
