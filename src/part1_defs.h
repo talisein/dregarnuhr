@@ -145,7 +145,7 @@ namespace part_1_defs
 { volume::P1V1, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V1, "Text/epilogue1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V1, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
-{ volume::P1V1, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High-Resolution Illustrations"sv, true },
+{ volume::P1V1, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P1V1, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V1, "Text/signup.xhtml"sv, "application/xhtml+xml"sv, "About J-Novel Club"sv, true },
 { volume::P1V1, "Text/copyright.xhtml"sv, "application/xhtml+xml"sv, "Copyright"sv, true },

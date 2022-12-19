@@ -18,16 +18,14 @@
 #include "outcome/utils.hpp"
 #include "outcome/try.hpp"
 #include "jpeg.h"
-#include "libxml++/validators/dtdvalidator.h"
 #include "libxml++/validators/relaxngvalidator.h"
-#include "dtd.h"
 #include "utils.h"
 
 namespace {
-    const std::string_view USER_COVER_JPG_PATH {"Images/OverrideFrontCover.jpg"};
-    const std::string_view USER_COVER_XHTML_ID {"user_provided_cover.xhtml"};
-    const std::string_view USER_COVER_XHTML_PATH {"Text/OverrideFrontCover.xhtml"};
-    const std::string_view USER_COVER_XHTML_BODY {R"xml(<?xml version="1.0" encoding="utf-8"?>
+    constexpr std::string_view USER_COVER_JPG_PATH {"Images/OverrideFrontCover.jpg"};
+    constexpr std::string_view USER_COVER_XHTML_ID {"user_provided_cover.xhtml"};
+    constexpr std::string_view USER_COVER_XHTML_PATH {"Text/OverrideFrontCover.xhtml"};
+    constexpr std::string_view USER_COVER_XHTML_BODY {R"xml(<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">
@@ -43,6 +41,33 @@ namespace {
   </section>
 </body>
 </html>)xml"};
+    constexpr std::string_view USER_COVER_STYLESHEET_ID {"user_provided_cover_stylesheet.css"};
+    constexpr std::string_view USER_COVER_STYLESHEET_PATH {"Styles/stylesheet.css"};
+    constexpr std::string_view USER_COVER_STYLESHEET_BODY {R"css(body {
+ line-height: 1.2em;
+ font-size: 1em;
+ overflow-wrap: break-word;
+}
+
+body.nomargin {
+ margin: 0em;
+ padding: 0em;
+}
+
+body.center {
+ text-align: center;
+}
+
+img {
+ max-width: 100%;
+}
+
+img.cover {
+  text-indent: 0em;
+  max-height: 98%;
+  width: auto !important;
+  clear: both;
+})css"};
 
     constinit std::array defined_volumes = std::to_array({
             volume::P1V1,
@@ -174,8 +199,7 @@ namespace {
             const auto& src_reader = src_readers.find(def.vol)->second;
             const auto& src_book = src_books.find(def.vol)->second;
             const auto root = src_book.rootfile_path.substr(0, src_book.rootfile_path.find_first_of('/')+1);
-            auto src {root};
-            src.append(def.href);
+            const auto src = utils::strcat(root, def.href);
 
             if (get_options()->size_filter) {
                 const auto src_idx = src_reader->zip.locate_file(src.c_str()).value();
@@ -279,6 +303,8 @@ namespace epub
     book_writer::create_rootfile()
     {
         xmlpp::Document doc;
+        xmlpp::ustring first_chapter_path;
+        xmlpp::ustring toc_path;
         OUTCOME_TRY(const auto base_vol, identify_volume(base_book.manifest.toc.dtb_uid));
         OUTCOME_TRY(auto idx, base_reader->zip.locate_file(base_book.rootfile_path.c_str()));
         OUTCOME_TRY(epub::file_reader f, base_reader->zip.extract_stream(idx));
@@ -336,9 +362,8 @@ namespace epub
                 contributor->set_attribute("id", "contributor01");
                 contributor->set_first_child_text("talisein");
                 if (get_options()->omnibus_type) {
-                    xmlpp::Element::PrefixNsMap map;
-                    map.insert({"dc", "http://purl.org/dc/elements/1.1/"});
-                    xmlpp::Node::NodeSet set = metadata_node->find("dc:title", map);
+                    const xmlpp::Element::PrefixNsMap ns_map {{"dc", "http://purl.org/dc/elements/1.1/"}};
+                    xmlpp::Node::NodeSet set = metadata_node->find("dc:title", ns_map);
                     if (!set.empty()) {
                         dynamic_cast<xmlpp::Element*>(set.front())->set_first_child_text(get_options()->title.value());
                     } else {
@@ -359,20 +384,28 @@ namespace epub
                         item->set_attribute("id", xmlpp::ustring(USER_COVER_XHTML_ID));
                         item->set_attribute("href", xmlpp::ustring(USER_COVER_XHTML_PATH));
                         item->set_attribute("media-type", "application/xhtml+xml"); }
+                    {   auto item = manifest->add_child_element("item");
+                        item->set_attribute("id", xmlpp::ustring(USER_COVER_STYLESHEET_ID));
+                        item->set_attribute("href", xmlpp::ustring(USER_COVER_STYLESHEET_PATH));
+                        item->set_attribute("media-type", "text/css"); }
                 }
                 for (const auto &def : get_filtered_defs(definition, src_books, src_readers)) {
                     const auto src_book = src_books.find(def.vol);
                     auto item = manifest->add_child_element("item");
                     item->set_attribute("id", def.get_id());
-                    // basebook just stay in normal place
-                    if (def.vol == base_vol) {
+
+                    if (def.vol == base_vol && def.href == base_book.manifest.toc_relpath) {
                         // toc.ncx will stay in OEBPS
-//                  if (def.href == base_book.manifest.toc_relpath) {
                         item->set_attribute("href", xmlpp::ustring(def.href));
                     } else {
-                        xmlpp::ustring href(to_string_view(def.vol));
-                        href.append("/").append(def.href);
+                        auto href { utils::xstrcat(to_string_view(def.vol), "/", def.href) };
                         item->set_attribute("href", href);
+                        if (first_chapter_path.empty() && chapter_type::CHAPTER == def.get_chapter_type()) {
+                            first_chapter_path = href;
+                        }
+                        if (toc_path.empty() && chapter_type::TOC == def.get_chapter_type()) {
+                            toc_path = href;
+                        }
                     }
 
                     item->set_attribute("media-type", xmlpp::ustring(def.mediatype));
@@ -391,7 +424,18 @@ namespace epub
                     }
                 }
             } else if (base_child->get_name() == "guide") {
-                root->import_node(base_child, true);
+                auto guide = dynamic_cast<xmlpp::Element*>(root->import_node(base_child, false));
+                for (const auto attr : dynamic_cast<const xmlpp::Element*>(base_child)->get_attributes()) {
+                    guide->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+                }
+                { auto text = guide->add_child_element("reference");
+                    text->set_attribute("type", "text");
+                    text->set_attribute("title", "Text");
+                    text->set_attribute("href", first_chapter_path); }
+                { auto text = guide->add_child_element("reference");
+                    text->set_attribute("type", "toc");
+                    text->set_attribute("title", "Table of Contents");
+                    text->set_attribute("href", toc_path); }
             } else {
                 auto x = dynamic_cast<const xmlpp::TextNode*>(base_child);
                 if (!x) {
@@ -456,8 +500,6 @@ namespace epub
             std::string srcattr;
             if (href) {
                 srcattr = *href;
-            } else if (vol == def.vol) {
-                srcattr = def.href;
             } else {
                 srcattr = utils::strcat(to_string_view(def.vol), "/", def.href);
             }
@@ -506,12 +548,11 @@ namespace epub
         const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
         // insert cover here too
         if (get_options()->omnibus_type && get_options()->cover) {
-            auto dst {root};
-            dst.append(USER_COVER_XHTML_PATH);
+            auto dst { utils::strcat(root, USER_COVER_XHTML_PATH) };
             std::span<const char> span { USER_COVER_XHTML_BODY.data(), USER_COVER_XHTML_BODY.size() };
             OUTCOME_TRY(writer.add(dst, span, get_options()->compression_level));
-            dst.assign(root);
-            dst.append(USER_COVER_JPG_PATH);
+
+            dst = utils::strcat(root, USER_COVER_JPG_PATH);
             try {
                 const auto len = fs::file_size(get_options()->cover.value());
                 std::ifstream cover_stream { get_options()->cover.value(), std::ios::in | std::ios::binary };
@@ -530,6 +571,10 @@ namespace epub
                 log_error("Couldn't insert omnibus cover image: ", e.what());
                 return outcome::error_from_exception();
             }
+
+            dst = utils::strcat(root, USER_COVER_STYLESHEET_PATH);
+            span = { USER_COVER_STYLESHEET_BODY.data(), USER_COVER_STYLESHEET_BODY.size() };
+            OUTCOME_TRY(writer.add(dst, span, get_options()->compression_level));
         }
         for (const volume_definition& def : get_filtered_defs(definition, src_books, src_readers))
         {
@@ -551,17 +596,10 @@ namespace epub
                 item = std::make_optional<manifest::item>(*src_item);
             }
 
-            // Determine src and dst paths. dst will be e.g. OEBPS/FB1/Text. Basebook dst is just OEBPS/Text
+            // Determine src and dst paths. dst will be e.g. OEBPS/FB1/Text.
             const auto srcbook_root = src_book.rootfile_path.substr(0, src_book.rootfile_path.find_first_of('/')+1);
-            auto src {srcbook_root};
-            src.append(def.href);
-            auto dst {root};
-            dst.append(to_string_view(def.vol));
-            dst.append("/");
-            dst.append(def.href);
-            if (def.vol == vol) {
-                dst.assign(src);
-            }
+            const auto src = utils::strcat(srcbook_root, def.href);
+            const auto dst = utils::strcat(root, to_string_view(def.vol), "/", def.href);
 
             // Transformations
             if (src.ends_with(".jpg") && (get_options()->jpg_quality || get_options()->jpg_scale)) {
@@ -644,18 +682,6 @@ namespace epub
         return outcome::success();
     }
 
-    namespace {
-        xmlpp::ustring
-        make_link(const volume_definition& def, volume vol)
-        {
-            if (def.vol == vol) { // basevol has same path
-                return utils::xstrcat("../", def.href);
-            }
-
-            return utils::xstrcat("../", to_string_view(def.vol), "/", def.href);//meow
-        }
-    }
-
     void
     book_writer::make_toc(xmlpp::Element *nav, const xmlpp::Element* src_nav)
     {
@@ -677,19 +703,23 @@ namespace epub
                 li->set_attribute("class", "toc-front");
                 li->set_attribute("id", "toc-omnibus-cover");
                 auto a = li->add_child_element("a");
-                a->set_attribute("href", utils::xstrcat("../", USER_COVER_XHTML_PATH));
+                a->set_attribute("href", utils::xstrcat("../../", USER_COVER_XHTML_PATH));
                 a->add_child_text("Omnibus Cover");
             }
 
-            const auto map = xmlpp::Element::PrefixNsMap{{"html", "http://www.w3.org/1999/xhtml"}};
+            constexpr auto make_link = [](const volume_definition& def) -> xmlpp::ustring {
+                return utils::xstrcat("../../", to_string_view(def.vol), "/", def.href);
+            };
+
+            const auto ns_map = xmlpp::Element::PrefixNsMap{{"html", "http://www.w3.org/1999/xhtml"}};
             int idx = 1;
             auto make_li = [&](xmlpp::Element* parent, const volume_definition& def) -> xmlpp::Element*
             {
                 using namespace std::string_literals;
                 using namespace std::string_view_literals;
-                xmlpp::Node::const_NodeSet set = src_nav->find("html:ol/html:li/html:a[@href='../"s + std::string(def.href) + "']"s, map);
+                xmlpp::Node::const_NodeSet set = src_nav->find("html:ol/html:li/html:a[@href='../"s + std::string(def.href) + "']"s, ns_map);
                 if (set.empty()) { // Sometimes it is "chapter1.html" instead of "../Text/chapter1.html"
-                    set = src_nav->find("html:ol/html:li/html:a[@href='"s + std::string(def.href.substr(def.href.find_last_of('/')+1)) + "']"s, map);
+                    set = src_nav->find("html:ol/html:li/html:a[@href='"s + std::string(def.href.substr(def.href.find_last_of('/')+1)) + "']"s, ns_map);
                 }
                 auto li = parent->add_child_element("li");
                 if (!set.empty() && def.vol == vol) {
@@ -699,10 +729,10 @@ namespace epub
                     }
                 } else {
                     li->set_attribute("class", "toc-chapter");
-                    li->set_attribute("id", utils::strcat<xmlpp::ustring>("chrono-chapter"sv, idx++));
+                    li->set_attribute("id", utils::xstrcat("chrono-chapter"sv, idx++));
                 }
                 auto a = li->add_child_element("a");
-                a->set_attribute("href", make_link(def, vol));
+                a->set_attribute("href", make_link(def));
                 if (get_options()->omnibus_type) {
                     a->add_child_text(utils::xstrcat(to_string_view(def.vol), ": ", def.toc_label.value()));
                 } else {
@@ -739,13 +769,13 @@ namespace epub
                     if (!current_part_ol || part != current_part) {
                         current_part = part;
                         current_volume = volume;
-                        current_part_ol = make_named_ol(root_ol, xmlpp::ustring(to_string_view(part)), make_link(def, vol));
-                        current_volume_ol = make_named_ol(current_part_ol, xmlpp::ustring(to_string_view(volume)), make_link(def, vol));
+                        current_part_ol = make_named_ol(root_ol, xmlpp::ustring(to_string_view(part)), make_link(def));
+                        current_volume_ol = make_named_ol(current_part_ol, xmlpp::ustring(to_string_view(volume)), make_link(def));
                     }
 
                     if (volume != current_volume) {
                         current_volume = volume;
-                        current_volume_ol = make_named_ol(current_part_ol, xmlpp::ustring(to_string_view(volume)), make_link(def, vol));
+                        current_volume_ol = make_named_ol(current_part_ol, xmlpp::ustring(to_string_view(volume)), make_link(def));
                     }
 
                     make_li(current_volume_ol, def);
@@ -799,6 +829,7 @@ namespace epub
         }
     }
     template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+
     result<void>
     bookmaker::make_books_impl(definition_t view, std::variant<volume, omnibus> base)
     {
