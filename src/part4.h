@@ -13,7 +13,7 @@ namespace part_4
     inline auto get_vol_5() { return part_4_defs::vol_5_def; }
     inline auto get_vol_6() { return part_4_defs::vol_6_def; }
     inline auto get_vol_7() { return part_4_defs::vol_7_def; }
-    inline auto get_vol_8() { return part_4_defs::vol_9_def; }
+    inline auto get_vol_8() { return part_4_defs::vol_8_def; }
     inline auto get_vol_9() { return part_4_defs::vol_9_def; }
     definition_span_view_t get_part_4();
 }
