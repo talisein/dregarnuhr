@@ -101,6 +101,7 @@ std::string_view to_string_view(omnibus vol);
 
 std::ostream& operator<<(std::ostream& os, volume v);
 std::ostream& operator<<(std::ostream& os, omnibus v);
+std::ostream& operator<<(std::ostream& os, const std::variant<omnibus, volume>& v);
 
 struct volume_definition
 {
@@ -139,13 +140,16 @@ struct volume_definition
 };
 
 template<std::ranges::input_range R>
-struct definition_view_t
+struct definition_view_t : public std::ranges::view_interface<definition_view_t<R>>
 {
     constexpr definition_view_t(R&& _defs, omnibus o) : defs(std::forward<R>(_defs)), name(o) {};
     constexpr definition_view_t(R&& _defs, volume v) : defs(std::forward<R>(_defs)), name(v) {};
 
     R defs;
     std::variant<omnibus, volume> name;
+
+    auto begin() const { return defs.begin(); }
+    auto end() const { return defs.end(); }
 };
 
 using definition_span_view_t = definition_view_t<std::span<const volume_definition>>;

@@ -21,10 +21,10 @@ namespace
     const std::vector<volume_definition> _omnibus = utils::make_omnibus_def(_omnibus_view);
 }
 
-std::span<const volume_definition>
+definition_span_view_t
 get_omnibus_definition()
 {
-    return std::span<const volume_definition>(_omnibus);
+    return { std::span<const volume_definition>(_omnibus), omnibus::ALL };
 }
 
 std::map<volume_definition, std::pair<omnibus, volume>, volume_map_comparator>

@@ -170,6 +170,12 @@ std::ostream& operator<<(std::ostream& os, const volume_definition& v)
     return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const std::variant<omnibus, volume>& v)
+{
+    std::visit([&os](auto&& arg) { os << to_string_view(arg); }, v);
+    return os;
+}
+
 chapter_type
 volume_definition::get_chapter_type() const
 {

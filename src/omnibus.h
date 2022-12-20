@@ -9,8 +9,7 @@
 #include "part5.h"
 
 
-std::span<const volume_definition> get_omnibus_definition();
-
+definition_span_view_t get_omnibus_definition();
 
 struct volume_map_comparator
 {
@@ -37,4 +36,5 @@ namespace omnibus_defs
         | std::views::join
         | std::views::transform(&definition_span_view_t::defs)
         | std::views::join;
+
 }

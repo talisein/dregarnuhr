@@ -69,7 +69,7 @@ img.cover {
   clear: both;
 })css"};
 
-    constinit std::array defined_volumes = std::to_array({
+    constexpr std::array defined_volumes = std::to_array({
             volume::P1V1,
             volume::P1V2,
             volume::P1V3,
@@ -94,75 +94,75 @@ img.cover {
             volume::P5V1,
         });
 
-    constexpr epub::definition_t get_definition_view(omnibus o)
+    constexpr auto get_definition_view(omnibus o)
     {
         switch (o)
         {
             case omnibus::PART1:
-                return part_1::get_part_1().defs;
+                return part_1::get_part_1();
             case omnibus::PART2:
-                return part_2::get_part_2().defs;
+                return part_2::get_part_2();
             case omnibus::PART3:
-                return part_3::get_part_3().defs;
+                return part_3::get_part_3();
             case omnibus::PART4:
-                return part_4::get_part_4().defs;
+                return part_4::get_part_4();
             case omnibus::PART5:
-                return part_5::get_part_5().defs;
+                return part_5::get_part_5();
             case omnibus::ALL:
                 return get_omnibus_definition();
         }
         assert(false);
-        return part_3::get_part_3().defs;
+        return part_3::get_part_3();
     }
 
-    constexpr epub::definition_t get_definition_view(volume v)
+    constexpr auto get_definition_view(volume v)
     {
         switch (v)
         {
             case volume::P1V1:
-                return part_1::get_vol_1().defs;
+                return part_1::get_vol_1();
             case volume::P1V2:
-                return part_1::get_vol_2().defs;
+                return part_1::get_vol_2();
             case volume::P1V3:
-                return part_1::get_vol_3().defs;
+                return part_1::get_vol_3();
             case volume::P2V1:
-                return part_2::get_vol_1().defs;
+                return part_2::get_vol_1();
             case volume::P2V2:
-                return part_2::get_vol_2().defs;
+                return part_2::get_vol_2();
             case volume::P2V3:
-                return part_2::get_vol_3().defs;
+                return part_2::get_vol_3();
             case volume::P2V4:
-                return part_2::get_vol_4().defs;
+                return part_2::get_vol_4();
             case volume::P3V1:
-                return part_3::get_vol_1().defs;
+                return part_3::get_vol_1();
             case volume::P3V2:
-                return part_3::get_vol_2().defs;
+                return part_3::get_vol_2();
             case volume::P3V3:
-                return part_3::get_vol_3().defs;
+                return part_3::get_vol_3();
             case volume::P3V4:
-                return part_3::get_vol_4().defs;
+                return part_3::get_vol_4();
             case volume::P3V5:
-                return part_3::get_vol_5().defs;
+                return part_3::get_vol_5();
             case volume::P4V1:
-                return part_4::get_vol_1().defs;
+                return part_4::get_vol_1();
             case volume::P4V2:
-                return part_4::get_vol_2().defs;
+                return part_4::get_vol_2();
             case volume::P4V3:
-                return part_4::get_vol_3().defs;
+                return part_4::get_vol_3();
             case volume::P4V4:
-                return part_4::get_vol_4().defs;
+                return part_4::get_vol_4();
             case volume::P4V5:
-                return part_4::get_vol_5().defs;
+                return part_4::get_vol_5();
             case volume::P4V6:
-                return part_4::get_vol_6().defs;
+                return part_4::get_vol_6();
             case volume::P4V7:
-                return part_4::get_vol_7().defs;
+                return part_4::get_vol_7();
             case volume::P4V8:
-                return part_4::get_vol_8().defs;
+                return part_4::get_vol_8();
             case volume::P4V9:
-                return part_4::get_vol_9().defs;
+                return part_4::get_vol_9();
             case volume::P5V1:
-                return part_5::get_vol_1().defs;
+                return part_5::get_vol_1();
             case volume::FB1: [[fallthrough]];
             case volume::FB2: [[fallthrough]];
             case volume::FB3: [[fallthrough]];
@@ -183,11 +183,11 @@ img.cover {
                 assert(false);
               }
         assert(false);
-        auto x = part_1::get_vol_1().defs;
-        return std::span(x.end(), x.end());
+        return part_1::get_vol_1();
     }
 
-    auto get_filtered_defs(epub::definition_t defs, const epub::books_t& src_books, const epub::readers_t& src_readers)
+    template<std::ranges::input_range R>
+    auto get_filtered_defs(R defs, const epub::books_t& src_books, const epub::readers_t& src_readers)
     {
         return std::ranges::views::filter(defs, [&src_books, &src_readers](const volume_definition& def) {
             // Filter out sources we don't have available
@@ -237,7 +237,7 @@ img.cover {
         return new_filename;
     }
 
-    void cleanup_dangling(volume vol, const std::filesystem::path& filename) {
+    void cleanup_dangling(auto vol, const std::filesystem::path& filename) {
         std::error_code ec;
         bool exists = std::filesystem::exists(filename, ec);
         if (ec) {
@@ -247,15 +247,15 @@ img.cover {
         if (exists) {
             auto is_regular = std::filesystem::is_regular_file(filename, ec);
             if (ec) {
-                log_error("Failed to create book ", to_string_view(vol), ". Dangling file ", filename, " is in unexpected state, got error: ", ec.message(), ". Clean it up yourself. This shouldn't happen!");
+                log_error("Failed to create book ", vol, ". Dangling file ", filename, " is in unexpected state, got error: ", ec.message(), ". Clean it up yourself. This shouldn't happen!");
                 return;
             }
             if (!is_regular) {
-                log_error("Failed to create book ", to_string_view(vol), ". Dangling file ", filename, " is somehow not even a regular file. Something's gone very wrong, aborting.");
+                log_error("Failed to create book ", vol, ". Dangling file ", filename, " is somehow not even a regular file. Something's gone very wrong, aborting.");
                 return;
             }
             if (!std::filesystem::remove(filename, ec) || ec) {
-                log_error("Failed to create book ", to_string_view(vol), ". Dangling file ", filename, " couldn't be cleaned up, error: ", ec.message());
+                log_error("Failed to create book ", vol, ". Dangling file ", filename, " couldn't be cleaned up, error: ", ec.message());
                 return;
             }
         }
@@ -265,8 +265,9 @@ img.cover {
 
 namespace epub
 {
+    template<std::ranges::input_range R>
     result<void>
-    book_writer::start_book()
+    book_writer<R>::start_book()
     {
         using namespace std::string_literals;
         static const std::string MIMETYPE { "mimetype"s };
@@ -285,8 +286,9 @@ namespace epub
         return outcome::success();
     }
 
+    template<std::ranges::input_range R>
     result<std::string>
-    book_writer::get_ncx_id() const
+    book_writer<R>::get_ncx_id() const
     {
         auto defs = get_filtered_defs(definition, src_books, src_readers);
         auto it = std::ranges::find(defs, NCX, &volume_definition::get_chapter_type);
@@ -299,8 +301,9 @@ namespace epub
     }
 
     // TODO: filters, and missing volumes like fanbook, should be excluded in the rootfile and toc
+    template<std::ranges::input_range R>
     result<std::string>
-    book_writer::create_rootfile()
+    book_writer<R>::create_rootfile()
     {
         xmlpp::Document doc;
         xmlpp::ustring first_chapter_path;
@@ -448,8 +451,9 @@ namespace epub
         return doc.write_to_string_formatted();
     }
 
+    template<std::ranges::input_range R>
     result<void>
-    book_writer::add_ncx()
+    book_writer<R>::add_ncx()
     {
         const auto toc_fullpath = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1).append(base_book.manifest.toc_relpath);
         auto it = std::ranges::find(basefiles, toc_fullpath);
@@ -460,8 +464,9 @@ namespace epub
         return outcome::success();
     }
 
+    template<std::ranges::input_range R>
     result<std::string>
-    book_writer::create_ncx(const std::string& toc_fullpath)
+    book_writer<R>::create_ncx(const std::string& toc_fullpath)
     {
         static const auto volume_map = get_volume_map();
         xmlpp::Document doc;
@@ -541,8 +546,9 @@ namespace epub
         return doc.write_to_string_formatted();
     }
 
+    template<std::ranges::input_range R>
     result<void>
-    book_writer::make_book_impl()
+    book_writer<R>::make_book_impl()
     {
         OUTCOME_TRY(start_book());
         const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
@@ -682,8 +688,9 @@ namespace epub
         return outcome::success();
     }
 
+    template<std::ranges::input_range R>
     void
-    book_writer::make_toc(xmlpp::Element *nav, const xmlpp::Element* src_nav)
+    book_writer<R>::make_toc(xmlpp::Element *nav, const xmlpp::Element* src_nav)
     {
         static const auto volume_map = get_volume_map();
 
@@ -786,37 +793,38 @@ namespace epub
         }
     }
 
+    template<std::ranges::input_range R>
     result<fs::path>
-    book_writer::make_book()
+    book_writer<R>::make_book()
     {
         try {
             auto res = make_book_impl();
             if (res.has_failure()) {
-                cleanup_dangling(vol, filename);
+                cleanup_dangling(definition.name, filename);
                 return res.as_failure();
             }
         } catch (std::system_error& e) {
-            cleanup_dangling(vol, filename);
+            cleanup_dangling(definition.name, filename);
             log_error("make_book: ", e.what());
             return e.code();
         } catch (std::exception& e) {
-            cleanup_dangling(vol, filename);
+            cleanup_dangling(definition.name, filename);
             log_error("make_book: ", e.what());
             return outcome::error_from_exception();
         }
         return filename;
     }
 
-    book_writer::book_writer(volume volume,
-                             const books_t &books,
-                             const readers_t &readers,
-                             definition_t def) :
-        vol(volume),
+    template<std::ranges::input_range R>
+    book_writer<R>::book_writer(const books_t &books,
+                                const readers_t &readers,
+                                R&& def) :
+        vol(def.begin()->vol),
         src_books(books),
         src_readers(readers),
-        base_book(src_books.find(vol)->second),
-        base_reader(src_readers.find(vol)->second),
-        definition(def),
+        base_book(src_books.find(def.begin()->vol)->second),
+        base_reader(src_readers.find(def.begin()->vol)->second),
+        definition(std::forward<R>(def)),
         filename(get_new_filename(base_reader->path)),
         writer(filename)
     {
@@ -830,8 +838,9 @@ namespace epub
     }
     template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 
+    template<std::ranges::input_range R>
     result<void>
-    bookmaker::make_books_impl(definition_t view, std::variant<volume, omnibus> base)
+    bookmaker::make_books_impl(R&& view, std::variant<volume, omnibus> base)
     {
         if (std::holds_alternative<volume>(base)) {
             auto basebook = src_books.find(std::get<volume>(base));
@@ -841,7 +850,6 @@ namespace epub
             }
         }
 
-        log_verbose("The defined view is size ", view.size());
         std::set<volume> located_inputs;
         for (const auto& def : view) {
             if (src_books.end() != src_books.find(def.vol))
@@ -855,14 +863,20 @@ namespace epub
 
         try {
             auto res = std::visit(overloaded {
-                    [&](omnibus) -> result<fs::path> {
+                        [&](omnibus) -> result<fs::path> {
+
                         if (std::end(src_books) == src_books.find(view.begin()->vol)) {
                             log_error("First book in the omnibus ", view.begin()->vol, " must be available.");
                             return std::errc::no_such_file_or_directory;
                         }
-                        book_writer writer(view.begin()->vol, src_books, src_readers, view);
-                        return writer.make_book(); },
-                    [&](volume v) { book_writer writer(v, src_books, src_readers, view); return writer.make_book();}
+
+                            auto writer = book_writer<R>(src_books, src_readers, std::forward<R>(view));
+                            return writer.make_book();
+                        },
+                        [&](volume) -> result<fs::path> {
+                            auto writer = book_writer<R>(src_books, src_readers, std::forward<R>(view));
+                            return writer.make_book();
+                        }
                 }, base);
             if (res.has_error()) {
                 std::visit([&](auto&& arg) { log_error("Couldn't make ", arg, ": ", res.error().message(), ". Moving on..."); }, base);
@@ -886,7 +900,9 @@ namespace epub
         int created_books = 0;
 
         if (get_options()->omnibus_type) {
-            auto res = make_books_impl(get_definition_view(get_options()->omnibus_type.value()),
+            auto defs = get_definition_view(get_options()->omnibus_type.value());
+//            auto x = std::views::filter(defs, [&](const auto &def) { return src_books.contains(def.vol); });
+            auto res = make_books_impl(defs,
                                        *get_options()->omnibus_type);
             if (res) {
                 ++created_books;
