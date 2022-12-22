@@ -69,135 +69,47 @@ img.cover {
   clear: both;
 })css"};
 
-    constexpr std::array defined_volumes = std::to_array({
-            volume::P1V1,
-            volume::P1V2,
-            volume::P1V3,
-            volume::P2V1,
-            volume::P2V2,
-            volume::P2V3,
-            volume::P2V4,
-            volume::P3V1,
-            volume::P3V2,
-            volume::P3V3,
-            volume::P3V4,
-            volume::P3V5,
-            volume::P4V1,
-            volume::P4V2,
-            volume::P4V3,
-            volume::P4V4,
-            volume::P4V5,
-            volume::P4V6,
-            volume::P4V7,
-            volume::P4V8,
-            volume::P4V9,
-            volume::P5V1,
-        });
+    constexpr auto defined_volumes = std::views::transform(get_omnibus_definition_r(),
+                                                           &std::ranges::range_value_t<decltype(get_omnibus_definition_r())>::name) | std::views::transform([](const auto& v) -> volume { return std::get<volume>(v); });
 
     constexpr auto get_definition_view(omnibus o)
     {
-        switch (o)
-        {
-            case omnibus::PART1:
-                return part_1::get_part_1();
-            case omnibus::PART2:
-                return part_2::get_part_2();
-            case omnibus::PART3:
-                return part_3::get_part_3();
-            case omnibus::PART4:
-                return part_4::get_part_4();
-            case omnibus::PART5:
-                return part_5::get_part_5();
-            case omnibus::ALL:
-                return get_omnibus_definition();
+        auto it = std::ranges::find(omnibus_defs::omnibus_arr,
+                                    o,
+                                    [](const auto& def) { return std::get<omnibus>(def.name); });
+        if (it == std::ranges::end(omnibus_defs::omnibus_arr)) {
+            return omnibus_defs::omnibus_def;
         }
-        assert(false);
-        return part_3::get_part_3();
+
+        return *it;
     }
 
     constexpr auto get_definition_view(volume v)
     {
-        switch (v)
-        {
-            case volume::P1V1:
-                return part_1::get_vol_1();
-            case volume::P1V2:
-                return part_1::get_vol_2();
-            case volume::P1V3:
-                return part_1::get_vol_3();
-            case volume::P2V1:
-                return part_2::get_vol_1();
-            case volume::P2V2:
-                return part_2::get_vol_2();
-            case volume::P2V3:
-                return part_2::get_vol_3();
-            case volume::P2V4:
-                return part_2::get_vol_4();
-            case volume::P3V1:
-                return part_3::get_vol_1();
-            case volume::P3V2:
-                return part_3::get_vol_2();
-            case volume::P3V3:
-                return part_3::get_vol_3();
-            case volume::P3V4:
-                return part_3::get_vol_4();
-            case volume::P3V5:
-                return part_3::get_vol_5();
-            case volume::P4V1:
-                return part_4::get_vol_1();
-            case volume::P4V2:
-                return part_4::get_vol_2();
-            case volume::P4V3:
-                return part_4::get_vol_3();
-            case volume::P4V4:
-                return part_4::get_vol_4();
-            case volume::P4V5:
-                return part_4::get_vol_5();
-            case volume::P4V6:
-                return part_4::get_vol_6();
-            case volume::P4V7:
-                return part_4::get_vol_7();
-            case volume::P4V8:
-                return part_4::get_vol_8();
-            case volume::P4V9:
-                return part_4::get_vol_9();
-            case volume::P5V1:
-                return part_5::get_vol_1();
-            case volume::FB1: [[fallthrough]];
-            case volume::FB2: [[fallthrough]];
-            case volume::FB3: [[fallthrough]];
-            case volume::MP1V1: [[fallthrough]];
-            case volume::MP1V2: [[fallthrough]];
-            case volume::MP1V3: [[fallthrough]];
-            case volume::MP1V4: [[fallthrough]];
-            case volume::MP1V5: [[fallthrough]];
-            case volume::MP1V6: [[fallthrough]];
-            case volume::MP1V7: [[fallthrough]];
-            case volume::MP2V1: [[fallthrough]];
-            case volume::MP2V2: [[fallthrough]];
-            case volume::MP2V3: [[fallthrough]];
-            case volume::MP2V4: [[fallthrough]];
-            case volume::MP2V5: [[fallthrough]];
-            case volume::MP2V6: [[fallthrough]];
-            case volume::RA1:
-                assert(false);
-              }
-        assert(false);
-        return part_1::get_vol_1();
+        auto it = std::ranges::find(omnibus_defs::omnibus_def,
+                                    v,
+                                    [](const auto& def) { return std::get<volume>(def.name); });
+        if (it == std::ranges::end(omnibus_defs::omnibus_def)) {
+            assert(false);
+            return definition_view_t(std::views::single(omnibus_defs::omnibus_def.front()), v);
+
+        }
+
+        return definition_view_t(std::views::single(*it), v);
     }
 
     template<std::ranges::input_range R>
-    auto get_filtered_defs(R defs, const epub::books_t& src_books, const epub::readers_t& src_readers)
+    auto get_filtered_defs(R&& defs, const epub::books_t& src_books, const epub::readers_t& src_readers)
     {
-        return std::ranges::views::filter(defs, [&src_books, &src_readers](const volume_definition& def) {
+        return std::views::filter(std::forward<R>(defs), [&src_books, &src_readers](const volume_definition& def) {
             // Filter out sources we don't have available
             const auto& src_book_iter = src_books.find(def.vol);
             if (std::end(src_books) == src_book_iter) {
                 return false;
             }
 
-            const auto& src_reader = src_readers.find(def.vol)->second;
-            const auto& src_book = src_books.find(def.vol)->second;
+            const auto& src_reader = src_readers.at(def.vol);
+            const auto& src_book = src_books.at(def.vol);
             const auto root = src_book.rootfile_path.substr(0, src_book.rootfile_path.find_first_of('/')+1);
             const auto src = utils::strcat(root, def.href);
 
@@ -300,7 +212,6 @@ namespace epub
         }
     }
 
-    // TODO: filters, and missing volumes like fanbook, should be excluded in the rootfile and toc
     template<std::ranges::input_range R>
     result<std::string>
     book_writer<R>::create_rootfile()
@@ -816,15 +727,16 @@ namespace epub
     }
 
     template<std::ranges::input_range R>
-    book_writer<R>::book_writer(const books_t &books,
+    book_writer<R>::book_writer(volume base_volume,
+                                const books_t &books,
                                 const readers_t &readers,
-                                R&& def) :
-        vol(def.begin()->vol),
+                                R def) :
+        vol(base_volume),
         src_books(books),
         src_readers(readers),
-        base_book(src_books.find(def.begin()->vol)->second),
-        base_reader(src_readers.find(def.begin()->vol)->second),
-        definition(std::forward<R>(def)),
+        base_book(src_books.find(vol)->second),
+        base_reader(src_readers.find(vol)->second),
+        definition(def),
         filename(get_new_filename(base_reader->path)),
         writer(filename)
     {
@@ -836,11 +748,12 @@ namespace epub
             throw e;
         }
     }
+
     template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 
     template<std::ranges::input_range R>
     result<void>
-    bookmaker::make_books_impl(R&& view, std::variant<volume, omnibus> base)
+    bookmaker::make_books_impl(R&& view, std::variant<omnibus, volume> base)
     {
         if (std::holds_alternative<volume>(base)) {
             auto basebook = src_books.find(std::get<volume>(base));
@@ -850,31 +763,31 @@ namespace epub
             }
         }
 
-        std::set<volume> located_inputs;
-        for (const auto& def : view) {
-            if (src_books.end() != src_books.find(def.vol))
-                located_inputs.insert(def.vol);
-        }
+        auto x = std::views::filter(view,
+                                    [&](const auto &def) {
+                                        return src_books.contains(std::get<volume>(def.name));
+                                    });
 
-        if (located_inputs.size() == 0) {
-            std::visit([](auto&& arg) { log_verbose("Info: No inputs to make ", arg); }, base);
+        if (std::ranges::empty(x)) {
+            log_verbose("Info: No inputs to make ", base);
             return std::errc::no_such_file_or_directory;
         }
 
+
         try {
             auto res = std::visit(overloaded {
-                        [&](omnibus) -> result<fs::path> {
+                        [&](omnibus o) -> result<fs::path> {
 
-                        if (std::end(src_books) == src_books.find(view.begin()->vol)) {
-                            log_error("First book in the omnibus ", view.begin()->vol, " must be available.");
-                            return std::errc::no_such_file_or_directory;
-                        }
+                            auto base_volume = std::get<volume>(x.begin()->name);
+                            auto omnibus_def = utils::make_omnibus_def(std::views::join(x));
+                            auto omnibus_def_view = definition_view_t(std::views::all(omnibus_def), o);
 
-                            auto writer = book_writer<R>(src_books, src_readers, std::forward<R>(view));
+                            auto writer = book_writer<decltype(omnibus_def_view)>(base_volume, src_books, src_readers, omnibus_def_view);
                             return writer.make_book();
                         },
                         [&](volume) -> result<fs::path> {
-                            auto writer = book_writer<R>(src_books, src_readers, std::forward<R>(view));
+                            auto base_volume = std::get<volume>(x.begin()->name);
+                            auto writer = book_writer<decltype(x.front())>(base_volume, src_books, src_readers, x.front());
                             return writer.make_book();
                         }
                 }, base);
@@ -901,16 +814,14 @@ namespace epub
 
         if (get_options()->omnibus_type) {
             auto defs = get_definition_view(get_options()->omnibus_type.value());
-//            auto x = std::views::filter(defs, [&](const auto &def) { return src_books.contains(def.vol); });
-            auto res = make_books_impl(defs,
-                                       *get_options()->omnibus_type);
+            auto res = make_books_impl(std::move(defs), *get_options()->omnibus_type);
             if (res) {
                 ++created_books;
             } else {
                 log_info(res.error());
             }
         } else {
-            for (auto defined_volume : defined_volumes) {
+            for (volume defined_volume : defined_volumes) {
                 auto res = make_books_impl(get_definition_view(defined_volume), defined_volume);
                 if (res) {
                     ++created_books;

@@ -6,9 +6,9 @@
 
 namespace part_1
 {
-    inline auto get_vol_1() { return part_1_defs::vol_1_def; }
-    inline auto get_vol_2() { return part_1_defs::vol_2_def; }
-    inline auto get_vol_3() { return part_1_defs::vol_3_def; }
-    definition_span_view_t get_part_1();
-    size_t get_reservation();
+
+    inline auto get_vol_1_v() { return std::views::single(part_1_defs::vol_1_def); }
+    inline auto get_vol_2_v() { return std::views::single(part_1_defs::vol_2_def); }
+    inline auto get_vol_3_v() { return std::views::single(part_1_defs::vol_3_def); }
+    inline auto get_part_1_v() { return part_1_defs::part_1_def; }
 }

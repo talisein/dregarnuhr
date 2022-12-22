@@ -52,8 +52,6 @@ interested in building:
 
 # Limitations (TODOs)
 
-- If you make an omnibus, you need the first book.
-  - Missing volumes after that are ok (obviously, they will not be included)
 - I don't have a mac to test the mac version on. Let me know if it works.
 
 # Examples

@@ -22,7 +22,7 @@ namespace epub
         result<void> make_books();
     private:
         template<std::ranges::input_range R>
-        result<void> make_books_impl(R&& def, std::variant<volume, omnibus> base);
+        result<void> make_books_impl(R&& def, std::variant<omnibus, volume> base);
 
     result<void>
     make_book_impl(volume vol,
@@ -43,9 +43,10 @@ namespace epub
     class book_writer
     {
     public:
-        book_writer(const books_t& books,
+        book_writer(volume base_volume,
+                    const books_t& books,
                     const readers_t& readers,
-                    R&& definition);
+                    R definition);
 
         result<fs::path> make_book();
 
@@ -66,7 +67,7 @@ namespace epub
         const readers_t& src_readers;
         const book_t& base_book;
         const reader_t& base_reader;
-        R definition;
+        std::remove_cvref_t<R> definition;
         fs::path filename;
         zip::writer writer;
         std::list<std::string> basefiles;

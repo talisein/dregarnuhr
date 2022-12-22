@@ -6,11 +6,10 @@
 
 namespace part_3
 {
-    inline auto get_vol_1() { return part_3_defs::vol_1_def; }
-    inline auto get_vol_2() { return part_3_defs::vol_2_def; }
-    inline auto get_vol_3() { return part_3_defs::vol_3_def; }
-    inline auto get_vol_4() { return part_3_defs::vol_4_def; }
-    inline auto get_vol_5() { return part_3_defs::vol_5_def; }
-    definition_span_view_t get_part_3();
-    size_t get_reservation();
+    inline auto get_vol_1_v() { return std::views::single(part_3_defs::vol_1_def); }
+    inline auto get_vol_2_v() { return std::views::single(part_3_defs::vol_2_def); }
+    inline auto get_vol_3_v() { return std::views::single(part_3_defs::vol_3_def); }
+    inline auto get_vol_4_v() { return std::views::single(part_3_defs::vol_4_def); }
+    inline auto get_vol_5_v() { return std::views::single(part_3_defs::vol_5_def); }
+    inline auto get_part_3_v() { return part_3_defs::part_3_def; }
 }

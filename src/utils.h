@@ -68,25 +68,26 @@ namespace utils
 
 
 
-    template <size_t N, size_t... I>
-    consteval std::array<volume_definition, N>
-    vec_to_arr_impl(const std::vector<volume_definition>& v, std::index_sequence<I...>)
+    template <size_t N, typename T, size_t... I>
+    consteval auto
+    vec_to_arr_impl(const T& v, std::index_sequence<I...>) -> std::array<typename T::value_type, N>
     {
         return { {v[I]...} };
     }
 
-    template<size_t N>
-    consteval auto vec_to_arr(const std::vector<volume_definition>& v)
+    template<size_t N, typename T>
+    consteval auto
+    vec_to_arr(const T& v) -> std::array<typename T::value_type, N>
     {
         return vec_to_arr_impl<N>(v, std::make_index_sequence<N>{});
     }
 
-    template<std::ranges::sized_range T>
+    template<std::ranges::input_range T>
     [[nodiscard]] std::vector<volume_definition>
     make_omnibus_def(T&& view)
     {
         std::vector<volume_definition> res;
-        res.reserve(std::ranges::size(view));
+        res.reserve(std::ranges::distance(view));
         std::ranges::remove_copy_if(view, std::back_inserter(res), utils::filter_chapter_stylesheet{});
         std::ranges::stable_sort(res);
         std::ranges::for_each(res, utils::foreach_label{});

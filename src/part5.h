@@ -6,7 +6,6 @@
 
 namespace part_5
 {
-    inline auto get_vol_1() { return part_5_defs::vol_1_def; }
-
-    definition_span_view_t get_part_5();
+    inline auto get_vol_1_v() { return std::views::single(part_5_defs::vol_1_def); }
+    inline auto get_part_1_v() { return part_5_defs::part_5_def; }
 }

@@ -1,15 +1,14 @@
 #pragma once
 
 #include <span>
+#include <ranges>
 #include "volumes.h"
 #include "part1.h"
 #include "part2.h"
 #include "part3.h"
 #include "part4.h"
 #include "part5.h"
-
-
-definition_span_view_t get_omnibus_definition();
+#include "utils.h"
 
 struct volume_map_comparator
 {
@@ -32,9 +31,23 @@ namespace omnibus_defs
         part_5_defs::part_5_def
     };
 
-    constexpr auto omnibus_flat_view = std::views::transform(omnibus_arr, &decltype(omnibus_arr)::value_type::defs)
-        | std::views::join
-        | std::views::transform(&definition_span_view_t::defs)
-        | std::views::join;
+    consteval auto view_to_arr()
+    {
+        constexpr auto v = std::views::join(omnibus_arr);
+        constexpr auto sz = std::ranges::distance(v);
+        std::vector<std::ranges::range_value_t<decltype(v)>> vec(std::ranges::begin(v),
+                                                                 std::ranges::end(v));
+        return utils::vec_to_arr<sz>(vec);
+    }
 
+
+    constexpr auto omnibus_flat_arr = view_to_arr();
+
+    constexpr definition_view_t omnibus_def { std::span<const definition_span_view_t, std::dynamic_extent>(omnibus_flat_arr), omnibus::ALL };
+
+}
+
+constexpr inline auto get_omnibus_definition_r()
+{
+    return omnibus_defs::omnibus_def;
 }
