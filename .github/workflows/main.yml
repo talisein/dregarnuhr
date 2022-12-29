@@ -107,7 +107,7 @@ jobs:
 
       - name: Install deps
         run: |
-          brew update
+#          brew update
           brew search gcc@
           brew install meson gcc@12 ninja
 
