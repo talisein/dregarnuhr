@@ -108,10 +108,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
       - name: Install deps
         run: |
-#          brew update
           brew search gcc@
           brew install meson gcc@12 ninja
 
