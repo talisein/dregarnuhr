@@ -75,7 +75,6 @@ jobs:
 
       - name: Install deps
         run: |
-          brew update
           brew install meson gcc@12 ninja
           brew uninstall --ignore-dependencies brotli
 
