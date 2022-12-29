@@ -86,4 +86,8 @@ boostut_dep = dependency('ut',
 
 add_project_arguments('-DBOOST_UT_DISABLE_MODULE', language: 'cpp')
 
+
+ctre_dep = dependency('ctre',
+                      fallback: ['ctre'])
+
 subdir('src')
