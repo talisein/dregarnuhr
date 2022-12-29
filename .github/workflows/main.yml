@@ -11,8 +11,12 @@ on:
   push:
     branches:
       - main
-  # Allows you to run this workflow manually from the Actions tab
-
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -104,10 +108,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
       - name: Install deps
         run: |
-          brew update
           brew search gcc@
           brew install meson gcc@12 ninja
 
