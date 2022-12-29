@@ -1,6 +1,13 @@
-[wrap-git]
-url = https://github.com/richgel999/miniz.git
-revision = head
+[wrap-file]
+directory = miniz-3.0.1
+lead_directory_missing = true
+source_url = https://github.com/richgel999/miniz/releases/download/3.0.1/miniz-3.0.1.zip
+source_filename = miniz-3.0.1.zip
+source_hash = ff960eeb9354b5ef489cf32363a121e25407cadd7b1bfe868386b74f3b38727c
+patch_filename = miniz_3.0.1-1_patch.zip
+patch_url = https://wrapdb.mesonbuild.com/v2/miniz_3.0.1-1/get_patch
+patch_hash = 2c80c1c71392c6f479dd8142554a965f19736f86ee91d9b79e893ded877bb36f
+wrapdb_version = 3.0.1-1
 
 [provide]
-dependency_names = miniz
+miniz = miniz_dep
