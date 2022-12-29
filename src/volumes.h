@@ -293,7 +293,7 @@ get_uniqueness(chapter_type c) {
         case BONUS:
         case FRONTMATTER: return chapter_uniqueness::MULTIPLE;
     }
-    return chapter_uniqueness::MULTIPLE;
+    throw std::logic_error("Couldn't determine chapter uniqueness");
 }
 
 std::ostream& operator<<(std::ostream& os, const volume_definition& v);
