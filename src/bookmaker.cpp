@@ -132,19 +132,17 @@ img.cover {
 
 
     std::filesystem::path get_new_filename(const std::filesystem::path& base) {
-        std::stringstream ss;
         int dups = 0;
         std::filesystem::path new_filename;
         do {
-            ss.str("");
-            if (get_options()->prefix) ss << *get_options()->prefix;
-            ss << base.stem().string();
-            if (get_options()->suffix) ss << *get_options()->suffix;
-            if (dups++ > 0)
-                ss << " (" << dups << ")";
-            ss << base.extension().string();
+            std::string name;
+            if (dups++ > 0) {
+                name = utils::strcat(get_options()->prefix, base.stem().string(), get_options()->suffix, " (", dups, ")", base.extension().string());
+            } else {
+                name = utils::strcat(get_options()->prefix, base.stem().string(), get_options()->suffix,                  base.extension().string());
+            }
             new_filename.assign(get_options()->output_dir);
-            new_filename.append(ss.view());
+            new_filename.append(name);
         } while (std::filesystem::exists(new_filename));
         return new_filename;
     }

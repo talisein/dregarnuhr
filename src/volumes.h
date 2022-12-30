@@ -71,7 +71,7 @@ enum chapter_type {
   MAP_EHRENFEST_CITY,
   MAP_EHRENFEST_DUCHY,
   MAP_YURGENSCHMIDT,
-  FAMILY_TREE,
+  AURELIA_FAMILY_TREE,
   AFTERWORD,
   MANGA,
   POLL,
@@ -211,8 +211,12 @@ struct volume_definition
         if (frontmatter_regex(href)) {
             return FRONTMATTER; // must be after maps
         }
-        if (family_tree_regex(href)) {
-            return FAMILY_TREE;
+        if (volume::P4V5 == vol && family_tree_regex(href)) {
+            if (toc_label.has_value()) {
+                return AURELIA_FAMILY_TREE;
+            } else {
+                return CHAPTER;
+            }
         }
         if (afterword_regex(href)) {
             return AFTERWORD;
@@ -279,7 +283,6 @@ get_uniqueness(chapter_type c) {
         case MAP_EHRENFEST_DUCHY:
         case MAP_YURGENSCHMIDT:
         case MAP_RA_LIBRARY:
-        case FAMILY_TREE:
         case SIGNUP:
         case COPYRIGHT: return chapter_uniqueness::SINGLE;
         case COVER:
@@ -291,6 +294,7 @@ get_uniqueness(chapter_type c) {
         case AFTERWORD:
         case POLL:
         case BONUS:
+        case AURELIA_FAMILY_TREE:
         case FRONTMATTER: return chapter_uniqueness::MULTIPLE;
     }
     throw std::logic_error("Couldn't determine chapter uniqueness");
