@@ -496,7 +496,7 @@ constexpr std::array vol_4 = std::to_array<volume_definition>({
 { volume::P2V4, "Text/extra6.xhtml"sv, "application/xhtml+xml"sv, "Effa—Facing the Future"sv, true },
 { volume::P2V4, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V4, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
-{ volume::P2V4, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "Coming Out of Nowhere to Celebrate the Conclusion of Part 2, It’s the First Ever End of Volume Bonuses! by You Shiina"sv, true },
+{ volume::P2V4, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P2V4, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V4, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P2V4, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },

@@ -89,7 +89,7 @@ namespace utils
         std::vector<volume_definition> res;
         res.reserve(std::ranges::distance(view));
         std::ranges::remove_copy_if(view, std::back_inserter(res), utils::filter_chapter_stylesheet{});
-        std::ranges::stable_sort(res);
+        std::ranges::stable_sort(res, std::ranges::less(), &volume_definition::type);
         std::ranges::for_each(res, utils::foreach_label{});
         return res;
     }
@@ -101,6 +101,11 @@ namespace utils
         using Type = std::remove_cvref_t<T>;
         if constexpr(std::is_same_v<Type, char>) {
             return 1ULL;
+        } else if constexpr(std::is_same_v<Type, std::optional<std::string>> || std::is_same_v<Type, std::optional<std::string_view>>) {
+            if (t.has_value())
+                return std::size(*t);
+            else
+                return 0;
         } else if constexpr(std::is_integral_v<Type>) {
             return std::max<size_t>(std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value), 10ULL);
         } else {
@@ -115,6 +120,11 @@ namespace utils
         using Type = std::remove_cvref_t<T>;
         if constexpr(std::is_same_v<Type, char>) {
             return 1ULL + _count_sizes(args...);
+        } else if constexpr(std::is_same_v<Type, std::optional<std::string>> || std::is_same_v<Type, std::optional<std::string_view>>) {
+            if (t.has_value())
+                return std::size(*t) + _count_sizes(args...);
+            else
+                return _count_sizes(args...);
         } else if constexpr(std::is_integral_v<Type>) {
             return std::max<size_t>(std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value), 10ULL) + _count_sizes(args...);
         } else {
@@ -129,6 +139,9 @@ namespace utils
         using Type = std::remove_cvref_t<T>;
         if constexpr(std::is_same_v<Type, char>) {
             str.push_back(std::forward<T>(t));
+        } else if constexpr(std::is_same_v<Type, std::optional<std::string>> || std::is_same_v<Type, std::optional<std::string_view>>) {
+            if (t.has_value())
+                str.append(*t);
         } else if constexpr(std::is_integral_v<Type>) {
             std::array<char, std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value)> buf;
             auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), std::forward<T>(t));
@@ -149,6 +162,9 @@ namespace utils
         using Type = std::remove_cvref_t<T>;
         if constexpr(std::is_same_v<Type, char>) {
             str.push_back(std::forward<T>(t));
+        } else if constexpr(std::is_same_v<Type, std::optional<std::string>> || std::is_same_v<Type, std::optional<std::string_view>>) {
+            if (t.has_value())
+                str.append(*t);
         } else if constexpr(std::is_integral_v<Type>) {
             std::array<char, std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value)> buf;
             auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), std::forward<T>(t));

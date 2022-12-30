@@ -59,7 +59,7 @@ namespace
     template<typename T>
     result<xmlpp::Node::const_NodeSet> find_quiet(const xmlpp::ustring& xpath,
                                                   const xmlpp::Element::PrefixNsMap& map,
-                                                  T ele,
+                                                  T& ele,
                                                   const std::string &filename)
     {
         xmlpp::Node::const_NodeSet set;
@@ -77,7 +77,7 @@ namespace
     template<typename T>
     result<xmlpp::Node::const_NodeSet> find(const xmlpp::ustring& xpath,
                                             const xmlpp::Element::PrefixNsMap& map,
-                                            T ele,
+                                            T& ele,
                                             const std::string &filename)
     {
         xmlpp::Node::const_NodeSet set;
@@ -96,7 +96,7 @@ namespace
     template<typename T>
     result<xmlpp::ustring> find_attr_required(const xmlpp::ustring& xpath,
                                               const xmlpp::Element::PrefixNsMap& map,
-                                              const T ele,
+                                              const T& ele,
                                               const std::string &filename)
     {
         OUTCOME_TRY(auto set, find(xpath, map, ele, filename));
@@ -111,7 +111,7 @@ namespace
     template<typename T>
     result<xmlpp::ustring> find_attr(const xmlpp::ustring& xpath,
                                      const xmlpp::Element::PrefixNsMap& map,
-                                     const T ele,
+                                     const T& ele,
                                      const std::string &filename)
     {
         OUTCOME_TRY(auto set, find_quiet(xpath, map, ele, filename));
@@ -125,7 +125,7 @@ namespace
     template<typename T>
     result<xmlpp::ustring> find_textnode(const xmlpp::ustring& xpath,
                                          const xmlpp::Element::PrefixNsMap& map,
-                                         const T ele,
+                                         const T& ele,
                                          const std::string &filename)
     {
         OUTCOME_TRY(auto set, find(xpath, map, ele, filename));
@@ -255,6 +255,31 @@ namespace epub
         std::string toc_path = prefix + "/"s + toc_href;
         log_verbose(rootfile_path, ": toc_href: ", toc_href, ", toc_path: ", toc_path);
 
+        // Parse the spine's itemrefs
+        OUTCOME_TRY(auto itemrefs, find("/opf:package/opf:spine/opf:itemref", map, root, rootfile_path));
+        struct itemref {
+            std::string idref;
+            bool is_linear;
+            std::optional<std::string> properties;
+        };
+        std::map<std::string, itemref> idrefs;
+        for (const auto item : std::views::transform(itemrefs, [](const auto node) { return dynamic_cast<const xmlpp::Element*>(node); })) {
+            itemref itemref;
+            for (const auto attr : item->get_attributes()) {
+                auto name = attr->get_name();
+                if (name == "idref") {
+                    itemref.idref = attr->get_value();
+                } else if (name == "linear") {
+                    itemref.is_linear = attr->get_value() == "yes";
+                } else if (name == "properties") {
+                    itemref.properties = attr->get_value();
+                }
+            }
+            auto key = itemref.idref;
+            idrefs.try_emplace(std::move(key), std::move(itemref));
+        }
+
+        // Go through the manifest
         OUTCOME_TRY(manifest.toc, dump_toc(prefix + "/"s + toc_href));
         manifest.toc_relpath = toc_href;
         OUTCOME_TRY(auto items, find("/opf:package/opf:manifest/opf:item", map, root, rootfile_path));
@@ -270,15 +295,11 @@ namespace epub
             if (props_node) {
                 properties = std::make_optional<std::string>(props_node.value());
             }
-            auto itemref = find_quiet("/opf:package/opf:spine/opf:itemref[@idref='"s + id + "']", map, root, rootfile_path);
-            if (itemref) {
+            if (auto iter = idrefs.find(id); std::end(idrefs) != iter) {
+                const auto& idref = iter->second;
                 in_spine = true;
-                auto linear = find_attr("@linear", map, itemref.value().front(), rootfile_path);
-                is_linear = linear.has_value();
-                auto props = find_attr("@properties", map, itemref.value().front(), rootfile_path);
-                if (props.has_value()) {
-                    spine_properties = std::make_optional<std::string>(props.value());
-                }
+                is_linear = idref.is_linear;
+                spine_properties = idref.properties;
             }
             if (manifest.toc.has_entry(href)) {
                 manifest.items.emplace_back(id, href, media_type, manifest.toc.get_label(href), properties, spine_properties, in_spine, is_linear);
@@ -293,14 +314,8 @@ namespace epub
             if (!item.in_spine)
                 sorted_manifest.items.push_back(item);
         }
-        OUTCOME_TRY(auto spine_items, find("/opf:package/opf:spine/opf:itemref/@idref", map, root, rootfile_path));
-        for (const auto& item : spine_items) {
-            auto id = dynamic_cast<const xmlpp::Attribute*>(item);
-            if (!id) {
-                log_error("Not an attribute: ", "idref");
-                return std::errc::invalid_argument;
-            }
-            auto iter = std::ranges::find_if(manifest.items, [&id](const auto& i) { return i.id == id->get_value(); });
+        for (const auto& id : std::views::values(idrefs) | std::views::transform(&itemref::idref)) {
+            auto iter = std::ranges::find(manifest.items, id, &manifest::item::id);
             if (iter != manifest.items.end()) {
                 sorted_manifest.items.push_back(*iter);
             }

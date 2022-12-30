@@ -96,7 +96,7 @@ namespace part_3_defs
 { volume::FB2, "Text/side5.xhtml"sv, "application/xhtml+xml"sv, "A Tea Party with My Older Sister"sv, true },
 { volume::FB2, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
 { volume::P3V1, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
-{ volume::P3V1, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "Coming Out of Nowhere Again, It’s the End of Volume Bonuses! by You Shiina"sv, true },
+{ volume::P3V1, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P3V1, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/poll1.xhtml"sv, "application/xhtml+xml"sv, "The 1st Ascendance of a Bookworm Character Poll!"sv, true },
 { volume::P3V1, "Text/poll2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },

@@ -1,3 +1,4 @@
+#include <optional>
 #include "utils.h"
 
 #include <boost/ut.hpp>
@@ -44,6 +45,19 @@ int main() {
         expect(utils::strcat(longstr, '-', 0) == "1234567890123456-0"s);
         expect(utils::strcat(longstr, '-', -1) == "1234567890123456--1"s);
         expect(utils::strcat(longstr, "-", i, '-',  l,"-",  ui,"-",  ul, "-"s, bigul, '-', bigul + 1) == "1234567890123456-2147486647-4147486647-4047486647-10047486647-18446744073709551615-0"s);
+
+    };
+
+    "optional_strcat"_test = [] {
+        std::optional<std::string> a = std::nullopt;
+        std::optional<std::string> b{"okay"s};
+        std::optional<std::string_view> c{"works"};
+
+        expect(utils::strcat(a,b,c) == "okayworks"s);
+        expect(utils::strcat(a,b,2,c) == "okay2works"s);
+        expect(utils::strcat(a,b,a,2,c) == "okay2works"s);
+        expect(utils::strcat(a,b,a,2,a,c) == "okay2works"s);
+        expect(utils::strcat(a,b,2,a,c) == "okay2works"s);
 
     };
 }

@@ -511,7 +511,7 @@ namespace part_4_defs
 { volume::P4V5, "Text/epilogue.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
 { volume::P4V5, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
 { volume::P4V5, "Text/map2.xhtml"sv, "application/xhtml+xml"sv, "Map of Yurgenschmidt"sv, true },
-{ volume::P4V5, "Text/tree.xhtml"sv, "application/xhtml+xml"sv, "Family Tree"sv, true },
+{ volume::P4V5, "Text/tree.xhtml"sv, "application/xhtml+xml"sv, "Family Tree"sv, true }, // Family Tree related to Aurelia
 { volume::P4V5, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
 { volume::P4V5, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P4V5, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
