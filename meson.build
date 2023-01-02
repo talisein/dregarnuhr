@@ -12,12 +12,19 @@ endif
 
 cpp_compiler = meson.get_compiler('cpp')
 if cpp_compiler.get_argument_syntax() == 'msvc'
-  add_global_arguments('/std:c++23', language: 'cpp')
-  cpp23_args = ['/std:c++23']
+  if cpp_compiler.has_argument('/std:c++23')
+    cpp23_args = ['/std:c++23']
+  else
+    cpp23_args = ['/std:c++latest']
+  endif
 else
-  add_global_arguments('-std=c++23', language: 'cpp')
-  cpp23_args = ['-std=c++23']
+  if cpp_compiler.has_argument('-std=c++23')
+    cpp23_args = ['-std=c++23']
+  else
+    cpp23_args = ['-std=c++2b']
+  endif
 endif
+add_global_arguments(cpp23_args, language: 'cpp')
 
 cpp_compiler.has_header_symbol('version', '__cpp_lib_filesystem', required: true, args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_string_view', required: true, args: cpp23_args)
