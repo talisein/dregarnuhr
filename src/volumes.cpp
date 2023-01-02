@@ -48,6 +48,16 @@ namespace {
         {"9781718338203"sv, volume::MP2V4},
         {"9781718338227"sv, volume::MP2V5},
         {"9781718338241"sv, volume::MP2V6},
+        {"96908895-C96B-4376-BBF8-6A25E96F72F3"sv, volume::SSBDOVA1},
+        {"22BC23BD-BEB1-4F8F-9104-825FA616AD4C"sv, volume::SSJBUNKO1},
+        {"DEB588FB-32EF-4512-8ADF-D8A5CB49D9CD"sv, volume::SSTEASET},
+        {"5F99914F-5229-482E-A63D-D38002C442FD"sv, volume::SSWN1},
+        {"94A7C755-6459-4B4A-A48C-9AEE66C3E58A"sv, volume::SSWN2},
+        {"614AD11F-85BA-499A-9A35-74C4DBCCA288"sv, volume::SSDRAMACD2},
+        {"E490F42A-CF20-476A-8327-59E034AE8928"sv, volume::SSDRAMACD3},
+        {"EADEFA73-BCAD-4166-8745-0137BEAC38EC"sv, volume::SSDRAMACD4},
+        {"7D41D170-FCB5-480A-82AD-D4F921AB5B61"sv, volume::SSTOBBONUS1},
+        {"CE71D400-5EF9-4B8E-80C1-CED953C285C6"sv, volume::SSUP1},
     };
 
     const std::map<std::string_view, volume> slug_map {
@@ -123,6 +133,16 @@ std::string_view to_string_view(volume vol)
         case volume::MP2V4:  return "M2V4"sv;
         case volume::MP2V5:  return "M2V5"sv;
         case volume::MP2V6:  return "M2V6"sv;
+        case volume::SSBDOVA1: return "SSBDOVA1"sv;
+        case volume::SSJBUNKO1: return "SSJBUNKO1"sv;
+        case volume::SSTEASET: return "SSTEASET"sv;
+        case volume::SSWN1: return "SSWN1"sv;
+        case volume::SSWN2: return "SSWN2"sv;
+        case volume::SSDRAMACD2: return "SSDRAMACD2"sv;
+        case volume::SSDRAMACD3: return "SSDRAMACD3"sv;
+        case volume::SSDRAMACD4: return "SSDRAMACD4"sv;
+        case volume::SSTOBBONUS1: return "SSTOBBONUS1"sv;
+        case volume::SSUP1: return "SSUP1"sv;
     }
     assert(false);
     return "UNKNOWN"sv;

@@ -64,6 +64,8 @@ namespace part_5_defs
 { volume::P5V1, "Text/chapter7_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P5V1, "Text/chapter8.xhtml"sv, "application/xhtml+xml"sv, "Beginning the Archduke Candidate Course"sv, true },
 { volume::P5V1, "Text/chapter9.xhtml"sv, "application/xhtml+xml"sv, "Dedication Whirling (Third Year)"sv, true },
+{ volume::SSUP1, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
+{ volume::SSUP1, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "The Saint and My Older Brother & A Headache Report for Anastasius"sv, true },
 { volume::P5V1, "Text/chapter10.xhtml"sv, "application/xhtml+xml"sv, "Hirschur’s Meeting with the Aub"sv, true },
 { volume::P5V1, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P5V1, "Text/chapter10_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },

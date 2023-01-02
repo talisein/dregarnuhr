@@ -216,6 +216,11 @@ namespace part_1_defs
 { volume::P1V2, "Text/chapter12.xhtml"sv, "application/xhtml+xml"sv, "The Guildmaster and the Hair Ornament"sv, true },
 { volume::P1V2, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V2, "Text/chapter12_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::SSJBUNKO1, "images/graphics1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSJBUNKO1, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
+{ volume::SSJBUNKO1, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "The Common Factor of the Rampaging Little Gremlins"sv, true },
+
 { volume::P1V2, "Text/chapter13.xhtml"sv, "application/xhtml+xml"sv, "The Guildmaster’s Granddaughter"sv, true },
 { volume::P1V2, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, "Freida’s Hair Ornaments"sv, true },
 { volume::P1V2, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "Delivering the Hair Ornaments"sv, true },
@@ -364,6 +369,10 @@ constexpr std::array vol_3 = std::to_array<volume_definition>({
 { volume::P1V3, "Text/chapter24.xhtml"sv, "application/xhtml+xml"sv, "Confrontation"sv, true },
 { volume::P1V3, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V3, "Text/chapter24_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::SSBDOVA1, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
+{ volume::SSBDOVA1, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "New Developments"sv, true }, // Otto
+
 { volume::P1V3, "Text/epilogue.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
 { volume::P1V3, "Text/extra5.xhtml"sv, "application/xhtml+xml"sv, "The Life of an Apprentice Merchant"sv, true },
 { volume::P1V3, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },

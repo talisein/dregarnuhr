@@ -129,10 +129,11 @@ namespace
                                          const std::string &filename)
     {
         OUTCOME_TRY(auto set, find(xpath, map, ele, filename));
-        auto textnode = dynamic_cast<const xmlpp::TextNode*>(set.front());
-        if (!textnode) {log_error( "Not a textnode: ", xpath);
-            return std::errc::invalid_argument;
-        }
+        auto e = dynamic_cast<const xmlpp::Element*>(set.front());
+        if (!e->has_child_text())
+            return xmlpp::ustring();
+
+        auto textnode = e->get_first_child_text();
         return textnode->get_content();
     }
 
@@ -394,7 +395,11 @@ namespace epub
         OUTCOME_TRY(toc.dtb_depth, find_attr_required("/dtb:ncx/dtb:head/dtb:meta[@name='dtb:depth']/@content", map, root, toc_path));
 
         // title
-        OUTCOME_TRY(toc.title, find_textnode("/dtb:ncx/dtb:docTitle/dtb:text/text()", map, root, toc_path));
+        OUTCOME_TRY(toc.title, find_textnode("/dtb:ncx/dtb:docTitle/dtb:text", map, root, toc_path));
+        if (toc.title.empty()) {
+            auto o = find_textnode("/dtb:ncx/dtb:navMap/dtb:navPoint/dtb:navLabel/dtb:text", map, root, toc_path);
+            if (o) toc.title = o.value();
+        }
 
         log_verbose(toc_path, ": dtb_uid: ", toc.dtb_uid);
         log_verbose(toc_path, ": dtb_depth: ", toc.dtb_depth);

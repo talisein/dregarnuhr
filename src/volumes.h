@@ -55,6 +55,16 @@ enum class volume
     MP2V4,
     MP2V5,
     MP2V6,
+    SSBDOVA1,    // Otto P1V3
+    SSJBUNKO1,   // Benno P1V2
+    SSTEASET,    // Ferdinand & Rozemyne P3V1
+    SSWN1,       // Hartmut P3V1
+    SSWN2,       // Charlotte P4V4
+    SSDRAMACD2,  // Tulli P4V3
+    SSDRAMACD3,  // Hartmut @ Name Swearing P4V7
+    SSDRAMACD4,  // Ferdinand Hair Stick P4V9
+    SSTOBBONUS1, // Raimund P4V6
+    SSUP1        // Anastasius/Hannelore P5V1
 };
 
 // The order here determines the sort order
@@ -187,6 +197,10 @@ struct volume_definition
                 //return MAP_RA_LIBRARY;
                 return CHAPTER; // Treat the RA Library map as an insert image rather than a map
             }
+        }
+
+        if (ctre::search<"text/content[0-9]+.xhtml", ctre::case_insensitive>(href)) {
+            return CHAPTER;
         }
 
         if (toc_label) {
