@@ -12,8 +12,8 @@ endif
 
 cpp_compiler = meson.get_compiler('cpp')
 if cpp_compiler.get_argument_syntax() == 'msvc'
-  add_global_arguments('-std:c++23', language: 'cpp')
-  cpp23_args = ['-std:c++23']
+  add_global_arguments('/std:c++23', language: 'cpp')
+  cpp23_args = ['/std:c++23']
 else
   add_global_arguments('-std=c++23', language: 'cpp')
   cpp23_args = ['-std=c++23']
