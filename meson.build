@@ -2,7 +2,6 @@ project('dregarnuhr', ['c', 'cpp'],
         license : 'GPLv3+',
         version : '1.0.9',
         default_options : ['c_std=gnu17',
-                           'cpp_std=gnu++20',
                            'buildtype=release',
                            'default_library=static',
                            'cpp_eh=a'])
@@ -12,17 +11,25 @@ if host_machine.system() == 'linux'
 endif
 
 cpp_compiler = meson.get_compiler('cpp')
-cpp_compiler.has_header_symbol('version', '__cpp_lib_filesystem', required: true)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_string_view', required: true)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges', required: true)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_source_location', required: true)
-cpp_compiler.has_header_symbol('version', '__cpp_concepts', required: true)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_functions', required: true)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_expected')
-cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip')
-cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace')
+if cpp_compiler.get_argument_syntax() == 'msvc'
+  add_global_arguments('-std:c++23', language: 'cpp')
+  cpp23_args = ['-std:c++23']
+else
+  add_global_arguments('-std=c++23', language: 'cpp')
+  cpp23_args = ['-std=c++23']
+endif
 
-has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>')
+cpp_compiler.has_header_symbol('version', '__cpp_lib_filesystem', required: true, args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_string_view', required: true, args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges', required: true, args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_source_location', required: true, args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_concepts', required: true, args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_functions', required: true, args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_expected', args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip', args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace', args: cpp23_args)
+
+has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>', args: cpp23_args)
 
 # Fedora libjpeg-turbo-devel, Ubuntu libjpeg-turbo8-dev
 jpeg_dep = dependency('libjpeg', version: '>=2.1.0', fallback: ['libjpeg-turbo'])
@@ -38,7 +45,7 @@ if not miniz_dep.found()
 endif
 
 # Unpackaged
-if not cpp_compiler.has_header('outcome/outcome.hpp')
+if not cpp_compiler.has_header('outcome/outcome.hpp', args: cpp23_args)
   outcome_dep = dependency('outcome-2.0', fallback: ['outcome'])
 else
   outcome_dep = dependency('', required: false)
