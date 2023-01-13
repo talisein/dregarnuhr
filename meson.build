@@ -33,7 +33,7 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_source_location', required:
 cpp_compiler.has_header_symbol('version', '__cpp_concepts', required: true, args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_functions', required: true, args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_expected', required: true, args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_size_t_suffix', required: true, args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_size_t_suffix', args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip', args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace', args: cpp23_args)
 
