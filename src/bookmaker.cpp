@@ -469,17 +469,9 @@ namespace epub
 
             dst = utils::strcat(root, USER_COVER_JPG_PATH);
             try {
-                const auto len = fs::file_size(get_options()->cover.value());
                 std::ifstream cover_stream { get_options()->cover.value(), std::ios::in | std::ios::binary };
-                const auto begin = cover_stream.tellg();
-                cover_stream.exceptions(std::ios_base::badbit | std::ios_base::failbit);
-                std::unique_ptr<char[]> buf = std::make_unique<char[]>(len);
-                cover_stream.read(buf.get(), len);
-                if (std::cmp_not_equal(len, cover_stream.tellg() - begin)) {
-                    log_error("Incomplete read of omnibus cover: expected ", len, " not ", cover_stream.tellg());
-                    return std::errc::resource_unavailable_try_again;
-                }
-                OUTCOME_TRY(writer.add(dst, std::span<const char>(buf.get(), len), get_options()->compression_level));
+                cover_stream.exceptions(std::ios_base::badbit);
+                OUTCOME_TRY(writer.add(dst, cover_stream, std::nullopt, std::filesystem::last_write_time(get_options()->cover.value())));
             } catch (std::system_error& e) {
                 return e.code();
             } catch (std::exception& e) {

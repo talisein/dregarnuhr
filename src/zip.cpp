@@ -9,6 +9,13 @@
 #include "utils.h"
 #include "config.h"
 
+#if HAVE_CHRONO
+#include <chrono>
+#else
+// for clock_cast
+#include "date/tz.h"
+#endif
+
 namespace {
     static constexpr time_t ZIP_TIME_UNSET = 312796800;
 
@@ -36,6 +43,16 @@ namespace {
                 return 0;
             }
         }
+
+        size_t
+        _mz_file_read_func(void *pOpaque, mz_uint64 file_ofs, void *pBuf, size_t n)
+        {
+            std::istream *in = static_cast<std::istream*>(pOpaque);
+            if (in->eof()) return 0UZ;
+            in->read(static_cast<char*>(pBuf), utils::safe_int_cast<std::streamsize>(n));
+            return utils::safe_int_cast<size_t>(in->gcount());
+        }
+
     }
 
 }
@@ -309,7 +326,7 @@ namespace zip
             auto ostream = static_cast<std::ofstream*>(pOpaque);
             auto cur_pos = ostream->tellp();
             auto desired_pos = std::ifstream::traits_type::pos_type(file_ofs);
-            if (std::cmp_not_equal(desired_pos - cur_pos, 0)) {
+            if (std::cmp_not_equal(desired_pos - cur_pos, 0z)) {
                 ostream->seekp(file_ofs);
             }
             ostream->write(static_cast<const char *>(pBuf), n);
@@ -389,6 +406,52 @@ namespace zip
             }
         } catch (std::system_error& e) {
             log_error("Exception: ", e.code(), ' ', e.what());
+            return e.code();
+        } catch (...) {
+            return outcome::error_from_exception();
+        }
+
+        return outcome::success();
+    }
+
+    result<void>
+    writer::add(const std::string& filename,
+                std::istream &in,
+                std::optional<mz_uint> compression_level,
+                std::optional<std::filesystem::file_time_type> modified)
+    {
+        try {
+            in.ignore(std::numeric_limits<std::streamsize>::max());
+            const auto max_size = in.gcount();
+            in.clear();
+            in.seekg(0, std::ios_base::beg);
+
+            const time_t file_time = modified.transform([](const auto &time) {
+#if HAVE_CHRONO
+                return std::chrono::clock_cast<std::chrono::system_clock>(time);
+#else
+                return date::clock_cast<std::chrono::system_clock>(time);
+#endif
+            }).or_else([] { return std::make_optional(std::chrono::system_clock::now());
+            }).transform(&std::chrono::system_clock::to_time_t).value();
+
+            auto res = mz_zip_writer_add_read_buf_callback(&zip,
+                                                           filename.c_str(),
+                                                           _mz_file_read_func,
+                                                           &in,//void *callback_opaque,
+                                                           utils::safe_int_cast<mz_uint64>(max_size),
+                                                           &file_time, //const time_t *pFile_time,
+                                                           nullptr,//const void *pComment,
+                                                           0,//mz_uint16 comment_size,
+                                                           compression_level.value_or(0),//mz_uint level_and_flags,
+                                                           nullptr, //const char *user_extra_data_local,
+                                                           0, //mz_uint user_extra_data_local_len,
+                                                           nullptr, //const char *user_extra_data_central,
+                                                           0);//mz_uint user_extra_data_central_len)
+            if (MZ_FALSE == res) {
+                return mz_zip_get_last_error(&zip);
+            }
+        } catch (std::system_error &e) {
             return e.code();
         } catch (...) {
             return outcome::error_from_exception();

@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <optional>
 #include <regex>
+#include <string>
+#include <expected>
 #include "outcome/result.hpp"
 #include "volumes.h"
 
@@ -42,4 +44,4 @@ struct args
 
 const args* get_options();
 
-result<void> parse(int argc, char **argv);
+std::expected<void, std::error_code> parse(int argc, char **argv);

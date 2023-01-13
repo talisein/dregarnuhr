@@ -258,7 +258,7 @@ struct volume_definition
             return SIGNUP;
         }
 
-        throw std::logic_error("Unable to identify chapter type");
+        std::unreachable();
     }
 
     template<typename StringHref, typename StringMedia, typename StringLabel>
@@ -312,7 +312,7 @@ get_uniqueness(chapter_type c) {
         case AURELIA_FAMILY_TREE:
         case FRONTMATTER: return chapter_uniqueness::MULTIPLE;
     }
-    throw std::logic_error("Couldn't determine chapter uniqueness");
+    std::unreachable();
 }
 
 std::ostream& operator<<(std::ostream& os, const volume_definition& v);

@@ -1,0 +1,11 @@
+
+test('Simple', exe, args: ['--check'])
+
+
+utils_test =  executable('utils_test', 'utils.cpp',
+                         dependencies: [boostut_dep, dep])
+test('utils', utils_test)
+
+args_test = executable('args_test', 'args.cpp',
+                       dependencies: [boostut_dep, dep])
+test('args', args_test)

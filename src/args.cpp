@@ -13,6 +13,7 @@
 #include "log.h"
 #include "miniz.h"
 #include "updates.h"
+#include "utils.h"
 
 struct args options;
 
@@ -137,16 +138,18 @@ namespace {
 } // anonymous namespace
 
 
-result<void>
-parse(int argc, char **argv)
+std::expected<void, std::error_code>
+parse(int argc, char** argv)
 {
     using namespace std::string_view_literals;
     using namespace std::ranges;
-    const std::vector<std::string_view> args_sv { argv + 1, argv + argc};
+    auto args_view = std::views::counted(argv, argc) | std::views::drop(1) | std::views::transform([](const char *p) -> std::string_view { return std::string_view(p); });
+    std::vector<std::string_view> args_sv(begin(args_view), end(args_view));
+//    auto args_sv = args_view;
 
     if (argc < 2) {
         usage(argv[0]);
-        exit(0);
+        return std::unexpected(std::make_error_code(std::errc::invalid_argument));
     }
     options.command = args::command::NORMAL;
     auto args_options { views::filter(args_sv, [](const auto &sv) { return sv.starts_with("--"sv); }) };
@@ -159,71 +162,69 @@ parse(int argc, char **argv)
     if (find (args_options, "--verbose"sv) != args_options.end()) {
         options.verbose = true;
     }
-    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--suffix="sv); }); it != args_options.end()) {
-        auto pos = it->find("="sv);
-        options.suffix = std::make_optional<std::string>(it->substr(pos+1));
-        log_info("Info: Filename suffix set to ", std::quoted(*options.suffix));
-    }
-    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--prefix="sv); }); it != args_options.end()) {
-        auto pos = it->find("="sv);
-        options.prefix = std::make_optional<std::string>(it->substr(pos+1));
+
+    options.suffix = utils::find_if_optarg<std::string>(args_options, "--suffix="sv, std::identity{});
+    if (options.suffix) log_info("Filename suffix set to ", std::quoted(*options.suffix));
+
+    options.prefix = utils::find_if_optarg<std::string>(args_options, "--prefix="sv);
+
+    if (options.prefix) {
+        log_info("Filename prefix set to ", std::quoted(*options.prefix));
         if (options.prefix->empty() && (!options.suffix || options.suffix->empty())) {
             log_error("No suffix and empty prefix defined. This would create files with the same name as the input; that will make things too confusing!");
-            return std::errc::invalid_argument;
+            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
-        log_info("Info: Filename prefix set to ", std::quoted(*options.prefix));
     }
 
-    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--filter="sv); }); it != args_options.end()) {
-        const auto filters = it->substr(it->find("="sv)+1);
+    const auto filters = utils::find_if_optarg(args_options, "--filter="sv);
+
+    if (filters) {
         // Size
-        if (const auto pos = filters.find("size="sv); std::string::npos != pos) {
-            auto colon_pos = filters.find(":", pos);
+        if (const auto pos = filters->find("size="sv); std::string::npos != pos) {
+            auto colon_pos = filters->find(':', pos);
             auto cnt = std::string::npos;
-            if (std::string::npos != colon_pos) {
+            if (std::string_view::npos != colon_pos) {
                 cnt = colon_pos - pos - 5;
             }
-            options.size_filter = std::stoull(std::string(filters.substr(pos + 5, cnt)));
+            options.size_filter = std::stoull(std::string(filters->substr(pos + 5, cnt)));
             log_info("Size filter: ", *options.size_filter);
         }
         // Name
-        if (const auto pos = filters.find("name="sv); std::string::npos != pos) {
+        if (const auto pos = filters->find("name="sv); std::string::npos != pos) {
             try {
-                auto colon_pos = filters.find(":", pos);
+                auto colon_pos = filters->find(":", pos);
                 auto cnt = std::string::npos;
                 if (std::string::npos != colon_pos) {
                     cnt = colon_pos - pos - 5;
                 }
-                options.name_filter = std::make_optional<std::regex>(std::string(filters.substr(pos + 5, cnt)), std::regex_constants::icase);
+                options.name_filter = std::make_optional<std::regex>(std::string(filters->substr(pos + 5, cnt)), std::regex_constants::icase);
             } catch (std::system_error &e) {
                 log_error("Failed to prepare regex name filter: ", e.what());
-                return e.code();
+                return std::unexpected(e.code());
             } catch (std::exception &e) {
                 log_error("Failed to prepare regex name filter: ", e.what());
-                return outcome::error_from_exception();
+                return std::unexpected(std::make_error_code(std::errc::invalid_argument));
             }
         }
     }
-    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--jpg-quality="sv); }); it != args_options.end()) {
-        auto pos = it->find("="sv);
-        std::string quality(it->substr(pos+1));
-        auto i = std::stoi(quality);
-        options.jpg_quality = std::make_optional<int>( i );
-        log_info("JPG quality will be ", options.jpg_quality.value());
-    }
-    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--jpg-scale="sv); }); it != args_options.end()) {
-        auto pos = it->find("="sv);
-        std::string scale(it->substr(pos+1));
-        auto i = std::stoi(scale);
-        options.jpg_scale = std::make_optional<int>( i );
-        log_info("JPG scale will be ", options.jpg_scale.value());
-    }
+
+    constexpr auto to_int = [](std::string_view s) -> std::optional<int> {
+        if (int value; std::from_chars(std::to_address(s.begin()), std::to_address(s.end()), value).ec == std::errc{})
+            return value;
+        else
+            return std::nullopt;
+    };
+
+    options.jpg_quality = utils::find_if_optarg(args_options, "--jpg-quality"sv).and_then(to_int);
+    options.jpg_scale = utils::find_if_optarg(args_options, "--jpg-scale"sv).and_then(to_int);
+    options.title = utils::find_if_optarg(args_options, "--title=");
+
     if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--title="sv); }); it != args_options.end()) {
         auto pos = it->find("="sv);
         options.title = std::make_optional<std::string>(it->substr(pos+1));
         if (options.title.value().size() == 0) {
             log_error("Setting a blank title seems like a mistake");
-            return std::errc::invalid_argument;
+            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
         log_info("Title set to ", std::quoted(options.title.value()));
     }
@@ -249,7 +250,7 @@ parse(int argc, char **argv)
                 options.omnibus_type = omnibus::ALL;
             } else {
                 log_error("Unrecognized omnibus value: ", type);
-                return std::errc::invalid_argument;
+                return std::unexpected(std::make_error_code(std::errc::invalid_argument));
             }
             log_info("Omnibus ", *options.omnibus_type, " selected.");
         }
@@ -283,8 +284,8 @@ parse(int argc, char **argv)
         std::error_code ec;
         if (!fs::exists(path, ec) || ec) {
             log_error("Cover ", path, " doesn't exist");
-            if (ec) return ec;
-            return std::errc::invalid_argument;
+            if (ec) return std::unexpected(ec);
+            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
         auto status = fs::status(path, ec);
         if (ec) {
@@ -292,13 +293,13 @@ parse(int argc, char **argv)
         }
         if (status.type() != fs::file_type::regular) {
             log_error("Cover ", path, " isn't a regular file");
-            if (ec) return ec;
-            return std::errc::invalid_argument;
+            if (ec) return std::unexpected(ec);
+            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
         const fs::path JPG {".jpg"};
         if (path.extension() != JPG) {
             log_error("Cover ", path, " isn't a .jpg");
-            return std::errc::invalid_argument;
+            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
         options.cover = path;
     }
@@ -355,7 +356,9 @@ parse(int argc, char **argv)
             options.input_file = *it;
         }
 
-        OUTCOME_TRY(verify_input_file(options.input_file));
+        if (auto res = verify_input_file(options.input_file); !res) {
+            return std::unexpected(res.error());
+        }
     }
 
     if (args::command::NORMAL == options.command) {
@@ -368,10 +371,14 @@ parse(int argc, char **argv)
         options.input_dir = *it++;
         options.output_dir = *it;
 
-        OUTCOME_TRY(verify_input_directory(options.input_dir));
+        if (auto res = verify_input_directory(options.input_dir); !res) {
+            return std::unexpected(res.error());
+        }
         log_verbose("Verified input dir: ", options.input_dir.string());
-        OUTCOME_TRY(verify_output_directory(options.input_dir, options.output_dir));
+        if (auto res = verify_output_directory(options.input_dir, options.output_dir); !res) {
+            return std::unexpected(res.error());
+        }
         log_verbose("Verified output dir: ", options.output_dir.string());
     }
-    return outcome::success();
+    return {};
 }
