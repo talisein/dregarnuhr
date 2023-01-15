@@ -100,14 +100,14 @@ namespace utils
     {
         using Type = std::remove_cvref_t<T>;
         if constexpr(std::is_same_v<Type, char>) {
-            return 1UZ;
+            return 1ULL;
         } else if constexpr(std::is_same_v<Type, std::optional<std::string>> || std::is_same_v<Type, std::optional<std::string_view>>) {
             if (t.has_value())
                 return std::size(*t);
             else
                 return 0;
         } else if constexpr(std::is_integral_v<Type>) {
-            return std::max<size_t>(std::numeric_limits<Type>::digits10 + 1UZ + static_cast<size_t>(std::is_signed<Type>::value), 10UZ);
+            return std::max<size_t>(std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value), 10ULL);
         } else {
             return std::size(t);
         }
@@ -119,14 +119,14 @@ namespace utils
     {
         using Type = std::remove_cvref_t<T>;
         if constexpr(std::is_same_v<Type, char>) {
-            return 1UZ + _count_sizes(args...);
+            return 1ULL + _count_sizes(args...);
         } else if constexpr(std::is_same_v<Type, std::optional<std::string>> || std::is_same_v<Type, std::optional<std::string_view>>) {
             if (t.has_value())
                 return std::size(*t) + _count_sizes(args...);
             else
                 return _count_sizes(args...);
         } else if constexpr(std::is_integral_v<Type>) {
-            return std::max<size_t>(std::numeric_limits<Type>::digits10 + 1UZ + static_cast<size_t>(std::is_signed<Type>::value), 10UZ) + _count_sizes(args...);
+            return std::max<size_t>(std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value), 10ULL) + _count_sizes(args...);
         } else {
             return std::size(t) + _count_sizes(args...);
         }
@@ -143,7 +143,7 @@ namespace utils
             if (t.has_value())
                 str.append(*t);
         } else if constexpr(std::is_integral_v<Type>) {
-            std::array<char, std::numeric_limits<Type>::digits10 + 1UZ + static_cast<size_t>(std::is_signed<Type>::value)> buf;
+            std::array<char, std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value)> buf;
             auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), std::forward<T>(t));
             if (ec != std::errc()) {
                 throw std::system_error(std::make_error_code(ec));
@@ -166,7 +166,7 @@ namespace utils
             if (t.has_value())
                 str.append(*t);
         } else if constexpr(std::is_integral_v<Type>) {
-            std::array<char, std::numeric_limits<Type>::digits10 + 1UZ + static_cast<size_t>(std::is_signed<Type>::value)> buf;
+            std::array<char, std::numeric_limits<Type>::digits10 + 1ULL + static_cast<size_t>(std::is_signed<Type>::value)> buf;
             auto [ptr, ec] = std::to_chars(buf.data(), buf.data() + buf.size(), std::forward<T>(t));
             if (ec != std::errc()) {
                 throw std::system_error(std::make_error_code(ec));

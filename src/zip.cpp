@@ -48,7 +48,12 @@ namespace {
         _mz_file_read_func(void *pOpaque, mz_uint64 file_ofs, void *pBuf, size_t n)
         {
             std::istream *in = static_cast<std::istream*>(pOpaque);
-            if (in->eof()) return 0UZ;
+            if (in->eof()) return 0ULL;
+            const std::istream::traits_type::pos_type desired_pos{utils::safe_int_cast<std::istream::traits_type::off_type>(file_ofs)};
+            const auto cur_ofs = in->tellg();
+            if (cur_ofs != desired_pos) [[unlikely]] {
+                in->seekg(desired_pos);
+            }
             in->read(static_cast<char*>(pBuf), utils::safe_int_cast<std::streamsize>(n));
             return utils::safe_int_cast<size_t>(in->gcount());
         }
@@ -75,9 +80,9 @@ namespace zip
         size_t _zip_file_read_func(void *pOpaque, mz_uint64 file_ofs, void *pBuf, size_t n)
         {
             auto istream = static_cast<std::ifstream*>(pOpaque);
-            auto desired_pos = std::ifstream::traits_type::pos_type(file_ofs);
-            auto cur_ofs = istream->tellg();
-            if (std::cmp_not_equal(desired_pos - cur_ofs, 0)) {
+            const std::ifstream::traits_type::pos_type desired_pos{utils::safe_int_cast<std::ifstream::traits_type::off_type>(file_ofs)};
+            const auto cur_ofs = istream->tellg();
+            if (desired_pos != cur_ofs) {
                 istream->seekg(desired_pos);
             }
             istream->read(static_cast<char *>(pBuf), n);
@@ -325,12 +330,12 @@ namespace zip
         {
             auto ostream = static_cast<std::ofstream*>(pOpaque);
             auto cur_pos = ostream->tellp();
-            auto desired_pos = std::ifstream::traits_type::pos_type(file_ofs);
-            if (std::cmp_not_equal(desired_pos - cur_pos, 0z)) {
+            const std::ofstream::traits_type::pos_type desired_pos{utils::safe_int_cast<std::ofstream::traits_type::off_type>(file_ofs)};
+            if (cur_pos != desired_pos) {
                 ostream->seekp(file_ofs);
             }
             ostream->write(static_cast<const char *>(pBuf), n);
-            return n; // an exception throws if less than n
+            return utils::safe_int_cast<size_t>(ostream->tellp() - cur_pos);
         }
     }
     writer::writer(const fs::path& filename) :
