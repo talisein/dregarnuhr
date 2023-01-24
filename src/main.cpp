@@ -187,9 +187,9 @@ int main(int argc, char* argv[])
 
     init();
 
-    if (args::command::DUMP == get_options()->command) {
+    if (args::command_e::DUMP == get_options()->command) {
         do_dump();
-    } else if (args::command::NORMAL == get_options()->command) {
+    } else if (args::command_e::NORMAL == get_options()->command) {
         auto res = print_books(get_options()->input_dir);
 
         if (res.has_error()) {

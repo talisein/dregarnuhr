@@ -14,7 +14,7 @@ using outcome::result;
 
 struct args
 {
-    enum class command
+    enum class command_e
     {
         NORMAL,
         DUMP,
@@ -41,6 +41,7 @@ struct args
     std::optional<unsigned int> compression_level;
 };
 
+std::ostream& operator<<(std::ostream& os, args::command_e c);
 
 const args* get_options();
 
