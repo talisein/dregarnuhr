@@ -298,7 +298,7 @@ parse(int argc, char** argv)
             return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
 
-        if (!ctre::match<"[.]jpg", ctre::case_insensitive>(path.extension())) {
+        if (!ctre::match<"[.]jpg", ctre::case_insensitive>(path.extension().string())) {
             log_error("Cover ", path, " isn't a .jpg");
             return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
