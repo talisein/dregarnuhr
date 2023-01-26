@@ -1,5 +1,5 @@
 Name:           dregarnuhr
-Version:        1.0.8
+Version:        1.0.9
 Release:        1
 Summary:        Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
@@ -49,6 +49,9 @@ Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 
 %changelog
+* Thu Jan 26 2022 Andrew Potter <agpotter@gmail.com> - v1.0.9-1
+- P5V2
+
 * Fri Dec 30 2022 Andrew Potter <agpotter@gmail.com> - v1.0.8-1
 - Fix 1.0.7 bug that omits P4V8 from omnibus
 - Move P3V5 'And So, the Future' to after 'Meanwhile at the Temple'
