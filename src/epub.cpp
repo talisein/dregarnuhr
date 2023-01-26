@@ -264,6 +264,7 @@ namespace epub
             std::optional<std::string> properties;
         };
         std::map<std::string, itemref> idrefs;
+        std::vector<std::string> idref_order;
         for (const auto item : std::views::transform(itemrefs, [](const auto node) { return dynamic_cast<const xmlpp::Element*>(node); })) {
             itemref itemref;
             for (const auto attr : item->get_attributes()) {
@@ -277,6 +278,7 @@ namespace epub
                 }
             }
             auto key = itemref.idref;
+            idref_order.push_back(key);
             idrefs.try_emplace(std::move(key), std::move(itemref));
         }
 
@@ -315,7 +317,7 @@ namespace epub
             if (!item.in_spine)
                 sorted_manifest.items.push_back(item);
         }
-        for (const auto& id : std::views::values(idrefs) | std::views::transform(&itemref::idref)) {
+        for (const auto& id : idref_order) {
             auto iter = std::ranges::find(manifest.items, id, &manifest::item::id);
             if (iter != manifest.items.end()) {
                 sorted_manifest.items.push_back(*iter);
