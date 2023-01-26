@@ -1,9 +1,12 @@
 #include <vector>
 #include <spanstream>
 #include <optional>
-#include "args.h"
 
 #include <boost/ut.hpp>
+#include "miniz.h"
+
+#include "args.h"
+#include "utils.h"
 
 
 int main() {
@@ -79,4 +82,57 @@ int main() {
         expect(eq(res.error(), std::make_error_code(std::errc::invalid_argument)));
     } | std::vector<const char*>{"--omnibus=part6", "--omnibus=garbage", "--omnibus=Part"};
 
+    "compression level small"_test = [] (const auto& arg) {
+        const char *argv[] = {"dregarnuhr", arg, "..", "."};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
+        expect(get_options()->compression_level.has_value());
+        expect(eq(*get_options()->compression_level, static_cast<decltype(args::compression_level)::value_type>(MZ_BEST_COMPRESSION)));
+    } | std::vector<const char*>{"--compression-level=smallest", "--compression-level=SMALLEST", "--compression-level=smalLest"};
+
+    "compression level fast"_test = [] (const auto& arg) {
+        const char *argv[] = {"dregarnuhr", arg, "..", "."};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
+        expect(get_options()->compression_level.has_value());
+        expect(eq(*get_options()->compression_level, static_cast<decltype(args::compression_level)::value_type>(MZ_BEST_SPEED)));
+    } | std::vector<const char*>{"--compression-level=fastest", "--compression-level=FASTEST", "--compression-level=Fastest"};
+
+    "compression level fast"_test = [] (const auto& arg) {
+        const char *argv[] = {"dregarnuhr", arg.first, "..", "."};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
+        expect(get_options()->compression_level.has_value());
+        expect(eq(*get_options()->compression_level, arg.second));
+    } | std::vector<std::pair<const char*, mz_uint>>{
+        {"--compression-level=0", 0}, {"--compression-level=1", 1}, {"--compression-level=8", 8},
+        {"--compression-level=10", 10}, {"--compression-level=100", 10}, {"--compression-level=999999999", 10},
+    };
+
+    "compression level range"_test = [] (const auto& arg) {
+        const char *argv[] = {"dregarnuhr", arg, "..", "."};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(not res.has_value());
+        expect(eq(res.error(), std::make_error_code(std::errc::result_out_of_range)));
+    } | std::vector<const char*>{"--compression-level=9999999999999"};
+
+    "compression level invalid"_test = [] (const auto& arg) {
+        const char *argv[] = {"dregarnuhr", arg, "..", "."};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(not res.has_value());
+        expect(eq(res.error(), std::make_error_code(std::errc::invalid_argument)));
+    } | std::vector<const char*> {
+        "--compression-level=-1", "--compression-level=-10000000000000", "--compression-level=smallest1",
+        "--compression-level=6abc", "--compression-level=abc5", "--compression-level=123ok"
+    };
+
+    "size filter"_test = [] (const auto& arg) {
+        const char *argv[] = {"dregarnuhr", arg.first, "..", "."};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
+        expect(get_options()->size_filter.has_value());
+        expect(eq(*get_options()->size_filter, arg.second));
+    } | std::vector<std::pair<const char*, std::size_t>>{
+        {"--filter=size=123", 123ULL}, {"--filter=size=456:name=[abc]", 456ULL}, {"--filter=name=wow:size=789", 789ULL},
+    };
 }

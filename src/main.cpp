@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
         } else {
             std::locale::global(std::locale(""));
         }
-    } catch (std::exception &e) {
+    } catch (std::exception &) {
         // MacOS has issues
         std::setlocale(LC_ALL, "");
         log_info("Warning: Couldn't set locale, but we will continue.");

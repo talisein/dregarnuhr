@@ -20,14 +20,14 @@ const args* get_options() { return &options; }
 
 namespace {
     using namespace std::string_view_literals;
-    constexpr std::string_view DEFAULT_PREFIX { "chronological-"sv };
-    constexpr std::string_view DEFAULT_OMNIBUS_PART1_TITLE { "Ascendence of a Bookworm: Part 1 Chronological Omnibus"sv };
-    constexpr std::string_view DEFAULT_OMNIBUS_PART2_TITLE { "Ascendence of a Bookworm: Part 2 Chronological Omnibus"sv };
-    constexpr std::string_view DEFAULT_OMNIBUS_PART3_TITLE { "Ascendence of a Bookworm: Part 3 Chronological Omnibus"sv };
-    constexpr std::string_view DEFAULT_OMNIBUS_PART4_TITLE { "Ascendence of a Bookworm: Part 4 Chronological Omnibus"sv };
-    constexpr std::string_view DEFAULT_OMNIBUS_PART5_TITLE { "Ascendence of a Bookworm: Part 5 Chronological Omnibus"sv };
-    constexpr std::string_view DEFAULT_OMNIBUS_TITLE { "Ascendence of a Bookworm: Chronological Omnibus"sv };
-    constexpr mz_uint DEFAULT_COMPRESSION_LEVEL = MZ_DEFAULT_LEVEL;
+    static constexpr std::string_view DEFAULT_PREFIX { "chronological-"sv };
+    static constexpr std::string_view DEFAULT_OMNIBUS_PART1_TITLE { "Ascendence of a Bookworm: Part 1 Chronological Omnibus"sv };
+    static constexpr std::string_view DEFAULT_OMNIBUS_PART2_TITLE { "Ascendence of a Bookworm: Part 2 Chronological Omnibus"sv };
+    static constexpr std::string_view DEFAULT_OMNIBUS_PART3_TITLE { "Ascendence of a Bookworm: Part 3 Chronological Omnibus"sv };
+    static constexpr std::string_view DEFAULT_OMNIBUS_PART4_TITLE { "Ascendence of a Bookworm: Part 4 Chronological Omnibus"sv };
+    static constexpr std::string_view DEFAULT_OMNIBUS_PART5_TITLE { "Ascendence of a Bookworm: Part 5 Chronological Omnibus"sv };
+    static constexpr std::string_view DEFAULT_OMNIBUS_TITLE { "Ascendence of a Bookworm: Chronological Omnibus"sv };
+    static constexpr mz_uint DEFAULT_COMPRESSION_LEVEL = MZ_DEFAULT_LEVEL;
 }
 
 namespace {
@@ -44,7 +44,7 @@ namespace {
                  "--suffix=XXX\t: Created filenames will be suffixed with XXX. The default is blank.\n",
                  "--verbose\t: Print a lot of debugging information\n",
                  "--jpg-scale=N\t: Scale jpg images down by 1/N, where N is between 1-16\n",
-                 "--jpg-quality=N\t: Low jpg quality to n, where N is between 1-100\n"
+                 "--jpg-quality=N\t: Re-encode jpg quality to n, where N is between 1-100\n"
                  "--compression-level=[0-10,fastest,smallest]\t: Set compression level; only for generated files. The default is ", DEFAULT_COMPRESSION_LEVEL, '\n',
                  "--no-nested\t: Skip creating a nested NCX (table of contents) for omnibus outputs.\n"
                  "--mode=dump\t: Dump spine and toc data. Give a path to an epub file instead of a directory. This is mostly for development."
@@ -134,6 +134,25 @@ namespace {
 
         return {};
     }
+
+    template<std::integral T>
+    constexpr auto to_int(std::string_view sv) -> std::expected<T, std::error_code>
+    {
+        T value;
+        const auto& [ptr, ec] = std::from_chars(std::to_address(sv.begin()), std::to_address(sv.end()), value);
+        if (ec == std::errc()) {
+            if (ptr == std::to_address(sv.end())) {
+                return value;
+            } else {
+                log_error("Can't parse integer from ", std::quoted(sv));
+                return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+            }
+        } else {
+            log_error("Can't parse integer from ", std::quoted(sv));
+            return std::unexpected(std::make_error_code(ec));
+        }
+    }
+
 } // anonymous namespace
 
 
@@ -142,9 +161,7 @@ parse(int argc, char** argv)
 {
     using namespace std::string_view_literals;
     using namespace std::ranges;
-    auto args_view = std::views::counted(argv, argc) | std::views::drop(1) | std::views::transform([](const char *p) -> std::string_view { return std::string_view(p); });
-    std::vector<std::string_view> args_sv(begin(args_view), end(args_view));
-//    auto args_sv = args_view;
+    auto args_sv = std::views::counted(argv, argc) | std::views::drop(1) | std::views::transform([](const char *p) -> std::string_view { return std::string_view(p); });
 
     options.command = args::command_e::NORMAL;
     if (argc < 2) {
@@ -175,53 +192,63 @@ parse(int argc, char** argv)
         }
     }
 
-    const auto filters = utils::find_if_optarg(args_options, "--filter="sv);
-
+    auto filters = utils::find_if_optarg(args_options, "--filter="sv).transform([](const auto sv) {
+        return std::views::split(sv, ':') |
+            std::views::transform([](auto&& range) {
+                return std::string_view(std::ranges::cbegin(range), std::ranges::cend(range));
+            });
+    });
     if (filters) {
+        auto splitview = *filters;
         // Size
-        if (const auto pos = filters->find("size="sv); std::string::npos != pos) {
-            auto colon_pos = filters->find(':', pos);
-            auto cnt = std::string::npos;
-            if (std::string_view::npos != colon_pos) {
-                cnt = colon_pos - pos - 5;
-            }
-            options.size_filter = std::stoull(std::string(filters->substr(pos + 5, cnt)));
+        constexpr auto to_sizet = [](std::string_view s) -> std::optional<std::size_t> {
+            if (std::size_t value; std::from_chars(std::to_address(s.begin()), std::to_address(s.end()), value).ec == std::errc{})
+                return value;
+            else
+                return std::nullopt;
+        };
+        options.size_filter = utils::find_if_optarg(splitview, "size="sv).and_then(to_sizet);
+        if (options.size_filter) {
             log_info("Size filter: ", *options.size_filter);
         }
+
         // Name
-        if (const auto pos = filters->find("name="sv); std::string::npos != pos) {
-            try {
-                auto colon_pos = filters->find(":", pos);
-                auto cnt = std::string::npos;
-                if (std::string::npos != colon_pos) {
-                    cnt = colon_pos - pos - 5;
-                }
-                options.name_filter = std::make_optional<std::regex>(std::string(filters->substr(pos + 5, cnt)), std::regex_constants::icase);
-            } catch (std::system_error &e) {
-                log_error("Failed to prepare regex name filter: ", e.what());
-                return std::unexpected(e.code());
-            } catch (std::exception &e) {
-                log_error("Failed to prepare regex name filter: ", e.what());
-                return std::unexpected(std::make_error_code(std::errc::invalid_argument));
-            }
+        try {
+            options.name_filter = utils::find_if_optarg<std::string>(splitview, "size="sv).and_then([](const auto& str) -> std::optional<std::regex> {
+                    return std::make_optional<std::regex>(str, std::regex_constants::icase);
+                });
+        } catch (std::system_error &e) {
+            log_error("Failed to prepare regex name filter: ", e.what());
+            return std::unexpected(e.code());
+        } catch (std::exception &e) {
+            log_error("Failed to prepare regex name filter: ", e.what());
+            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
     }
 
-    constexpr auto to_int = [](std::string_view s) -> std::optional<int> {
-        if (int value; std::from_chars(std::to_address(s.begin()), std::to_address(s.end()), value).ec == std::errc{})
-            return value;
-        else
-            return std::nullopt;
-    };
 
-    options.jpg_quality = utils::find_if_optarg(args_options, "--jpg-quality"sv).and_then(to_int);
-    options.jpg_scale = utils::find_if_optarg(args_options, "--jpg-scale"sv).and_then(to_int);
-    options.title = utils::find_if_optarg(args_options, "--title=");
+    if (auto quality = utils::find_if_optarg(args_options, "--jpg-quality"sv); quality) {
+        auto q = to_int<int>(*quality);
+        if (q.has_value()) {
+            options.jpg_quality = std::clamp<int>(q.value(), 1, 100);
+        } else {
+            return std::unexpected(q.error());
+        }
+    }
+
+    if (auto scale = utils::find_if_optarg(args_options, "--jpg-scale"sv)) {
+        auto s = to_int<int>(*scale);
+        if (s.has_value()) {
+            options.jpg_scale = std::clamp<int>(s.value(), 1, 16);
+        } else {
+            return std::unexpected(s.error());
+        }
+    }
 
     options.title = utils::find_if_optarg(args_options, "--title="sv);
     if (options.title) {
         if (options.title.value().size() == 0) {
-            log_error("Setting a blank title seems like a mistake");
+            log_error("Can not set a blank title");
             return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
         log_info("Title set to ", std::quoted(options.title.value()));
@@ -288,13 +315,12 @@ parse(int argc, char** argv)
         }
 
         if (!fs::exists(status)) {
-            log_error("Cover ", path, " doesn't exist ", ec);
-            if (ec) return std::unexpected(ec);
+            log_error("Cover ", path, " doesn't exist.");
             return std::unexpected(std::make_error_code(std::errc::no_such_file_or_directory));
         }
 
         if (!fs::is_regular_file(status)) {
-            log_error("Cover ", path, " isn't a regular file");
+            log_error("Cover ", path, " isn't a regular file.");
             return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
 
@@ -304,19 +330,29 @@ parse(int argc, char** argv)
         }
         options.cover = path;
     }
-    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--compression-level="sv); }); it != args_options.end()) {
-        auto pos = it->find("="sv);
-        auto level = fs::path(it->substr(pos+1));
-        if (level == "smallest"sv) {
+
+    if (auto level = utils::find_if_optarg(args_options, "--compression-level="sv); level) {
+        if (ctre::match<"smallest", ctre::case_insensitive>(*level)) {
             options.compression_level = MZ_BEST_COMPRESSION;
-        } else if (level == "fastest"sv) {
+        } else if (ctre::match<"fastest", ctre::case_insensitive>(*level)) {
             options.compression_level = MZ_BEST_SPEED;
         } else {
-            auto l = std::stoi(level);
-            options.compression_level = std::clamp<mz_uint>(l, MZ_NO_COMPRESSION, MZ_UBER_COMPRESSION);
+            mz_uint l;
+            auto [ptr, ec] = std::from_chars(std::to_address(std::begin(*level)), std::to_address(std::end(*level)), l);
+            if (ec == std::errc()) { // success
+                if (ptr != std::to_address(std::end(*level))) {
+                    log_error("Compression level ", std::quoted(*level), " is invalid.");
+                    return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+                }
+                options.compression_level = std::clamp<mz_uint>(l, MZ_NO_COMPRESSION, MZ_UBER_COMPRESSION);
+                log_info("Compression level set to ", *options.compression_level);
+            } else {
+                log_error("Compression level ", std::quoted(*level), " is invalid: ", std::make_error_code(ec));
+                return std::unexpected(std::make_error_code(ec));
+            }
         }
-        log_info("Compression level set to ", *options.compression_level);
     }
+
     if (find (args_options, "--check"sv) != args_options.end()) {
         auto map = get_updated();
         if (map.size() > 0) {
@@ -325,7 +361,7 @@ parse(int argc, char** argv)
             log_info("Failed to get updates.json");
         }
         log_info("This executable works.");
-        options.command = args::command_e::DUMP;
+        options.command = args::command_e::TEST;
     }
     if (options.omnibus_type) {
         options.do_nested = true;
