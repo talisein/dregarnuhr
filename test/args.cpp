@@ -87,7 +87,7 @@ int main() {
         auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
         expect(res.has_value());
         expect(get_options()->compression_level.has_value());
-        expect(eq(*get_options()->compression_level, static_cast<decltype(args::compression_level)::value_type>(MZ_BEST_COMPRESSION)));
+        expect(eq(*get_options()->compression_level, static_cast<mz_uint>(MZ_BEST_COMPRESSION)));
     } | std::vector<const char*>{"--compression-level=smallest", "--compression-level=SMALLEST", "--compression-level=smalLest"};
 
     "compression level fast"_test = [] (const auto& arg) {
@@ -95,7 +95,7 @@ int main() {
         auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
         expect(res.has_value());
         expect(get_options()->compression_level.has_value());
-        expect(eq(*get_options()->compression_level, static_cast<decltype(args::compression_level)::value_type>(MZ_BEST_SPEED)));
+        expect(eq(*get_options()->compression_level, static_cast<mz_uint>(MZ_BEST_SPEED)));
     } | std::vector<const char*>{"--compression-level=fastest", "--compression-level=FASTEST", "--compression-level=Fastest"};
 
     "compression level fast"_test = [] (const auto& arg) {
