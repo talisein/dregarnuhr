@@ -39,6 +39,7 @@ enum class volume
     P4V9,
     P5V1,
     P5V2,
+    P5V3,
     FB1,
     FB2,
     FB3,

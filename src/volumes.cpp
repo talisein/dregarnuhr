@@ -36,6 +36,7 @@ namespace {
         {"9781718346413"sv, volume::P4V9},
         {"9781718346437"sv, volume::P5V1},
         {"9781718346451"sv, volume::P5V2},
+        {"9781718346475"sv, volume::P5V3},
         {"9781718338005"sv, volume::MP1V1},
         {"9781718338029"sv, volume::MP1V2},
         {"9781718338043"sv, volume::MP1V3},
@@ -120,6 +121,7 @@ std::string_view to_string_view(volume vol)
         case volume::P4V9: return "P4V9"sv;
         case volume::P5V1: return "P5V1"sv;
         case volume::P5V2: return "P5V2"sv;
+        case volume::P5V3: return "P5V3"sv;
         case volume::FB1:  return "FB1"sv;
         case volume::FB2:  return "FB2"sv;
         case volume::FB3:  return "FB3"sv;
