@@ -47,6 +47,7 @@ namespace {
                  "--jpg-quality=N\t: Low jpg quality to n, where N is between 1-100\n"
                  "--compression-level=[0-10,fastest,smallest]\t: Set compression level; only for generated files.\n"
                  "--no-nested\t: Skip created a nested NCX (table of contents) for omnibus outputs\n"
+                 "--slim\t: Set title, omnibus mode, jpg-scale and quality.\n"
                  "--mode=dump\t: Dump spine and toc data. Give a path to an epub file instead of a directory. This is mostly for development."
             );
     }
@@ -159,6 +160,15 @@ parse(int argc, char **argv)
     if (find (args_options, "--verbose"sv) != args_options.end()) {
         options.verbose = true;
     }
+
+    if (find (args_options, "--slim"sv) != args_options.end()) {
+        options.jpg_quality = std::make_optional<int>( 80 );
+        options.jpg_scale = std::make_optional<int>( 2 );
+        options.prefix = std::make_optional<std::string>("slim-");
+        options.omnibus_type = omnibus::ALL;
+        options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_TITLE);
+    }
+
     if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--suffix="sv); }); it != args_options.end()) {
         auto pos = it->find("="sv);
         options.suffix = std::make_optional<std::string>(it->substr(pos+1));
