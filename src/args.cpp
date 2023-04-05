@@ -142,6 +142,7 @@ result<void>
 parse(int argc, char **argv)
 {
     using namespace std::string_view_literals;
+    using namespace std::string_literals;
     using namespace std::ranges;
     const std::vector<std::string_view> args_sv { argv + 1, argv + argc};
 
@@ -162,11 +163,18 @@ parse(int argc, char **argv)
     }
 
     if (find (args_options, "--slim"sv) != args_options.end()) {
-        options.jpg_quality = std::make_optional<int>( 80 );
+        options.jpg_quality = std::make_optional<int>( 70 );
         options.jpg_scale = std::make_optional<int>( 2 );
         options.prefix = std::make_optional<std::string>("slim-");
         options.omnibus_type = omnibus::ALL;
         options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_TITLE);
+
+        fs::path path = "../covers/omnibus.jpg";
+        if (fs::exists(path)) {
+            options.cover = path;
+            log_info("Defaulted cover to ", path);
+        }
+        options.name_filter = std::make_optional<std::regex>("(bonus[0-9]|frontmatter[0-9]).(jpg|xhtml)"s, std::regex_constants::icase);
     }
 
     if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--suffix="sv); }); it != args_options.end()) {
