@@ -49,6 +49,7 @@ namespace {
         {"9781718338203"sv, volume::MP2V4},
         {"9781718338227"sv, volume::MP2V5},
         {"9781718338241"sv, volume::MP2V6},
+        {"9781718338265"sv, volume::MP2V7},
         {"96908895-C96B-4376-BBF8-6A25E96F72F3"sv, volume::SSBDOVA1},
         {"22BC23BD-BEB1-4F8F-9104-825FA616AD4C"sv, volume::SSJBUNKO1},
         {"DEB588FB-32EF-4512-8ADF-D8A5CB49D9CD"sv, volume::SSTEASET},
@@ -136,6 +137,7 @@ std::string_view to_string_view(volume vol)
         case volume::MP2V4:  return "M2V4"sv;
         case volume::MP2V5:  return "M2V5"sv;
         case volume::MP2V6:  return "M2V6"sv;
+        case volume::MP2V7:  return "M2V7"sv;
         case volume::SSBDOVA1: return "SSBDOVA1"sv;
         case volume::SSJBUNKO1: return "SSJBUNKO1"sv;
         case volume::SSTEASET: return "SSTEASET"sv;

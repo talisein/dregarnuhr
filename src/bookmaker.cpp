@@ -823,6 +823,9 @@ namespace epub
                 auto res = make_books_impl(get_definition_view(defined_volume), defined_volume);
                 if (res) {
                     ++created_books;
+                } else {
+                    log_error("Got error ", res.error(), ". Stopping.");
+                    break;
                 }
             }
         }
