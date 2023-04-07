@@ -31,7 +31,7 @@ namespace part_2_defs
 { volume::P2V1, "Images/jnovelclubCMYK.png"sv, "image/png"sv, std::nullopt, false },
 { volume::P2V1, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, "Cover"sv, true },
 { volume::P2V1, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
-{ volume::P2V1, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P2V1, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true }, /* Served pizza */
 { volume::P2V1, "Text/characters1.xhtml"sv, "application/xhtml+xml"sv, "Characters"sv, true },
 { volume::P2V1, "Text/characters2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V1, "Text/toc.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -482,7 +482,7 @@ constexpr std::array vol_4 = std::to_array<volume_definition>({
 { volume::P2V4, "Images/Map.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P2V4, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, "Cover"sv, true },
 { volume::P2V4, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
-{ volume::P2V4, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P2V4, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true }, /* Using ring in temple corridor */
 { volume::P2V4, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
 { volume::P2V4, "Text/characters1.xhtml"sv, "application/xhtml+xml"sv, "Characters"sv, true },
 { volume::P2V4, "Text/characters2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },

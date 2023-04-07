@@ -34,7 +34,7 @@ namespace part_3_defs
 { volume::P3V1, "Images/Extra2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P3V1, "Images/Map.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P3V1, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, "Cover"sv, true },
-{ volume::P3V1, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
+{ volume::P3V1, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true }, /* Blessing at baptism ceremony */
 { volume::P3V1, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
 { volume::P3V1, "Text/characters1.xhtml"sv, "application/xhtml+xml"sv, "Characters"sv, true },
@@ -136,7 +136,7 @@ namespace part_3_defs
 { volume::P3V2, "Images/Characters3.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P3V2, "Images/Map.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P3V2, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, "Cover"sv, true },
-{ volume::P3V2, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
+{ volume::P3V2, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true }, /* Dyeing ruelle */
 { volume::P3V2, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V2, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
 { volume::P3V2, "Text/characters1.xhtml"sv, "application/xhtml+xml"sv, "Characters"sv, true },
@@ -218,8 +218,8 @@ constexpr std::array vol_3 = std::to_array<const volume_definition>({
 { volume::P3V3, "Images/Characters3.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P3V3, "Images/Insert10.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P3V3, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, "Cover"sv, true },
-{ volume::P3V3, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
-{ volume::P3V3, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P3V3, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true }, /* Singing at Goddess's bath */
+{ volume::P3V3, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true }, /* Using Liedenshaft's spear */
 { volume::P3V3, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
 { volume::P3V3, "Text/characters1.xhtml"sv, "application/xhtml+xml"sv, "Characters"sv, true },
 { volume::P3V3, "Text/characters2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -390,7 +390,7 @@ constexpr std::array vol_5 = std::to_array<const volume_definition>({
 { volume::P3V5, "Images/Manga2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P3V5, "Images/Manga1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P3V5, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, "Cover"sv, true },
-{ volume::P3V5, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
+{ volume::P3V5, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true }, /* In the juerve */
 { volume::P3V5, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V5, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
 { volume::P3V5, "Text/characters1.xhtml"sv, "application/xhtml+xml"sv, "Characters"sv, true },

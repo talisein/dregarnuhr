@@ -104,6 +104,8 @@ namespace jpeg
             cinfo.input_components = decompressor.cinfo.output_components;
             cinfo.in_color_space = decompressor.cinfo.out_color_space;
             jpeg_set_defaults(&cinfo);
+            cinfo.optimize_coding = TRUE;
+
             if (quality)
                 jpeg_set_quality(&cinfo, quality.value(), TRUE);
             jpeg_start_decompress(&decompressor.cinfo);

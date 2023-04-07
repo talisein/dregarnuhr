@@ -91,6 +91,7 @@ namespace {
         {"ascendance-of-a-bookworm-part-4-volume-9"sv, volume::P4V9},
         {"ascendance-of-a-bookworm-part-5-volume-1"sv, volume::P5V1},
         {"ascendance-of-a-bookworm-part-5-volume-2"sv, volume::P5V2},
+        {"ascendance-of-a-bookworm-part-5-volume-3"sv, volume::P5V3},
     };
 
 }

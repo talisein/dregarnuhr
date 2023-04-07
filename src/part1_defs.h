@@ -289,8 +289,8 @@ constexpr std::array vol_3 = std::to_array<volume_definition>({
 { volume::P1V3, "Images/jnovelclubCMYK.png"sv, "image/png"sv, std::nullopt, false },
 { volume::P1V3, "Images/Bonus2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P1V3, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, "Cover"sv, true },
-{ volume::P1V3, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
-{ volume::P1V3, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P1V3, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },  /* Baptism ceremony prayer */
+{ volume::P1V3, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true }, /* Tulli hugging at home */
 { volume::P1V3, "Text/frontmatter3.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest"sv, true },
 { volume::P1V3, "Text/toc.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V3, "Text/prologue.xhtml"sv, "application/xhtml+xml"sv, "Prologue"sv, true },
