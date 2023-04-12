@@ -5,6 +5,7 @@
 #include "outcome/result.hpp"
 #include "volumes.h"
 #include "log.h"
+#include "utils.h"
 
 namespace {
     using namespace std::string_view_literals;
@@ -216,7 +217,15 @@ get_volume_from_slug(std::string_view sv)
     if (it != slug_map.end()) {
         return it->second;
     }
-    log_error("Unknown volume for slug ", sv);
-    assert(false);
-    return volume::P1V1;
+    throw std::system_error(std::make_error_code(std::errc::argument_out_of_domain), utils::strcat("Invalid volume slug ", sv));
+}
+
+std::string_view
+get_slug_from_volume(volume vol)
+{
+    for (const auto &p : slug_map) {
+        if (p.second == vol)
+            return p.first;
+    }
+    throw std::system_error(std::make_error_code(std::errc::argument_out_of_domain), utils::strcat("Invalid volume ", to_string_view(vol)));
 }
