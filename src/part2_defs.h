@@ -201,7 +201,10 @@ namespace part_2_defs
 { volume::P2V1, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V1, "Text/chapter24_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V1, "Text/epilogue.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
-{ volume::FB2, "Text/side2.xhtml"sv, "application/xhtml+xml"sv, "I’m Not Givin’ Ya My Daughter!"sv, true },
+
+{ volume::SSC1, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, "Gunther — I’m Not Givin’ Up My Daughter!"sv, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P2V1, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
 { volume::P2V1, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P2V1, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -243,9 +246,17 @@ constexpr std::array vol_2 = std::to_array<volume_definition>({
 { volume::P2V2, "Text/chapter01_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V2, "Text/chapter02.xhtml"sv, "application/xhtml+xml"sv, "Rosina and Harspiels"sv, true },
 { volume::P2V2, "Text/chapter03.xhtml"sv, "application/xhtml+xml"sv, "An Attendant’s Job"sv, true },
+
 { volume::P2V2, "Text/extra1.xhtml"sv, "application/xhtml+xml"sv, "The Attendant of an Apprentice Blue Shrine Maiden"sv, true },
 { volume::P2V2, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V2, "Text/extra1_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::SSC1, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Wilma — Servants of Sister Christine"sv, true },
+{ volume::SSC1, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/chapter4_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P2V2, "Text/chapter04.xhtml"sv, "application/xhtml+xml"sv, "The Italian Restaurant’s Interior Decoration"sv, true },
 { volume::P2V2, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V2, "Text/chapter04_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -316,7 +327,12 @@ constexpr std::array vol_2 = std::to_array<volume_definition>({
 { volume::P2V2, "Text/chapter18.xhtml"sv, "application/xhtml+xml"sv, "Off to Buy Winter Clothes"sv, true },
 { volume::P2V2, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V2, "Text/chapter18_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
-{ volume::FB2, "Text/side4.xhtml"sv, "application/xhtml+xml"sv, "Studying Literature and Picture Books"sv, true },
+
+{ volume::SSC1, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, "Tuuli — Studying Literature and Picture Books"sv, true },
+{ volume::SSC1, "Text/insert3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert3.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/chapter6_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
 { volume::P2V2, "Text/chapter19.xhtml"sv, "application/xhtml+xml"sv, "Butchering and Absence"sv, true },
 { volume::P2V2, "Text/extra2.xhtml"sv, "application/xhtml+xml"sv, "Apprentice Chef in the Temple"sv, true },
 { volume::P2V2, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "The End of Winter Preparations"sv, true },

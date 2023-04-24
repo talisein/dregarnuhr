@@ -52,8 +52,12 @@ namespace part_3_defs
 { volume::P3V1, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Adoption"sv, true },
 { volume::P3V1, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/chapter4_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
-{ volume::SSWN1, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
-{ volume::SSWN1, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "The Fated Baptism Ceremony"sv, true },
+
+{ volume::SSC1, "Text/chapter8.xhtml"sv, "application/xhtml+xml"sv, "Hartmut — That Fateful Ceremony"sv, true },
+{ volume::SSC1, "Text/insert4.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert4.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/chapter8_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
 { volume::P3V1, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, "Inauguration Ceremony"sv, true },
 { volume::SSTEASET, "text/content0002.xhtml"sv, "application/xhtml+xml"sv, "Tableware for the Temple"sv, true },
 { volume::P3V1, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, "Reunited at Last"sv, true },
@@ -74,6 +78,9 @@ namespace part_3_defs
 { volume::P3V1, "Text/chapter8.xhtml"sv, "application/xhtml+xml"sv, "Starbind Ceremony in the Lower City"sv, true },
 { volume::P3V1, "Text/insert4.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/chapter9.xhtml"sv, "application/xhtml+xml"sv, "The Archduke’s Castle"sv, true },
+{ volume::SSC1, "Text/chapter7.xhtml"sv, "application/xhtml+xml"sv, "Rihyarda — My New Lady"sv, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P3V1, "Text/chapter10.xhtml"sv, "application/xhtml+xml"sv, "Starbind Ceremony in the Noble’s Quarter"sv, true },
 { volume::P3V1, "Text/chapter11.xhtml"sv, "application/xhtml+xml"sv, "The Archduke and the Italian Restaurant"sv, true },
 { volume::P3V1, "Text/chapter12.xhtml"sv, "application/xhtml+xml"sv, "Making a Monastery"sv, true },
@@ -97,8 +104,9 @@ namespace part_3_defs
 { volume::P3V1, "Text/epilogue.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
 { volume::P3V1, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/epilogue_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
-{ volume::FB2, "Text/side5.xhtml"sv, "application/xhtml+xml"sv, "A Tea Party with My Older Sister"sv, true },
-{ volume::FB2, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
+{ volume::SSC1, "Text/chapter9.xhtml"sv, "application/xhtml+xml"sv, "Christel — A Tea Party with My Older Sister"sv, true },
+
 { volume::P3V1, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
 { volume::P3V1, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P3V1, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -182,6 +190,7 @@ namespace part_3_defs
 { volume::P3V2, "Text/extra2.xhtml"sv, "application/xhtml+xml"sv, "Hasse’s Orphans"sv, true },
 { volume::P3V2, "Text/chapter17.xhtml"sv, "application/xhtml+xml"sv, "My Winter Preparations"sv, true },
 { volume::P3V2, "Text/epilogue.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
+
 { volume::P3V2, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
 { volume::P3V2, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P3V2, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -266,7 +275,17 @@ constexpr std::array vol_3 = std::to_array<const volume_definition>({
 { volume::P3V3, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "The End of Spring Prayer"sv, true },
 { volume::P3V3, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V3, "Text/chapter20_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::SSC1, "Text/chapter11.xhtml"sv, "application/xhtml+xml"sv, "Eckhart — Travel Tales for Justus"sv, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P3V3, "Text/epilogue.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
+
+{ volume::SSC1, "Text/chapter10.xhtml"sv, "application/xhtml+xml"sv, "Lamprecht — Where My Path Leads"sv, true },
+{ volume::SSC1, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert5.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/chapter10_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
 { volume::P3V3, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
 { volume::P3V3, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P3V3, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -323,6 +342,13 @@ constexpr std::array vol_4 = std::to_array<const volume_definition>({
 { volume::P3V4, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, "Angelica’s Manablade"sv, true },
 { volume::P3V4, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V4, "Text/chapter6_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::SSC1, "Text/chapter12.xhtml"sv, "application/xhtml+xml"sv, "Wilfried — Time with My Siblings"sv, true },
+{ volume::SSC1, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert6.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/chapter12_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P3V4, "Text/chapter7.xhtml"sv, "application/xhtml+xml"sv, "Let’s Print More Stuff"sv, true },
 { volume::P3V4, "Text/chapter8.xhtml"sv, "application/xhtml+xml"sv, "Meeting with the Plantin Company"sv, true },
 { volume::P3V4, "Text/insert3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -423,7 +449,17 @@ constexpr std::array vol_5 = std::to_array<const volume_definition>({
 { volume::P3V5, "Text/chapter13.xhtml"sv, "application/xhtml+xml"sv, "Rescue"sv, true },
 { volume::P3V5, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V5, "Text/chapter13_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::SSC1, "Text/chapter13.xhtml"sv, "application/xhtml+xml"sv, "Cornelius — A Miserable Morning Full of Regret"sv, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P3V5, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "Grandfather on the Day of the Baptism"sv, true },
+
+{ volume::SSC1, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, "Cornelius — To Protect My Little Sister"sv, true },
+{ volume::SSC1, "Text/insert7.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert7.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/chapter14_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
 { volume::P3V5, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "In Place of My Older Sister"sv, true },
 { volume::P3V5, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V5, "Text/chapter16_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },

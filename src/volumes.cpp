@@ -14,6 +14,7 @@ namespace {
         {"9781718344648"sv, volume::FB2},
         {"9781718344655"sv, volume::FB3},
         {"9781718346734"sv, volume::RA1},
+        {"9781718346758"sv, volume::SSC1},
         {"9781718346017"sv, volume::P1V1},
         {"9781718346031"sv, volume::P1V2},
         {"9781718346055"sv, volume::P1V3},
@@ -65,10 +66,11 @@ namespace {
     };
 
     const std::map<std::string_view, volume> slug_map {
-        {"ascendance-of-a-bookworm-royal-academy-stories-first-year"sv, volume::RA1},
         {"ascendance-of-a-bookworm-fanbook-1"sv, volume::FB1},
         {"ascendance-of-a-bookworm-fanbook-2"sv, volume::FB2},
         {"ascendance-of-a-bookworm-fanbook-3"sv, volume::FB3},
+        {"ascendance-of-a-bookworm-royal-academy-stories-first-year"sv, volume::RA1},
+        {"ascendance-of-a-bookworm-short-story-collection-volume-1"sv, volume::SSC1},
         {"ascendance-of-a-bookworm"sv, volume::P1V1},
         {"ascendance-of-a-bookworm-volume-2"sv, volume::P1V2},
         {"ascendance-of-a-bookworm-part-1-volume-3"sv, volume::P1V3},
@@ -128,6 +130,7 @@ std::string_view to_string_view(volume vol)
         case volume::FB2:  return "FB2"sv;
         case volume::FB3:  return "FB3"sv;
         case volume::RA1:  return "RA1"sv;
+        case volume::SSC1:  return "SSC1"sv;
         case volume::MP1V1:  return "M1V1"sv;
         case volume::MP1V2:  return "M1V2"sv;
         case volume::MP1V3:  return "M1V3"sv;

@@ -44,6 +44,7 @@ enum class volume
     FB2,
     FB3,
     RA1,
+    SSC1,
     MP1V1,
     MP1V2,
     MP1V3,

@@ -47,10 +47,17 @@ namespace part_4_defs
 { volume::P4V1, "Text/insert1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/prologue_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter1.xhtml"sv, "application/xhtml+xml"sv, "Just Call Me Urashima Taro"sv, true },
+
 { volume::P4V1, "Text/chapter24.xhtml"sv, "application/xhtml+xml"sv, "Myne Awakes"sv, true },
 { volume::P4V1, "Text/insert10.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter24_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "Moving to the Castle"sv, true },
+
+{ volume::SSC1, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "Hirschur — Special Accommodations"sv, true },
+{ volume::SSC1, "Text/insert8.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert8.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P4V1, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Dinnertime"sv, true },
 { volume::P4V1, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter3_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -58,7 +65,6 @@ namespace part_4_defs
 
 { volume::FB3, "Text/45.xhtml"sv, "application/xhtml+xml"sv, "Yurgenschmidt Duchies"sv, true },
 { volume::FB3, "Images/Image45.jpg"sv, "image/jpeg"sv, std::nullopt, false },
-
 
 { volume::P4V1, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, "The Gifting Ceremony"sv, true },
 { volume::P4V1, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, "The Winter Playroom and Our Departure"sv, true },
@@ -160,6 +166,13 @@ namespace part_4_defs
 { volume::P4V2, "Text/insert1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V2, "Text/chapter2_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V2, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "I Want to Found the Library Committee"sv, true },
+
+{ volume::SSC1, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "Roderick — She Who Saved My Heart"sv, true },
+{ volume::SSC1, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert9.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/chapter16_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P4V2, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Preparing a Tea Party for Solange"sv, true },
 { volume::P4V2, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, "My First Tea Party at the Royal Academy"sv, true },
 { volume::P4V2, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -322,12 +335,21 @@ namespace part_4_defs
 { volume::P4V3, "Text/chapter22.xhtml"sv, "application/xhtml+xml"sv, "The Blessing at the Graduation Ceremony"sv, true },
 { volume::P4V3, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, "Year One: Complete"sv, true },
 { volume::RA1, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "Hannelore — Ehrenfest’s Books"sv, true },
-{ volume::RA1, "Text/prologue.xhtml"sv, "application/xhtml+xml"sv, "Solange — Prologue"sv, true },
 { volume::P4V3, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "Buying Information and the Mana Compression Lecture"sv, true },
+
+{ volume::SSC1, "Text/chapter17.xhtml"sv, "application/xhtml+xml"sv, "Philine — Coming Home from the Royal Academy"sv, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P4V3, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "Philine’s Family Circumstances"sv, true },
 { volume::P4V3, "Text/insert8.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V3, "Text/chapter16_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::RA1, "Text/prologue.xhtml"sv, "application/xhtml+xml"sv, "Solange — Prologue"sv, true },
+
 { volume::P4V3, "Text/chapter17.xhtml"sv, "application/xhtml+xml"sv, "Taking Konrad to the Temple"sv, true },
+
+{ volume::SSC1, "Text/chapter18.xhtml"sv, "application/xhtml+xml"sv, "Philine — My Knight in Shining Armor"sv, true },
+
 { volume::P4V3, "Text/chapter18.xhtml"sv, "application/xhtml+xml"sv, "The Book Fair and the Follow-Up Meeting"sv, true },
 { volume::P4V3, "Text/chapter19.xhtml"sv, "application/xhtml+xml"sv, "A Promise"sv, true },
 { volume::P4V3, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -387,9 +409,17 @@ namespace part_4_defs
 { volume::P4V4, "Text/insert1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V4, "Text/prologue_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V4, "Text/chapter1.xhtml"sv, "application/xhtml+xml"sv, "The Feast Celebrating Spring"sv, true },
-{ volume::SSWN2, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
-{ volume::SSWN2, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "Taking a New Step"sv, true },
+
+{ volume::SSC1, "Text/chapter19.xhtml"sv, "application/xhtml+xml"sv, "Charlotte — A New Step Forward"sv, true },
+{ volume::SSC1, "Text/insert10.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert10.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/chapter19_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P4V4, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "Meeting the Scholars"sv, true },
+
+{ volume::SSC1, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "Charlotte — My Task"sv, true },
+
 { volume::P4V4, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Life in the Temple"sv, true },
 { volume::P4V4, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V4, "Text/chapter3_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -476,6 +506,10 @@ namespace part_4_defs
 { volume::P4V5, "Text/prologue_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V5, "Text/chapter1.xhtml"sv, "application/xhtml+xml"sv, "Apprentices and the Temple"sv, true },
 { volume::P4V5, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "A Discussion with the Lower City"sv, true },
+
+{ volume::SSC1, "Text/chapter21.xhtml"sv, "application/xhtml+xml"sv, "Philine — I Serve Lady Rozemyne"sv, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P4V5, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Going to the Italian Restaurant"sv, true },
 { volume::P4V5, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Evolved Cooking"sv, true },
 { volume::P4V5, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -519,8 +553,24 @@ namespace part_4_defs
 { volume::P4V5, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
 { volume::P4V5, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P4V5, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::SSC1, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
+{ volume::SSC1, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Manga1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Images/Manga2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+
 { volume::P4V5, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P4V5, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::SSC1, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
+{ volume::SSC1, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/FrontMatter1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Images/FrontMatter2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
+{ volume::SSC1, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Bonus1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Images/Bonus2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+
 { volume::P4V5, "Text/signup.xhtml"sv, "application/xhtml+xml"sv, "About J-Novel Club"sv, true },
 { volume::P4V5, "Text/copyright.xhtml"sv, "application/xhtml+xml"sv, "Copyright"sv, true },
         });
