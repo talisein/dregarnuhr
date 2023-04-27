@@ -100,6 +100,33 @@ enum class chapter_uniqueness
     MULTIPLE
 };
 
+constexpr chapter_uniqueness
+get_uniqueness(chapter_type c) {
+    switch (c)
+    {
+        case TOC:
+        case NCX:
+        case MAP_EHRENFEST_CITY:
+        case MAP_EHRENFEST_DUCHY:
+        case MAP_YURGENSCHMIDT:
+        case MAP_RA_LIBRARY:
+        case SIGNUP:
+        case COPYRIGHT: return chapter_uniqueness::SINGLE;
+        case COVER:
+        case CHARACTERS:
+        case CHAPTER:
+        case IMAGE:
+        case STYLESHEET:
+        case MANGA:
+        case AFTERWORD:
+        case POLL:
+        case BONUS:
+        case AURELIA_FAMILY_TREE:
+        case FRONTMATTER: return chapter_uniqueness::MULTIPLE;
+    }
+    throw std::logic_error("Couldn't determine chapter uniqueness");
+}
+
 enum class omnibus
 {
     PART1,
@@ -131,7 +158,9 @@ struct volume_definition
 
     void print_id(std::ostream &os) const {
         auto pos = href.find_last_of('/');
-        os << vol << '-';
+        if (chapter_uniqueness::MULTIPLE == get_uniqueness(type)) {
+            os << vol << '-';
+        }
         if (pos == std::string_view::npos) {
             os << href;
         } else {
@@ -290,33 +319,6 @@ struct definition_view_t : public std::ranges::view_interface<definition_view_t<
 };
 
 using definition_span_view_t = definition_view_t<std::span<const volume_definition>>;
-
-constexpr chapter_uniqueness
-get_uniqueness(chapter_type c) {
-    switch (c)
-    {
-        case TOC:
-        case NCX:
-        case MAP_EHRENFEST_CITY:
-        case MAP_EHRENFEST_DUCHY:
-        case MAP_YURGENSCHMIDT:
-        case MAP_RA_LIBRARY:
-        case SIGNUP:
-        case COPYRIGHT: return chapter_uniqueness::SINGLE;
-        case COVER:
-        case CHARACTERS:
-        case CHAPTER:
-        case IMAGE:
-        case STYLESHEET:
-        case MANGA:
-        case AFTERWORD:
-        case POLL:
-        case BONUS:
-        case AURELIA_FAMILY_TREE:
-        case FRONTMATTER: return chapter_uniqueness::MULTIPLE;
-    }
-    throw std::logic_error("Couldn't determine chapter uniqueness");
-}
 
 std::ostream& operator<<(std::ostream& os, const volume_definition& v);
 

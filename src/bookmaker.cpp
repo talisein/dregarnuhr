@@ -18,7 +18,6 @@
 #include "outcome/utils.hpp"
 #include "outcome/try.hpp"
 #include "jpeg.h"
-#include "libxml++/validators/relaxngvalidator.h"
 #include "utils.h"
 
 namespace {
@@ -229,7 +228,7 @@ namespace epub
         root->set_namespace_declaration(base_root->get_namespace_uri(), base_root->get_namespace_prefix());
         for (auto base_child : base_root->get_children()) {
             if (base_child->get_name() == "spine") {
-                auto spine = dynamic_cast<xmlpp::Element*>(root->import_node(base_child, false));
+                auto spine = utils::as_element(root->import_node(base_child, false));
                 for (auto attr : base_child->get_first_child()->get_parent()->get_attributes()) {
                     if (attr->get_name() == "toc") {
                         OUTCOME_TRY(auto ncx_id, get_ncx_id());
@@ -269,7 +268,7 @@ namespace epub
                 }
             } else if (base_child->get_name() == "metadata") {
                 OUTCOME_TRY(const auto base_metadata, base_reader->get_metadata(f.get_doc()));
-                auto metadata_node = dynamic_cast<xmlpp::Element*>(root->import_node(base_metadata, true));
+                auto metadata_node = utils::as_element(root->import_node(base_metadata, true));
                 auto contributor = metadata_node->add_child_element("contributor", "dc");
                 contributor->set_attribute("id", "contributor01");
                 contributor->set_first_child_text("talisein");
@@ -277,7 +276,7 @@ namespace epub
                     const xmlpp::Element::PrefixNsMap ns_map {{"dc", "http://purl.org/dc/elements/1.1/"}};
                     xmlpp::Node::NodeSet set = metadata_node->find("dc:title", ns_map);
                     if (!set.empty()) {
-                        dynamic_cast<xmlpp::Element*>(set.front())->set_first_child_text(get_options()->title.value());
+                        utils::as_element(set.front())->set_first_child_text(get_options()->title.value());
                     } else {
                         log_error("Can't find the metadata title..?");
                     }
@@ -336,8 +335,8 @@ namespace epub
                     }
                 }
             } else if (base_child->get_name() == "guide") {
-                auto guide = dynamic_cast<xmlpp::Element*>(root->import_node(base_child, false));
-                for (const auto attr : dynamic_cast<const xmlpp::Element*>(base_child)->get_attributes()) {
+                auto guide = utils::as_element(root->import_node(base_child, false));
+                for (const auto attr : utils::as_element(base_child)->get_attributes()) {
                     guide->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
                 }
                 { auto text = guide->add_child_element("reference");
@@ -479,6 +478,7 @@ namespace epub
                     log_error("Incomplete read of omnibus cover: expected ", len, " not ", cover_stream.tellg());
                     return std::errc::resource_unavailable_try_again;
                 }
+
                 OUTCOME_TRY(writer.add(dst, std::span<const char>(buf.get(), len), get_options()->compression_level));
             } catch (std::system_error& e) {
                 return e.code();
@@ -547,20 +547,46 @@ namespace epub
                 doc.set_internal_subset(dtd->get_name(), dtd->get_external_id(), dtd->get_system_id());
                 for (const auto& src_root_child : src_root->get_children()) {
                     if (src_root_child->get_name() == "head") {
-                        nav_root->import_node(src_root_child, true);
+                        // Making the link to the stylesheet is currently
+                        // unnecessary. If not for the title being wrong, we
+                        // could just import the whole <head>...
+                        auto head = utils::import_attr(nav_root, utils::as_element(src_root_child));
+                        if (get_options()->title) {
+                            utils::import_children_except(head, src_root_child, {"title", "link"});
+                            auto title = head->add_child_element("title");
+                            title->add_child_text(get_options()->title.value());
+                        } else {
+                            utils::import_children_except(head, src_root_child, "link");
+                        }
+
+                        auto src_link = utils::as_element(src_root_child->get_first_child("link"));
+                        auto link = utils::import_attr_except(head, src_link, "href");
+                        // Find the stylesheet from the volume with this toc
+                        auto iter = std::ranges::find_if(definition, [vol = def.vol](auto&& def) {
+                            return vol == def.vol && def.get_chapter_type() == chapter_type::STYLESHEET;
+                        });
+
+                        link->set_attribute("href", utils::xstrcat("../../", to_string_view(def.vol), "/", iter->href));
                     } else if (src_root_child->get_name() == "body") {
-                        auto body = dynamic_cast<xmlpp::Element*>(nav_root->import_node(src_root_child, false));
+                        auto body = utils::as_element(nav_root->import_node(src_root_child, false));
                         for (const auto &src_iter : src_root_child->get_children()) {
                             if (src_iter->get_name() == "nav") {
-                                auto srcattr = dynamic_cast<xmlpp::Element*>(src_iter)->get_attribute("type", "epub");
+                                auto srcattr = utils::as_element(src_iter)->get_attribute("type", "epub");
                                 bool is_toc = srcattr->get_value() == "toc";
                                 if (is_toc) {
-                                    auto nav = dynamic_cast<xmlpp::Element*>(body->import_node(src_iter, false));
-                                    for (const auto &attr : dynamic_cast<xmlpp::Element*>(src_iter)->get_attributes()) {
+                                    auto nav = utils::as_element(body->import_node(src_iter, false));
+                                    for (const auto &attr : utils::as_element(src_iter)->get_attributes()) {
                                         nav->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
                                     }
-                                    make_toc(nav, dynamic_cast<xmlpp::Element*>(src_iter));
+                                    make_toc(nav, utils::as_element(src_iter));
                                     log_verbose("Made toc");
+                                } else if (utils::as_element(src_iter)->get_attribute("type", "epub")->get_value() == "landmarks") {
+                                    auto nav = utils::as_element(body->import_node(src_iter, false));
+                                    for (const auto &attr : utils::as_element(src_iter)->get_attributes()) {
+                                        nav->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+                                    }
+                                    make_landmarks(nav, utils::as_element(src_iter), utils::xstrcat("../../", to_string_view(def.vol), "/", def.href));
+                                    log_verbose("Made landmarks");
                                 } else {
                                     body->import_node(src_iter, true);
                                 }
@@ -599,6 +625,32 @@ namespace epub
 
     template<std::ranges::input_range R>
     void
+    book_writer<R>::make_landmarks(xmlpp::Element *nav, const xmlpp::Element* src_nav, const xmlpp::ustring& toc_path)
+    {
+        static const auto volume_map = get_volume_map();
+        auto h1 = nav->add_child_element("h1");
+        h1->add_child_text("Landmarks");
+        auto ol = nav->add_child_element("ol");
+        for (const auto& def : get_filtered_defs(definition, src_books, src_readers) |
+                 std::ranges::views::filter([](const definition_t::value_type& def){ return chapter_type::FRONTMATTER ==def.get_chapter_type(); }))
+        {
+            auto li = ol->add_child_element("li");
+            auto a = li->add_child_element("a");
+            a->set_attribute("type", "bodymatter", "epub");
+            a->set_attribute("href", utils::xstrcat("../../", to_string_view(def.vol), "/", def.href));
+            a->add_child_text("Color Images");
+            break;
+        }
+
+        auto li = ol->add_child_element("li");
+        auto a = li->add_child_element("a");
+        a->set_attribute("type", "toc", "epub");
+        a->set_attribute("href", toc_path);
+        a->add_child_text("Table of Contents");
+    }
+
+    template<std::ranges::input_range R>
+    void
     book_writer<R>::make_toc(xmlpp::Element *nav, const xmlpp::Element* src_nav)
     {
         static const auto volume_map = get_volume_map();
@@ -608,8 +660,8 @@ namespace epub
                 nav->import_node(child, true);
                 continue;
             }
-            auto root_ol = dynamic_cast<xmlpp::Element*>(nav->import_node(child, false));
-            for (const auto& attr : dynamic_cast<const xmlpp::Element*>(child)->get_attributes()) {
+            auto root_ol = utils::as_element(nav->import_node(child, false));
+            for (const auto& attr : utils::as_element(child)->get_attributes()) {
                 root_ol->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
             }
 
@@ -639,7 +691,7 @@ namespace epub
                 }
                 auto li = parent->add_child_element("li");
                 if (!set.empty() && def.vol == vol) {
-                    auto src_li = dynamic_cast<const xmlpp::Element*>(set.front()->get_parent());
+                    auto src_li = utils::as_element(set.front()->get_parent());
                     for (const auto &attr : src_li->get_attributes()) {
                         li->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
                     }

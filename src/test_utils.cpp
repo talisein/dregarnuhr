@@ -3,10 +3,10 @@
 
 #include <boost/ut.hpp>
 
-
 int main() {
     using namespace boost::ut;
     using namespace std::string_literals;
+    using namespace std::string_view_literals;
 
     "simple_int_cast"_test = [] {
         expect(1_c == utils::safe_int_cast<unsigned char>(1));
@@ -59,5 +59,117 @@ int main() {
         expect(utils::strcat(a,b,a,2,a,c) == "okay2works"s);
         expect(utils::strcat(a,b,2,a,c) == "okay2works"s);
 
+    };
+
+    "import attr"_test = [] {
+        xmlpp::Document doc { };
+        auto root = doc.create_root_node("root");
+        auto first = root->add_child_element("first");
+        first->set_attribute("one", "1");
+        first->set_attribute("two", "2");
+        auto next = root->add_child_element("next");
+        utils::import_attr(next, first);
+        expect(doc.write_to_string_formatted() == R"xml(<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <first one="1" two="2"/>
+  <next>
+    <first one="1" two="2"/>
+  </next>
+</root>
+)xml"s);
+    };
+
+    "import attr except many"_test = [] {
+        xmlpp::Document doc { };
+        auto root = doc.create_root_node("root");
+        auto first = root->add_child_element("first");
+        first->set_attribute("one", "1");
+        first->set_attribute("two", "2");
+        first->set_attribute("three", "3");
+        auto next = root->add_child_element("next");
+        utils::import_attr_except(next, first, {"two", "three"});
+        expect(doc.write_to_string_formatted() == R"xml(<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <first one="1" two="2" three="3"/>
+  <next>
+    <first one="1"/>
+  </next>
+</root>
+)xml"s);
+    };
+
+    "import attr except one"_test = [] {
+        xmlpp::Document doc { };
+        auto root = doc.create_root_node("root");
+        auto first = root->add_child_element("first");
+        first->set_attribute("one", "1");
+        first->set_attribute("two", "2");
+        auto next = root->add_child_element("next");
+        utils::import_attr_except(next, first, "two");
+        expect(doc.write_to_string_formatted() == R"xml(<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <first one="1" two="2"/>
+  <next>
+    <first one="1"/>
+  </next>
+</root>
+)xml"s);
+    };
+
+    "import child except many"_test = [] {
+        xmlpp::Document doc { };
+        auto root = doc.create_root_node("root");
+        auto first = root->add_child_element("first");
+        first->set_attribute("one", "1");
+        first->set_attribute("two", "2");
+        first->add_child_element("hello");
+        first->add_child_element("goodbye");
+        first->add_child_element("goodnight");
+        auto next = root->add_child_element("next");
+        auto first_copy = utils::import_attr_except(next, first, {"two", "three"});
+        utils::import_children_except(first_copy, first, {"hello", "goodnight"});
+        expect(doc.write_to_string_formatted() == R"xml(<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <first one="1" two="2">
+    <hello/>
+    <goodbye/>
+    <goodnight/>
+  </first>
+  <next>
+    <first one="1">
+      <goodbye/>
+    </first>
+  </next>
+</root>
+)xml"s);
+    };
+
+    "import child except one"_test = [] {
+        xmlpp::Document doc { };
+        auto root = doc.create_root_node("root");
+        auto first = root->add_child_element("first");
+        first->set_attribute("one", "1");
+        first->set_attribute("two", "2");
+        first->add_child_element("hello");
+        first->add_child_element("goodbye");
+        first->add_child_element("goodnight");
+        auto next = root->add_child_element("next");
+        auto first_copy = utils::import_attr_except(next, first, {"two", "three"});
+        utils::import_children_except(first_copy, first, "goodbye");
+        expect(doc.write_to_string_formatted() == R"xml(<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <first one="1" two="2">
+    <hello/>
+    <goodbye/>
+    <goodnight/>
+  </first>
+  <next>
+    <first one="1">
+      <hello/>
+      <goodnight/>
+    </first>
+  </next>
+</root>
+)xml"s);
     };
 }

@@ -4,12 +4,14 @@
 #include <ranges>
 #include <charconv>
 #include <numeric>
+#include <functional>
 #include <concepts>
 #include <algorithm>
 #include <stdexcept>
 #include <sstream>
 #include <string_view>
 #include <set>
+#include "libxml++/libxml++.h"
 #include "libxml++/ustring.h"
 #include "volumes.h"
 #include "log.h"
@@ -212,4 +214,72 @@ namespace utils
         return res;
     }
 
+    template<typename Node>
+    constexpr auto as_element(Node node) -> std::conditional_t<std::is_const_v<std::remove_pointer_t<Node>>, const xmlpp::Element*, xmlpp::Element*>
+    {
+        if constexpr (std::is_const_v<std::remove_pointer_t<Node>>) {
+            return dynamic_cast<const xmlpp::Element*>(node);
+        } else {
+            return dynamic_cast<xmlpp::Element*>(node);
+        }
+    }
+
+    inline auto import_attr(xmlpp::Node* p, const xmlpp::Element* src) -> xmlpp::Element*
+    {
+        auto elem = as_element(p->import_node(src, false));
+        for (auto&& attr : src->get_attributes()) {
+            elem->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+        }
+        return elem;
+    }
+
+    constexpr auto import_attr_except(xmlpp::Node* p, const xmlpp::Element* src, std::invocable<const xmlpp::Attribute*> auto&& func) -> xmlpp::Element*
+    {
+        auto elem = as_element(p->import_node(src, false));
+        for (auto&& attr : src->get_attributes() | std::views::filter(std::forward<decltype(func)>(func))) {
+            elem->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+        }
+        return elem;
+    }
+
+    constexpr auto import_attr_except(xmlpp::Node* p, const xmlpp::Element* src, std::initializer_list<std::string_view>&& list) -> xmlpp::Element*
+    {
+        return import_attr_except(p, src,
+            [list = std::move(list)](const xmlpp::Attribute* attr) -> bool
+            {
+                return std::ranges::end(list) == std::ranges::find_if(list, [name = attr->get_name()](auto&& list_elem) { return name == list_elem; });
+            });
+    }
+
+    constexpr auto import_attr_except(xmlpp::Node* p, const xmlpp::Element* src, std::string_view&& attribute_name) -> xmlpp::Element*
+    {
+        return import_attr_except(p, src,
+                                  [name = std::move(attribute_name)](const xmlpp::Attribute* attr) -> bool
+                                  {
+                                      return attr->get_name() != name;
+                                  });
+    }
+
+    constexpr auto import_children_except(xmlpp::Node* p, const xmlpp::Node* src, std::invocable<const xmlpp::ustring&> auto&& func) -> void
+    {
+        for (const auto &child : src->get_children()) {
+            if (std::invoke(func, child->get_name())) {
+                p->import_node(child, true);
+            }
+        }
+    }
+
+    constexpr auto import_children_except(xmlpp::Node* p, const xmlpp::Node* src, std::initializer_list<std::string_view> list) -> void
+    {
+        import_children_except(p, src, [list = std::move(list)](const xmlpp::ustring &name) {
+            return std::ranges::end(list) == std::ranges::find_if(list, [name](auto&& sv){ return name == sv; });
+        });
+    }
+
+    constexpr auto import_children_except(xmlpp::Node* p, const xmlpp::Node* src, std::string_view&& sv) -> void
+    {
+        import_children_except(p, src, [sv = std::move(sv)](const xmlpp::ustring &name) {
+            return name != sv;
+        });
+    }
 }
