@@ -174,9 +174,8 @@ img.cover {
 
 namespace epub
 {
-    template<std::ranges::input_range R>
     result<void>
-    book_writer<R>::start_book()
+    book_writer::start_book()
     {
         using namespace std::string_literals;
         static const std::string MIMETYPE { "mimetype"s };
@@ -195,13 +194,11 @@ namespace epub
         return outcome::success();
     }
 
-    template<std::ranges::input_range R>
     result<std::string>
-    book_writer<R>::get_ncx_id() const
+    book_writer::get_ncx_id() const
     {
-        auto defs = get_filtered_defs(definition, src_books, src_readers);
-        auto it = std::ranges::find(defs, NCX, &volume_definition::get_chapter_type);
-        if (defs.end() == it) {
+        auto it = std::ranges::find(definition, NCX, &volume_definition::get_chapter_type);
+        if (definition.end() == it) {
             log_error("No NCX found in volume definition");
             return std::errc::invalid_argument;
         } else {
@@ -209,9 +206,8 @@ namespace epub
         }
     }
 
-    template<std::ranges::input_range R>
     result<std::string>
-    book_writer<R>::create_rootfile()
+    book_writer::create_rootfile()
     {
         xmlpp::Document doc;
         xmlpp::ustring first_chapter_path;
@@ -244,7 +240,7 @@ namespace epub
                     auto itemref = spine->add_child_element("itemref");
                     itemref->set_attribute("idref", xmlpp::ustring(USER_COVER_XHTML_ID));
                 }
-                for (const auto &def : get_filtered_defs(definition, src_books, src_readers) | std::ranges::views::filter(&volume_definition::in_spine)) {
+                for (const auto &def : definition | std::views::filter(&volume_definition::in_spine)) {
                     auto itemref = spine->add_child_element("itemref");
                     itemref->set_attribute("idref", def.get_id());
                     auto src_book = src_books.find(def.vol);
@@ -300,7 +296,7 @@ namespace epub
                         item->set_attribute("href", xmlpp::ustring(USER_COVER_STYLESHEET_PATH));
                         item->set_attribute("media-type", "text/css"); }
                 }
-                for (const auto &def : get_filtered_defs(definition, src_books, src_readers)) {
+                for (const auto &def : definition) {
                     const auto src_book = src_books.find(def.vol);
                     auto item = manifest->add_child_element("item");
                     item->set_attribute("id", def.get_id());
@@ -359,22 +355,20 @@ namespace epub
         return doc.write_to_string_formatted();
     }
 
-    template<std::ranges::input_range R>
     result<void>
-    book_writer<R>::add_ncx()
+    book_writer::add_ncx()
     {
         const auto toc_fullpath = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1).append(base_book.manifest.toc_relpath);
         auto it = std::ranges::find(basefiles, toc_fullpath);
-        if (it == basefiles.end()) { log_error("Couldn't find toc in original? Basebook ", vol, "  Wasn't at ", toc_fullpath); return std::errc::no_such_file_or_directory; }
+        if (it == basefiles.end()) { log_error("Couldn't find toc in original? Basebook ", base_vol, "  Wasn't at ", toc_fullpath); return std::errc::no_such_file_or_directory; }
         basefiles.remove(toc_fullpath);
         OUTCOME_TRY(auto toc_buf, create_ncx(toc_fullpath));
         OUTCOME_TRY(writer.add(toc_fullpath, std::span<const char>(toc_buf), get_options()->compression_level));
         return outcome::success();
     }
 
-    template<std::ranges::input_range R>
     result<std::string>
-    book_writer<R>::create_ncx(const std::string& toc_fullpath)
+    book_writer::create_ncx(const std::string& toc_fullpath)
     {
         static const auto volume_map = get_volume_map();
         xmlpp::Document doc;
@@ -393,10 +387,9 @@ namespace epub
         }
         auto navmap = root->add_child_element("navMap");
 
-        auto make_nav_point = [vol = vol, point = int{1}](const auto &def, xmlpp::Element* parent,
-                                                  std::optional<xmlpp::ustring> label = std::nullopt,
-                                                  std::optional<xmlpp::ustring> href = std::nullopt)
-
+        auto make_nav_point = [point = int{1}](const auto &def, xmlpp::Element* parent,
+                                               std::optional<xmlpp::ustring> label = std::nullopt,
+                                               std::optional<xmlpp::ustring> href = std::nullopt)
             mutable -> xmlpp::Element*
         {
             auto res = parent->add_child_element("navPoint");
@@ -429,7 +422,7 @@ namespace epub
         volume current_volume = volume::FB1;
         xmlpp::Element *current_part_element = nullptr;
         xmlpp::Element *current_volume_element = nullptr;
-        for (const auto& def : get_filtered_defs(definition, src_books, src_readers)
+        for (const auto& def : definition
                  | std::ranges::views::filter([](const auto& def) { return def.toc_label.has_value(); })) {
             if (get_options()->do_nested && chapter_type::CHAPTER == def.get_chapter_type()) {
                 auto [part, volume] = volume_map.at(def);
@@ -454,9 +447,8 @@ namespace epub
         return doc.write_to_string_formatted();
     }
 
-    template<std::ranges::input_range R>
     result<void>
-    book_writer<R>::make_book_impl()
+    book_writer::make_book_impl()
     {
         OUTCOME_TRY(start_book());
         const auto root = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1);
@@ -491,7 +483,7 @@ namespace epub
             span = { USER_COVER_STYLESHEET_BODY.data(), USER_COVER_STYLESHEET_BODY.size() };
             OUTCOME_TRY(writer.add(dst, span, get_options()->compression_level));
         }
-        for (const volume_definition& def : get_filtered_defs(definition, src_books, src_readers))
+        for (const volume_definition& def : definition)
         {
             if (def.href == base_book.manifest.toc_relpath) {
                 OUTCOME_TRY(add_ncx());
@@ -604,7 +596,7 @@ namespace epub
             log_verbose("Copying ", src, " to ", dst);
             OUTCOME_TRY(writer.copy_from(src_reader->zip, src, dst));
             log_verbose("Copying ", src, " to ", dst, ": done");
-            if (def.vol == vol) {
+            if (def.vol == base_vol) {
                 auto res = basefiles.remove(src);
                 if (1 != res) [[unlikely]] {
                     log_error("Unexpectedly removed ", res, " sources named ", src);
@@ -616,30 +608,46 @@ namespace epub
             std::make_pair(volume::P2V4, "OEBPS/Text/extra8.xhtml"),
             std::make_pair(volume::P4V2, "OEBPS/Text/chapter21.xhtml")
         };
-        for (auto src : basefiles | std::ranges::views::filter([this](auto const &basefile) { return std::end(expected_leftovers) == std::ranges::find(expected_leftovers, std::make_pair(vol, basefile)); })) {
-            log_info("Warning: left over file in src ", to_string_view(vol), ": ", src);
+        for (auto src : basefiles | std::ranges::views::filter([this](auto const &basefile) { return std::end(expected_leftovers) == std::ranges::find(expected_leftovers, std::make_pair(base_vol, basefile)); })) {
+            log_info("Warning: left over file in src ", to_string_view(base_vol), ": ", src);
         }
         OUTCOME_TRY(writer.finish());
         return outcome::success();
     }
 
-    template<std::ranges::input_range R>
     void
-    book_writer<R>::make_landmarks(xmlpp::Element *nav, const xmlpp::Element* src_nav, const xmlpp::ustring& toc_path)
+    book_writer::make_landmarks(xmlpp::Element *nav, const xmlpp::Element* src_nav, const xmlpp::ustring& toc_path)
     {
         static const auto volume_map = get_volume_map();
         auto h1 = nav->add_child_element("h1");
         h1->add_child_text("Landmarks");
         auto ol = nav->add_child_element("ol");
-        for (const auto& def : get_filtered_defs(definition, src_books, src_readers) |
-                 std::ranges::views::filter([](const definition_t::value_type& def){ return chapter_type::FRONTMATTER ==def.get_chapter_type(); }))
+        if (auto frontmatter = std::ranges::find(definition, chapter_type::FRONTMATTER, &volume_definition::get_chapter_type);
+            frontmatter != std::ranges::end(definition))
+        {
+            auto li = ol->add_child_element("li");
+            auto a = li->add_child_element("a");
+            a->set_attribute("type", "frontmatter", "epub");
+            a->set_attribute("href", utils::xstrcat("../../", to_string_view(frontmatter->vol), "/", frontmatter->href));
+            a->add_child_text("Color Images");
+        }
+
+        if (auto chapter = std::ranges::find(definition, chapter_type::CHAPTER, &volume_definition::get_chapter_type);
+            chapter != std::ranges::end(definition))
         {
             auto li = ol->add_child_element("li");
             auto a = li->add_child_element("a");
             a->set_attribute("type", "bodymatter", "epub");
-            a->set_attribute("href", utils::xstrcat("../../", to_string_view(def.vol), "/", def.href));
-            a->add_child_text("Color Images");
-            break;
+            a->set_attribute("href", utils::xstrcat("../../", to_string_view(chapter->vol), "/", chapter->href));
+            a->add_child_text("Body");
+        }
+
+        if (get_options()->cover) {
+            auto li = ol->add_child_element("li");
+            auto a = li->add_child_element("a");
+            a->set_attribute("type", "cover", "epub");
+            a->set_attribute("href", utils::xstrcat("../../", USER_COVER_XHTML_PATH));
+            a->add_child_text("Cover");
         }
 
         auto li = ol->add_child_element("li");
@@ -649,9 +657,8 @@ namespace epub
         a->add_child_text("Table of Contents");
     }
 
-    template<std::ranges::input_range R>
     void
-    book_writer<R>::make_toc(xmlpp::Element *nav, const xmlpp::Element* src_nav)
+    book_writer::make_toc(xmlpp::Element *nav, const xmlpp::Element* src_nav)
     {
         static const auto volume_map = get_volume_map();
 
@@ -690,7 +697,7 @@ namespace epub
                     set = src_nav->find("html:ol/html:li/html:a[@href='"s + std::string(def.href.substr(def.href.find_last_of('/')+1)) + "']"s, ns_map);
                 }
                 auto li = parent->add_child_element("li");
-                if (!set.empty() && def.vol == vol) {
+                if (!set.empty() && def.vol == base_vol) {
                     auto src_li = utils::as_element(set.front()->get_parent());
                     for (const auto &attr : src_li->get_attributes()) {
                         li->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
@@ -731,7 +738,7 @@ namespace epub
             volume current_volume = volume::FB1;
             xmlpp::Element* current_part_ol = nullptr;
             xmlpp::Element* current_volume_ol = nullptr;
-            for (const auto& def : get_filtered_defs(definition, src_books, src_readers) | std::ranges::views::filter([](const definition_t::value_type& def){ return def.toc_label.has_value(); }) ) {
+            for (const auto& def : definition | std::ranges::views::filter([](const definition_t::value_type& def){ return def.toc_label.has_value(); }) ) {
                 if (get_options()->do_nested && chapter_type::CHAPTER == def.get_chapter_type()) {
                     auto [part, volume] = volume_map.at(def);
                     if (!current_part_ol || part != current_part) {
@@ -754,39 +761,39 @@ namespace epub
         }
     }
 
-    template<std::ranges::input_range R>
     result<fs::path>
-    book_writer<R>::make_book()
+    book_writer::make_book()
     {
         try {
             auto res = make_book_impl();
             if (res.has_failure()) {
-                cleanup_dangling(definition.name, filename);
+                cleanup_dangling(name, filename);
                 return res.as_failure();
             }
         } catch (std::system_error& e) {
-            cleanup_dangling(definition.name, filename);
+            cleanup_dangling(name, filename);
             log_error("make_book: ", e.what());
             return e.code();
         } catch (std::exception& e) {
-            cleanup_dangling(definition.name, filename);
+            cleanup_dangling(name, filename);
             log_error("make_book: ", e.what());
             return outcome::error_from_exception();
         }
         return filename;
     }
 
-    template<std::ranges::input_range R>
-    book_writer<R>::book_writer(volume base_volume,
-                                const books_t &books,
-                                const readers_t &readers,
-                                R def) :
-        vol(base_volume),
+    book_writer::book_writer(volume base_volume,
+                             const books_t &books,
+                             const readers_t &readers,
+                             std::variant<omnibus, volume> name,
+                             std::ranges::input_range auto&& definition) :
+        base_vol(base_volume),
         src_books(books),
         src_readers(readers),
-        base_book(src_books.find(vol)->second),
-        base_reader(src_readers.find(vol)->second),
-        definition(def),
+        base_book(src_books.find(base_vol)->second),
+        base_reader(src_readers.find(base_vol)->second),
+        name(name),
+        definition(std::ranges::begin(definition), std::ranges::end(definition)),
         filename(get_new_filename(base_reader->path)),
         writer(filename)
     {
@@ -813,31 +820,26 @@ namespace epub
             }
         }
 
-        auto x = std::views::filter(view,
-                                    [&](const auto &def) {
-                                        return src_books.contains(std::get<volume>(def.name));
-                                    });
-
-        if (std::ranges::empty(x)) {
+        if (std::ranges::none_of(view, [&](const auto &def) {
+            return src_books.contains(std::get<volume>(def.name));
+        })) {
             log_verbose("Info: No inputs to make ", base);
             return std::errc::no_such_file_or_directory;
         }
 
-
         try {
             auto res = std::visit(overloaded {
                         [&](omnibus o) -> result<fs::path> {
-
-                            auto base_volume = std::get<volume>(x.begin()->name);
-                            auto omnibus_def = utils::make_omnibus_def(std::views::join(x));
-                            auto omnibus_def_view = definition_view_t(std::views::all(omnibus_def), o);
-
-                            auto writer = book_writer<decltype(omnibus_def_view)>(base_volume, src_books, src_readers, omnibus_def_view);
+                            // x is a view of a list of (defs, volume_name) definiition_view_t
+                            auto omnibus_def = utils::make_omnibus_def(get_filtered_defs(std::views::join(view), src_books, src_readers));
+                            auto base_volume = omnibus_def.front().vol;
+                            auto writer = book_writer(base_volume, src_books, src_readers, o, omnibus_def);
                             return writer.make_book();
                         },
-                        [&](volume) -> result<fs::path> {
-                            auto base_volume = std::get<volume>(x.begin()->name);
-                            auto writer = book_writer<decltype(x.front())>(base_volume, src_books, src_readers, x.front());
+                            [&](volume v) -> result<fs::path> {
+                            // x is a filter(views::single) of a (defs, volume_name) definiition_view_t
+                            auto volume_def = get_filtered_defs(view.front(), src_books, src_readers);
+                            auto writer = book_writer(v, src_books, src_readers, v, volume_def);
                             return writer.make_book();
                         }
                 }, base);

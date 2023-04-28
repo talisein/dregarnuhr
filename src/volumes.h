@@ -314,8 +314,8 @@ struct definition_view_t : public std::ranges::view_interface<definition_view_t<
     R defs;
     std::variant<omnibus, volume> name;
 
-    constexpr auto begin() const { return defs.begin(); }
-    constexpr auto end() const { return defs.end(); }
+    constexpr auto begin() const { return std::ranges::cbegin(defs); }
+    constexpr auto end() const { return std::ranges::cend(defs); }
 };
 
 using definition_span_view_t = definition_view_t<std::span<const volume_definition>>;
