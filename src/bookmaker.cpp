@@ -358,10 +358,19 @@ namespace epub
     result<void>
     book_writer::add_ncx()
     {
-        const auto toc_fullpath = base_book.rootfile_path.substr(0, base_book.rootfile_path.find_first_of('/')+1).append(base_book.manifest.toc_relpath);
+        auto def_iter = std::ranges::find(definition, NCX, &volume_definition::get_chapter_type);
+        if (def_iter == std::ranges::end(definition)) {
+            log_error("Couldn't find ncx");
+            return std::errc::no_such_file_or_directory;
+        }
+        const auto& ncx_book = src_books.at(def_iter->vol);
+        const auto toc_fullpath =  ncx_book.rootfile_path.substr(0,  ncx_book.rootfile_path.find_first_of('/')+1).append( ncx_book.manifest.toc_relpath);
+
         auto it = std::ranges::find(basefiles, toc_fullpath);
-        if (it == basefiles.end()) { log_error("Couldn't find toc in original? Basebook ", base_vol, "  Wasn't at ", toc_fullpath); return std::errc::no_such_file_or_directory; }
-        basefiles.remove(toc_fullpath);
+        if (it != basefiles.end()) {
+            basefiles.remove(toc_fullpath);
+        }
+
         OUTCOME_TRY(auto toc_buf, create_ncx(toc_fullpath));
         OUTCOME_TRY(writer.add(toc_fullpath, std::span<const char>(toc_buf), get_options()->compression_level));
         return outcome::success();
@@ -832,6 +841,7 @@ namespace epub
                         [&](omnibus o) -> result<fs::path> {
                             // x is a view of a list of (defs, volume_name) definiition_view_t
                             auto omnibus_def = utils::make_omnibus_def(get_filtered_defs(std::views::join(view), src_books, src_readers));
+                            //auto first_chapter = std::ranges::find(omnibus_def, CHAPTER, &volume_definition::get_chapter_type);
                             auto base_volume = omnibus_def.front().vol;
                             auto writer = book_writer(base_volume, src_books, src_readers, o, omnibus_def);
                             return writer.make_book();

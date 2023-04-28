@@ -47,14 +47,14 @@ jobs:
 
       - name: Cache subprojects
         id: meson-cache
-
         uses: actions/cache@v3
         with:
           path: subprojects/packagecache
           key: meson-build-cache
           enableCrossOsArchive: true
 
-      - name: List cache
+      - if: ${{ steps.meson-cache.outputs.cache-hit == 'true' }}
+        name: List cache
         run: ls subprojects/packagecache
         continue-on-error: true
 
@@ -129,10 +129,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: subprojects/packagecache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
-          restore-keys: |
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          key: meson-build-cache
+          enableCrossOsArchive: true
 
       - name: List cache
         run: ls subprojects/packagecache
@@ -197,10 +195,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: subprojects/packagecache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
-          restore-keys: |
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          key: meson-build-cache
+          enableCrossOsArchive: true
 
       - name: List cache
         run: dir subprojects/packagecache

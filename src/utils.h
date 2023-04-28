@@ -18,36 +18,47 @@
 
 namespace utils
 {
-    struct filter_chapter_stylesheet
+    struct filter_unique_chapters
     {
-        bool operator()(const volume_definition& def) {
+        bool operator()(const volume_definition& def)
+        {
             const auto chapter_type = def.get_chapter_type();
-            if (get_uniqueness(chapter_type) == chapter_uniqueness::SINGLE ) {
+            if (get_uniqueness(chapter_type) == chapter_uniqueness::SINGLE) {
                 if (chap_set.contains(chapter_type)) {
-                    return true;
+                    return false;
                 } else {
                     chap_set.insert(chapter_type);
-                    return false;
-                }
-            } else {
-                if (chapter_type == STYLESHEET) {
-                    if (style_set.contains(def.vol)) {
-                        return true;
-                    } else {
-                        style_set.insert(def.vol);
-                        return false;
-                    }
-                } else {
-                    return false;
+                    return true;
                 }
             }
+            return true;
         }
+
     private:
         std::set<chapter_type> chap_set;
+    };
+
+    struct filter_stylesheets
+    {
+        bool operator()(const volume_definition& def)
+        {
+            const auto chapter_type = def.get_chapter_type();
+            if (chapter_type == STYLESHEET) {
+                if (style_set.contains(def.vol)) {
+                    return false;
+                } else {
+                    style_set.insert(def.vol);
+                    return true;
+                }
+            }
+            return true;
+        }
+
+    private:
         std::set<volume> style_set;
     };
 
-    struct foreach_label
+    struct deduplicate_label
     {
         void operator()(volume_definition &def)
         {
@@ -89,10 +100,41 @@ namespace utils
     make_omnibus_def(T&& view)
     {
         std::vector<volume_definition> res;
+        std::vector<volume_definition> workbook;
+        filter_unique_chapters unique_filter; /* Stateful filters shouldn't be in std::views::filter */
+        filter_stylesheets stylesheet_filter; /* Stateful filters shouldn't be in std::views::filter */
+        deduplicate_label label_deduplicator;
         res.reserve(std::ranges::distance(view));
-        std::ranges::remove_copy_if(view, std::back_inserter(res), utils::filter_chapter_stylesheet{});
+
+        /* Filter stylesheet */
+        for (const auto &def : view) {
+            if (stylesheet_filter(def))
+                res.push_back(def);
+        }
+
+        /* Apply the unique_filter in reverse order, store to temp vector. */
+        /* Note: views::reverse | views::filter | views::reverse doesn't work. */
+        workbook.reserve(res.size());
+        for (const auto& def : res | std::views::reverse) {
+            if (unique_filter(def))
+                workbook.push_back(def);
+        }
+
+        /* Now reverse the temp vector into our result vector. This dance is so
+         * our stable sort gives the right result. */
+        res.clear();
+        std::ranges::copy(workbook | std::views::reverse, std::back_inserter(res));
         std::ranges::stable_sort(res, std::ranges::less(), &volume_definition::type);
-        std::ranges::for_each(res, utils::foreach_label{});
+
+        /* TODO23: In the future this could be a std::view::adjacent<2>
+        for (auto&& view : res | std::views::reverse | std::views::adjacent<2>) {
+            if (std::get<0>(view).toc_label == std::get<1>(view).toc_label) {
+                std::get<0>(view).toc_label = std::nullopt;
+            }
+        }
+        */
+        std::ranges::for_each(res, std::ref(label_deduplicator));
+
         return res;
     }
 
