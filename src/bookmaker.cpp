@@ -21,6 +21,7 @@
 #include "utils.h"
 
 namespace {
+    using namespace std::literals;
     constexpr std::string_view USER_COVER_JPG_PATH {"Images/OverrideFrontCover.jpg"};
     constexpr std::string_view USER_COVER_XHTML_ID {"user_provided_cover.xhtml"};
     constexpr std::string_view USER_COVER_XHTML_PATH {"Text/OverrideFrontCover.xhtml"};
@@ -130,20 +131,60 @@ img.cover {
     }
 
 
-    std::filesystem::path get_new_filename(const std::filesystem::path& base) {
+    static std::filesystem::path
+    get_new_filename(const std::string& basename)
+    {
         int dups = 0;
         std::filesystem::path new_filename;
+
         do {
             std::string name;
             if (dups++ > 0) {
-                name = utils::strcat(get_options()->prefix, base.stem().string(), get_options()->suffix, " (", dups, ")", base.extension().string());
+                name = utils::strcat(basename, " (", dups, ")", ".epub");
             } else {
-                name = utils::strcat(get_options()->prefix, base.stem().string(), get_options()->suffix,                  base.extension().string());
+                name = utils::strcat(basename, ".epub");
             }
             new_filename.assign(get_options()->output_dir);
             new_filename.append(name);
         } while (std::filesystem::exists(new_filename));
         return new_filename;
+    }
+
+    static std::filesystem::path
+    get_new_filename(volume vol)
+    {
+        const auto v = to_string_view(vol);
+        std::string base = utils::strcat(get_options()->prefix,
+                                         get_options()->basename,
+                                         "-part-"sv,
+                                         v.substr(1,1),
+                                         "-volume-"sv,
+                                         v.substr(3,1),
+                                         get_options()->suffix);
+        return get_new_filename(base);
+    }
+
+    static std::filesystem::path
+    get_new_filename(omnibus omnibus)
+    {
+        std::string_view o;
+        switch (omnibus) {
+            case omnibus::PART1: o = "-part-1"sv; break;
+            case omnibus::PART2: o = "-part-2"sv; break;
+            case omnibus::PART3: o = "-part-3"sv; break;
+            case omnibus::PART4: o = "-part-4"sv; break;
+            case omnibus::PART5: o = "-part-5"sv; break;
+            case omnibus::ALL: break;
+        };
+
+        std::string base = utils::strcat(get_options()->prefix, get_options()->basename, o, get_options()->suffix);
+        return get_new_filename(base);
+    }
+
+    static std::filesystem::path
+    get_new_filename(const std::variant<omnibus, volume>& v)
+    {
+        return std::visit([]<typename T>(T&& arg) { return get_new_filename(std::forward<T>(arg)); }, v);
     }
 
     void cleanup_dangling(auto vol, const std::filesystem::path& filename) {
@@ -803,7 +844,7 @@ namespace epub
         base_reader(src_readers.find(base_vol)->second),
         name(name),
         definition(std::ranges::begin(definition), std::ranges::end(definition)),
-        filename(get_new_filename(base_reader->path)),
+        filename(get_new_filename(name)),
         writer(filename)
     {
         auto res = base_reader->zip.get_files();

@@ -50,8 +50,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: subprojects/packagecache
-          key: meson-build-cache
+          key: meson-build-cache-${{ runner.os }}-${{ github.run_id }}
           enableCrossOsArchive: true
+          restore-keys: |
+            meson-build-cache-${{ runner.os }}-
+            meson-build-cache-
+            meson-build-cache
 
       - if: ${{ steps.meson-cache.outputs.cache-hit == 'true' }}
         name: List cache
@@ -129,8 +133,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: subprojects/packagecache
-          key: meson-build-cache
+          key: meson-build-cache-${{ runner.os }}-${{ github.run_id }}
           enableCrossOsArchive: true
+          restore-keys: |
+            meson-build-cache-${{ runner.os }}-
+            meson-build-cache-
+            meson-build-cache
 
       - name: List cache
         run: ls subprojects/packagecache
@@ -195,8 +203,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: subprojects/packagecache
-          key: meson-build-cache
+          key: meson-build-cache-${{ runner.os }}-${{ github.run_id }}
           enableCrossOsArchive: true
+          restore-keys: |
+            meson-build-cache-${{ runner.os }}-
+            meson-build-cache-
+            meson-build-cache
 
       - name: List cache
         run: dir subprojects/packagecache

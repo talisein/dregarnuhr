@@ -29,10 +29,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: subprojects/packagecache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          key: meson-build-cache-${{ runner.os }}-${{ github.run_id }}
+          enableCrossOsArchive: true
           restore-keys: |
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+            meson-build-cache-${{ runner.os }}-
+            meson-build-cache-
 
       - name: Configure
         run: meson setup --buildtype release --default-library static --force-fallback-for libjpeg build-linux
@@ -95,10 +96,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: subprojects/packagecache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          key: meson-build-cache-${{ runner.os }}-${{ github.run_id }}
+          enableCrossOsArchive: true
           restore-keys: |
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+            meson-build-cache-${{ runner.os }}-
+            meson-build-cache-
 
       - name: Configure
         run: |
@@ -151,10 +153,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: subprojects/packagecache
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          key: meson-build-cache-${{ runner.os }}-${{ github.run_id }}
+          enableCrossOsArchive: true
           restore-keys: |
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+            meson-build-cache-${{ runner.os }}-
+            meson-build-cache-
 
       - name: Configure
         run: |

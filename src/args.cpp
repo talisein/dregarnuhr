@@ -20,14 +20,16 @@ const args* get_options() { return &options; }
 
 namespace {
     using namespace std::string_view_literals;
-    constinit std::string_view DEFAULT_PREFIX { "chronological-"sv };
-    constinit std::string_view DEFAULT_OMNIBUS_PART1_TITLE { "Ascendence of a Bookworm: Part 1 Chronological Omnibus"sv };
-    constinit std::string_view DEFAULT_OMNIBUS_PART2_TITLE { "Ascendence of a Bookworm: Part 2 Chronological Omnibus"sv };
-    constinit std::string_view DEFAULT_OMNIBUS_PART3_TITLE { "Ascendence of a Bookworm: Part 3 Chronological Omnibus"sv };
-    constinit std::string_view DEFAULT_OMNIBUS_PART4_TITLE { "Ascendence of a Bookworm: Part 4 Chronological Omnibus"sv };
-    constinit std::string_view DEFAULT_OMNIBUS_PART5_TITLE { "Ascendence of a Bookworm: Part 5 Chronological Omnibus"sv };
-    constinit std::string_view DEFAULT_OMNIBUS_TITLE { "Ascendence of a Bookworm: Chronological Omnibus"sv };
-    constinit mz_uint DEFAULT_COMPRESSION_LEVEL = MZ_DEFAULT_LEVEL;
+    constexpr std::string_view DEFAULT_PREFIX { "chronological-"sv };
+    constexpr std::string_view DEFAULT_BASENAME { "ascendence-of-a-bookworm"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_SUFFIX { "-omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_PART1_TITLE { "Ascendence of a Bookworm: Part 1 Chronological Omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_PART2_TITLE { "Ascendence of a Bookworm: Part 2 Chronological Omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_PART3_TITLE { "Ascendence of a Bookworm: Part 3 Chronological Omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_PART4_TITLE { "Ascendence of a Bookworm: Part 4 Chronological Omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_PART5_TITLE { "Ascendence of a Bookworm: Part 5 Chronological Omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_TITLE { "Ascendence of a Bookworm: Chronological Omnibus"sv };
+    constexpr mz_uint DEFAULT_COMPRESSION_LEVEL = MZ_DEFAULT_LEVEL;
 }
 
 namespace {
@@ -42,6 +44,7 @@ namespace {
                  "--cover=XXX.jpg\t: Add a custom cover image. Only for omnibus.\n"
                  "--prefix=XXX\t: Created filenames will be prefixed with XXX. The default is ", std::quoted(DEFAULT_PREFIX), "\n",
                  "--suffix=XXX\t: Created filenames will be suffixed with XXX. The default is blank.\n",
+                 "--basename=XXX\t: Created filenames will have a base name with XXX. The default is ", std::quoted(DEFAULT_BASENAME), "\n",
                  "--verbose\t: Print a lot of debugging information\n",
                  "--jpg-scale=N\t: Scale jpg images down by 1/N, where N is between 1-16\n",
                  "--jpg-quality=N\t: Low jpg quality to n, where N is between 1-100\n"
@@ -333,6 +336,19 @@ parse(int argc, char **argv)
         }
         log_info("Compression level set to ", *options.compression_level);
     }
+
+    if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--base="sv); }); it != args_options.end()) {
+        auto pos = it->find("="sv);
+        options.basename = it->substr(pos+1);
+        if (options.basename.size() == 0) {
+            log_error("Setting a blank basename is invalid");
+            return std::errc::invalid_argument;
+        }
+        log_info("Basename set to ", std::quoted(options.basename));
+    } else {
+        options.basename = DEFAULT_BASENAME;
+    }
+
     if (find (args_options, "--check"sv) != args_options.end()) {
         auto map = get_updated();
         if (map.size() > 0) {
@@ -353,6 +369,11 @@ parse(int argc, char **argv)
     if (!options.prefix && !options.suffix) {
         options.prefix = std::make_optional<std::string>(DEFAULT_PREFIX);
     }
+
+    if (options.omnibus_type && !options.suffix) {
+        options.suffix = std::make_optional<std::string>(DEFAULT_OMNIBUS_SUFFIX);
+    }
+
     if (!options.compression_level) {
         options.compression_level = DEFAULT_COMPRESSION_LEVEL;
     }
