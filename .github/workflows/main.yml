@@ -12,6 +12,8 @@ on:
     branches:
       - main
   pull_request:
+    branches:
+      - main
     types:
       - opened
       - edited
@@ -20,29 +22,63 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build-linux:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-22.04
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-12, windows-latest]
+        include:
+          - CC: gcc-12
+          - CXX: g++-12
+          - CC:
+            os: windows-latest
+          - CXX:
+            os: windows-latest
+          - DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+            os: macos-12
     permissions:
       actions: read
       contents: read
       security-events: write
     env:
-      CC: gcc-12
-      CXX: g++-12
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+      CC: ${{ matrix.CC }}
+      CXX: ${{ matrix.CXX }}
+      DEVELOPER_DIR: ${{ matrix.DEVELOPER_DIR }}
+    runs-on: ${{ matrix.os }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Install deps
+      - if: ${{ matrix.os == 'ubuntu-22.04' }}
+        name: Install deps ubuntu
         run: |
           sudo apt-get update
           sudo apt-get install meson g++-12 ninja-build libhowardhinnant-date-dev
 
-      - name: Initialize CodeQL
+      - if: ${{ matrix.os == 'macos-12' }}
+        name: Install deps mac
+        run: |
+          brew search gcc@
+          brew install meson gcc@12 ninja
+
+      - if: ${{ matrix.os == 'windows-latest' }}
+        name: Setup Python Windows
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - if: ${{ matrix.os == 'windows-latest' }}
+        name: Install Meson/Ninja Windows
+        run: pip install meson ninja
+
+      - if: ${{ matrix.os == 'windows-latest' }}
+        name: Prepare MSVC
+        uses: bus1/cabuild/action/msdevshell@v1
+        with:
+          architecture: x64
+
+      - if: ${{ matrix.os == 'ubuntu-22.04'}}
+        name: Initialize CodeQL
         uses: github/codeql-action/init@v2
 
       - name: Cache subprojects
@@ -57,236 +93,182 @@ jobs:
             meson-build-cache-
             meson-build-cache
 
-      - if: ${{ steps.meson-cache.outputs.cache-hit == 'true' }}
+      - if: ${{ (steps.meson-cache.outputs.cache-hit == 'true') && (matrix.os != 'windows-latest') }}
         name: List cache
         run: ls subprojects/packagecache
         continue-on-error: true
 
-      # Runs a set of commands using the runners shell
-      - name: Configure
-        run: meson setup  --warnlevel 3 --buildtype release --default-library static --force-fallback-for libjpeg build-linux
-
-      # Runs a set of commands using the runners shell
-      - name: Compile
-        run: ninja -C build-linux
-
-      - name: ldd
-        run: ldd build-linux/src/dregarnuhr
-        continue-on-error: true
-
-      # Tests
-      - name: Test
-        run: ninja -C build-linux test
-
-      - name: Save logs
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux-meson-log
-          path: |
-            build-linux/meson-logs/meson-log.txt
-            build-linux/meson-logs/testlog.txt
-          if-no-files-found: ignore
-          retention-days: 5
-
-      # Capture the binary
-      - name: Binary
-        uses: actions/upload-artifact@v3
-        with:
-          name: dregarnuhr-linux
-          path: build-linux/src/dregarnuhr
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-
-  build-mac:
-    # The type of runner that the job will run on
-    runs-on: macos-12
-    env:
-      CC: gcc-12
-      CXX: g++-12
-      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-      - name: Install deps
-        run: |
-          brew search gcc@
-          brew install meson gcc@12 ninja
-
-      - name: Check gcc
-        continue-on-error: true
-        run: |
-          which gcc
-          ls -l `which gcc`
-          which g++
-          ls -l `which g++`
-          which $CC
-          ls -l `which $CC`
-          which $CXX
-          ls -l `which $CXX`
-
-      - name: Cache subprojects
-        id: meson-cache
-        uses: actions/cache@v3
-        with:
-          path: subprojects/packagecache
-          key: meson-build-cache-${{ runner.os }}-${{ github.run_id }}
-          enableCrossOsArchive: true
-          restore-keys: |
-            meson-build-cache-${{ runner.os }}-
-            meson-build-cache-
-            meson-build-cache
-
-      - name: List cache
-        run: ls subprojects/packagecache
-        continue-on-error: true
-
-      # Runs a set of commands using the runners shell
-      - name: Configure
-        run: |
-          meson setup --warnlevel 3 --buildtype release --default-library static -Dcpp_link_args="-static-libstdc++ -static-libgcc" --force-fallback-for libjpeg build-mac
-
-      # Runs a set of commands using the runners shell
-      - name: Compile
-        run: ninja -C build-mac
-
-      - name: ldd
-        run: otool -L build-mac/src/dregarnuhr
-        continue-on-error: true
-
-      # Tests
-      - name: Test
-        run: ninja -C build-mac test
-
-      - name: Save logs
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: mac-meson-log
-          path: |
-            build-mac/meson-logs/meson-log.txt
-            build-mac/meson-logs/testlog.txt
-          if-no-files-found: ignore
-          retention-days: 5
-
-      # Capture the binary
-      - name: Binary
-        uses: actions/upload-artifact@v3
-        with:
-          name: dregarnuhr-macos
-          path: build-mac/src/dregarnuhr
-
-  build-win:
-    # The type of runner that the job will run on
-    runs-on: windows-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-      - run: pip install meson ninja
-
-      - name: Prepare MSVC
-        uses: bus1/cabuild/action/msdevshell@v1
-        with:
-          architecture: x64
-
-      - name: Cache subprojects
-        id: meson-cache
-        uses: actions/cache@v3
-        with:
-          path: subprojects/packagecache
-          key: meson-build-cache-${{ runner.os }}-${{ github.run_id }}
-          enableCrossOsArchive: true
-          restore-keys: |
-            meson-build-cache-${{ runner.os }}-
-            meson-build-cache-
-            meson-build-cache
-
-      - name: List cache
+      - if: ${{ (steps.meson-cache.outputs.cache-hit == 'true') && (matrix.os == 'windows-latest') }}
+        name: List cache
         run: dir subprojects/packagecache
         continue-on-error: true
 
-      # Runs a set of commands using the runners shell
-      - name: Configure
+      - if: ${{ matrix.os == 'ubuntu-22.04' }}
+        name: Configure Ubuntu 22
         run: |
-          meson setup  --warnlevel 3 --buildtype release -Dc_std=c17 -Dcpp_std=c++20 --default-library static -Dcpp_eh=a -Dlibxml2:warning_level=0 -Dminiz:warning_level=0 -Dlibjpeg-turbo:warning_level=0 -Dcpp-httplib:cpp-httplib_openssl=disabled --force-fallback-for zlib,liblzma,libxml2 build-win
+          meson setup  --warnlevel 3 --buildtype release --default-library static --force-fallback-for libjpeg build
 
-      # Runs a set of commands using the runners shell
+      - if: ${{ matrix.os == 'macos-12' }}
+        name: Configure MacOS 12
+        run: |
+          meson setup --warnlevel 3 --buildtype release --default-library static -Dcpp_link_args="-static-libstdc++ -static-libgcc" --force-fallback-for libjpeg build
+
+      - if: ${{ matrix.os == 'windows-latest' }}
+        name: Configure Windows Latest
+        run: |
+          meson setup  --warnlevel 3 --buildtype release -Dc_std=c17 -Dcpp_std=c++20 --default-library static -Dcpp_eh=a -Dlibxml2:warning_level=0 -Dminiz:warning_level=0 -Dlibjpeg-turbo:warning_level=0 -Dcpp-httplib:cpp-httplib_openssl=disabled --force-fallback-for zlib,liblzma,libxml2 build
+
       - name: Compile
-        run: ninja -C build-win
+        run: ninja -C build
 
-      - name: ldd
-        run: dumpbin /DEPENDENTS build-win/src/dregarnuhr.exe
+      - if: ${{ matrix.os == 'ubuntu-22.04' }}
+        name: ldd ubuntu
+        run: ldd build/src/dregarnuhr
         continue-on-error: true
 
-      # Tests
+      - if: ${{ matrix.os == 'macos-12' }}
+        name: ldd macos
+        run: otool -L build/src/dregarnuhr
+        continue-on-error: true
+
+      - if: ${{ matrix.os == 'macos-12' }}
+        name: ldd windows
+        run: dumpbin /DEPENDENTS build/src/dregarnuhr.exe
+        continue-on-error: true
+
       - name: Test
-        run: ninja -C build-win test
+        run: ninja -C build test
 
       - name: Save logs
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
-          name: win-meson-log
+          name: meson-log ${{ matrix.os }}
           path: |
-            build-win/meson-logs/meson-log.txt
-            build-win/meson-logs/testlog.txt
+            build/meson-logs/meson-log.txt
+            build/meson-logs/testlog.txt
           if-no-files-found: ignore
           retention-days: 5
 
       # Capture the binary
-      - name: Binary
+      - if: ${{ matrix.os != 'windows-latest' }}
+        name: Binary Ubuntu/Mac
         uses: actions/upload-artifact@v3
         with:
-          name: dregarnuhr-win
-          path: build-win/src/dregarnuhr.exe
+          name: dregarnuhr-${{ matrix.os }}
+          path: build/src/dregarnuhr
+
+      - if: ${{ matrix.os == 'windows-latest' }}
+        name: Binary Windows
+        uses: actions/upload-artifact@v3
+        with:
+          name: dregarnuhr-${{ matrix.os }}
+          path: build/src/dregarnuhr.exe
+
+      - if: ${{ matrix.os == 'ubuntu-22.04' }}
+        name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
 
   check-run-linux:
-    needs: build-linux
+    needs: build
     runs-on: ubuntu-22.04
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
       - run: |
-          chmod u+x dregarnuhr-linux/dregarnuhr
-          dregarnuhr-linux/dregarnuhr --check --verbose
+          chmod u+x dregarnuhr-ubuntu-22.04/dregarnuhr
+          dregarnuhr-ubuntu-22.04/dregarnuhr --check --verbose
 
   check-run-macos-11:
-    needs: build-mac
+    needs: build
     runs-on: macos-11
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
       - run: |
-          chmod u+x dregarnuhr-macos/dregarnuhr
-          dregarnuhr-macos/dregarnuhr --check --verbose
+          chmod u+x dregarnuhr-macos-12/dregarnuhr
+          dregarnuhr-macos-12/dregarnuhr --check --verbose
 
   check-run-macos-12:
-    needs: build-mac
+    needs: build
     runs-on: macos-12
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
       - run: |
-          chmod u+x dregarnuhr-macos/dregarnuhr
-          dregarnuhr-macos/dregarnuhr --check --verbose
+          chmod u+x dregarnuhr-macos-12/dregarnuhr
+          dregarnuhr-macos-12/dregarnuhr --check --verbose
 
   check-run-win:
-    needs: build-win
+    needs: build
     runs-on: windows-latest
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v3
 
-      - run: dregarnuhr-win/dregarnuhr.exe --check --verbose
+      - run: dregarnuhr-windows-latest/dregarnuhr.exe --check --verbose
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [check-run-linux, check-run-macos-11, check-run-macos-12, check-run-win]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+
+      - id: myref
+        env:
+          REF: ${{ github.event.ref }}
+        run: echo "::set-output name=MYREF::`echo $REF | tr -d refs/tags`"
+
+      - run: chmod u+x dregarnuhr-ubuntu-22.04/dregarnuhr
+      - run: tar -C ./dregarnuhr-ubuntu-22.04 -cJvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz" dregarnuhr
+      - run: chmod u+x dregarnuhr-macos-12/dregarnuhr
+      - run: tar -C ./dregarnuhr-macos-12 -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
+      - run: zip -j "./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}" dregarnuhr-windows-latest/dregarnuhr.exe
+
+      - name: Release Linux Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz
+          asset_name: dregarnuhr-ubuntu22.04-${{ steps.myref.outputs.MYREF }}.tar.xz
+          asset_content_type: application/x-xz
+
+      - name: Release Mac Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz
+          asset_name: dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Release Windows Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip
+          asset_name: dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip
+          asset_content_type: application/zip
