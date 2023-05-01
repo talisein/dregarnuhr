@@ -253,7 +253,6 @@ namespace epub
         xmlpp::Document doc;
         xmlpp::ustring first_chapter_path;
         xmlpp::ustring toc_path;
-        OUTCOME_TRY(const auto base_vol, identify_volume(base_book.manifest.toc.dtb_uid));
         OUTCOME_TRY(auto idx, base_reader->zip.locate_file(base_book.rootfile_path.c_str()));
         OUTCOME_TRY(epub::file_reader f, base_reader->zip.extract_stream(idx));
         auto base_root = f.get_doc()->get_root_node();
@@ -851,21 +850,20 @@ namespace epub
         if (res) {
             basefiles = std::move(res.value());
         } else {
-            std::system_error e(res.error());
-            throw e;
+            throw std::system_error(res.error());
         }
     }
 
     template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+    template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
     template<std::ranges::input_range R>
     result<void>
-    bookmaker::make_books_impl(R&& view, std::variant<omnibus, volume> base)
+    bookmaker::make_books_impl(R&& view, std::variant<omnibus, volume> book)
     {
-        if (std::holds_alternative<volume>(base)) {
-            auto basebook = src_books.find(std::get<volume>(base));
-            if (std::end(src_books) == basebook) {
-                log_verbose("Info: ", std::get<volume>(base), " unavailable, skipping.");
+        if (std::holds_alternative<volume>(book)) {
+            if (!src_books.contains(std::get<volume>(book))) {
+                log_verbose("Info: ", std::get<volume>(book), " unavailable, skipping.");
                 return std::errc::no_such_file_or_directory;
             }
         }
@@ -873,7 +871,7 @@ namespace epub
         if (std::ranges::none_of(view, [&](const auto &def) {
             return src_books.contains(std::get<volume>(def.name));
         })) {
-            log_verbose("Info: No inputs to make ", base);
+            log_verbose("Info: No inputs to make ", book);
             return std::errc::no_such_file_or_directory;
         }
 
@@ -893,19 +891,19 @@ namespace epub
                             auto writer = book_writer(v, src_books, src_readers, v, volume_def);
                             return writer.make_book();
                         }
-                }, base);
+                }, book);
             if (res.has_error()) {
-                std::visit([&](auto&& arg) { log_error("Couldn't make ", arg, ": ", res.error().message(), ". Moving on..."); }, base);
+                std::visit([&](auto&& arg) { log_error("Couldn't make ", arg, ": ", res.error().message(), ". Moving on..."); }, book);
                 return res.as_failure();
             } else {
-                std::visit([&](auto&& arg) { log_info("Created chronologically ordered ", arg, ": ", res.value() ); }, base);
+                std::visit([&](auto&& arg) { log_info("Created chronologically ordered ", arg, ": ", res.value() ); }, book);
                 return outcome::success();
             }
         } catch (std::system_error& e) {
-            std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg, ": ", e.what(), ". Moving on..."); }, base);
+            std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg, ": ", e.what(), ". Moving on..."); }, book);
             return e.code();
         } catch (std::exception& e) {
-            std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg, ": ", e.what(), ". Moving on..."); }, base);
+            std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg, ": ", e.what(), ". Moving on..."); }, book);
             return outcome::error_from_exception();
         }
     }

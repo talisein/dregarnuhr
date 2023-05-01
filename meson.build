@@ -75,11 +75,14 @@ libxmlpp_dep = dependency('libxml++-5.0',
 if not has_chrono
   # Fedora date-devel, Ubuntu libhowardhinnant-date-dev
   # Note: Only needed until GCC implements c++20 <chrono>. Maybe in 13?
-  date_dep = dependency('date',
+  date_dep = dependency('date', 'howardhinnant-date',
                         fallback: ['hinnant-date', 'date_dep'],
                         default_options: ['use_manual_tzdb=true'])
 endif
 
+boostut_dep = cpp_compiler.find_library('ut',
+                                      has_headers: ['boost/ut.h'],
+                                      required: false)
 boostut_dep = dependency('ut',
                          method: 'cmake',
                          modules: 'Boost::ut',

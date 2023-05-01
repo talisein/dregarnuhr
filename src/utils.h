@@ -302,7 +302,7 @@ namespace utils
                                   });
     }
 
-    constexpr auto import_children_except(xmlpp::Node* p, const xmlpp::Node* src, std::invocable<const xmlpp::ustring&> auto&& func) -> void
+    auto import_children_except(xmlpp::Node* p, const xmlpp::Node* src, std::invocable<const xmlpp::ustring&> auto&& func) -> void
     {
         for (const auto &child : src->get_children()) {
             if (std::invoke(func, child->get_name())) {

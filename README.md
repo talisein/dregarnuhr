@@ -2,6 +2,7 @@
 
 Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/talisein/dregarnuhr)
 [![CI](https://github.com/talisein/dregarnuhr/actions/workflows/main.yml/badge.svg)](https://github.com/talisein/dregarnuhr/actions/workflows/main.yml)
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/talisein/dregarnuhr/package/dregarnuhr/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/talisein/dregarnuhr/package/dregarnuhr/)
 
@@ -25,11 +26,23 @@ fetch [updates.json](http://aoabmonitor.talinet.net/updates.json) from the web.
 - Building from source
   - Meson
     - There is a meson wrap for all dependencies, so if you can install python,
-      meson, ninja, and gcc >= 12 you should be good to go.
-  - Ubuntu
-    - If you are building on Ubuntu and want to avoid unnecessary meson wrap
-      downloads, install these packages:
-    - `libhowardhinnant-date-dev libcpp-httplib-dev libxml2-dev libjpeg-turbo8-dev meson ninja-build`
+      meson, ninja, and gcc >= 12 or clang >= 16 you should be good to go.
+      ```
+      # git clone https://github.com/talisein/dregarnuhr.git
+      # cd dregarnuhr
+      # meson setup build
+      # meson compile -C build
+      # meson install -C build # optional, you could also run
+                               # build/src/dregarnuhr directly
+      ```
+  - Ubuntu PPA
+    - You can install the Ubuntu PPA:
+    ```
+    # sudo add-apt-repository ppa:talisein/miniz
+    # sudo add-apt-repository ppa:talisein/libxml++5.0
+    # sudo add-apt-repository ppa:talisein/dregarnuhr
+    # sudo apt-get install dregarnuhr
+    ```
   - Fedora
     - You can install the copr package:
     ```

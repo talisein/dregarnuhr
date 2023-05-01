@@ -45,10 +45,12 @@ exe = executable('dregarnuhr', src,
 test('Simple', exe, args: ['--check'])
 
 utils_test =  executable('utils_test', 'test_utils.cpp',
-                         dependencies: [boostut_dep, deps])
+                         dependencies: [boostut_dep, deps],
+                         cpp_args: ['-Wno-unknown-warning-option'])
 
 volumes_test =  executable('volumes_test', 'test_volumes.cpp', 'volumes.cpp',
-                           dependencies: [boostut_dep, deps])
+                           dependencies: [boostut_dep, deps],
+                           cpp_args: ['-Wno-unknown-warning-option'])
 
 test('utils', utils_test)
 test('volumes', volumes_test)
