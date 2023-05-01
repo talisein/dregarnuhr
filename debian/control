@@ -8,14 +8,14 @@ Build-Depends: debhelper-compat (= 13),
 	       cmake,
 	       zlib1g-dev,
 	       libjpeg-turbo8-dev,
-	       libctre-dev,
-	       libboost-ext-ut-dev (>= 1.1.9-4),
-	       libxml++5.0-dev,
-	       libminiz3-dev,
-	       liboutcome-dev,
 	       liblzma-dev,
 	       libhowardhinnant-date-dev,
-	       libcpp-httplib-dev
+	       libcpp-httplib-dev,
+	       libboost-ext-ut-dev (>= 1.1.9-4),
+	       liboutcome-dev,
+	       libctre-dev,
+	       libminiz3-dev,
+	       libxml++5.0-dev
 Standards-Version: 4.6.0
 Section: libs
 Homepage: https://github.com/talisein/dregarnuhr

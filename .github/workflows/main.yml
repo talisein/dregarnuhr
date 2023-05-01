@@ -44,6 +44,8 @@ jobs:
       CC: ${{ matrix.CC }}
       CXX: ${{ matrix.CXX }}
       DEVELOPER_DIR: ${{ matrix.DEVELOPER_DIR }}
+      DEBEMAIL: ${{ vars.DEBEMAIL }}
+      DEBFULLNAME: ${{ vars.DEBFULLNAME }}
     runs-on: ${{ matrix.os }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -150,6 +152,47 @@ jobs:
           if-no-files-found: ignore
           retention-days: 5
 
+      - if: ${{ matrix.os == 'ubuntu-22.04' }}
+        name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+      # Generate tarball for PPA
+      - if: ${{ matrix.os == 'ubuntu-22.04'  && startsWith(github.ref, 'refs/tags/v') }}
+        name: Get debuild dependencies
+        run: |
+          sudo add-apt-repository ppa:talisein/ctre
+          sudo add-apt-repository ppa:talisein/libboost-ext-ut
+          sudo add-apt-repository ppa:talisein/libxml++5.0
+          sudo add-apt-repository ppa:talisein/miniz
+          sudo add-apt-repository ppa:talisein/outcome
+          sudo apt-get update
+          sudo apt-get install cmake libcpp-httplib-dev libctre-dev libboost-ext-ut-dev libxml++5.0-dev libminiz3-dev liboutcome-dev debmake debhelper devscripts equivs distro-info-data distro-info dpkg-dev git-buildpackage
+
+      - if: ${{ matrix.os == 'ubuntu-22.04'  && startsWith(github.ref, 'refs/tags/v') }}
+        name: Generate PPA tarball
+        run: |
+          git config user.email "$DEBEMAIL"
+          git config user.name "$DEBFULLNAME"
+          gbp dch --ignore-branch -c -R --spawn-editor=never
+          meson dist -C build --no-tests --formats gztar
+          cd build/meson-dist
+          tar -xf dregarnuhr*.tar.gz
+
+      - if: ${{ matrix.os == 'ubuntu-22.04'  && startsWith(github.ref, 'refs/tags/v') }}
+        name: Publish PPA Snapshot
+        env:
+          LD_PRELOAD:
+          GPG_PRIVATE_KEY: ${{ secrets.PPA_PGP_SECRET_KEY }}
+          DEB_GPG_PASSPHRASE: ${{ secrets.PPA_PGP_PASSPHRASE }}
+          DEB_SIGN_KEYID: ${{ secrets.PPA_PGP_KEY_ID }}
+          REPOSITORY: ppa:talisein/dregarnuhr
+        run: |
+          cd build/meson-dist/dregarnuhr*/
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --import
+          debmake
+          debuild -S -p"gpg --batch --no-tty --status-fd 1 --with-colons --passphrase "$DEB_GPG_PASSPHRASE" --pinentry-mode loopback" --force-sign -sa
+          dput $REPOSITORY ../*.changes
+
       # Capture the binary
       - if: ${{ matrix.os != 'windows-latest' }}
         name: Binary Ubuntu/Mac
@@ -164,10 +207,6 @@ jobs:
         with:
           name: dregarnuhr-${{ matrix.os }}
           path: build/src/dregarnuhr.exe
-
-      - if: ${{ matrix.os == 'ubuntu-22.04' }}
-        name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
 
   check-run-linux:
     needs: build
