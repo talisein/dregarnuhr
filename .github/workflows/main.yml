@@ -131,7 +131,7 @@ jobs:
         run: otool -L build/src/dregarnuhr
         continue-on-error: true
 
-      - if: ${{ matrix.os == 'macos-12' }}
+      - if: ${{ matrix.os == 'windows-latest' }}
         name: ldd windows
         run: dumpbin /DEPENDENTS build/src/dregarnuhr.exe
         continue-on-error: true
