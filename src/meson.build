@@ -75,7 +75,9 @@ boost_ut_args = ['-Wall',
 test_cpp_args = []
 foreach arg : boost_ut_args
   if not cpp_compiler.has_argument(arg)
-    test_cpp_args = ['-Wno-unknown-warning-option']
+    if cpp_compiler.has_argument('-Wno-unknown-warning-option')
+      test_cpp_args = ['-Wno-unknown-warning-option']
+    endif
     break
   endif
 endforeach
