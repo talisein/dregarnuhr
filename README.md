@@ -20,48 +20,47 @@ This program leverages [aoab-monitor](https://github.com/talisein/aoab-monitor)
 to alert you if there are updates available for your epub files. FYI it will
 fetch [updates.json](http://aoabmonitor.talinet.net/updates.json) from the web.
 
-# Dependencies
+# Building
 
-- Running the Linux binary from Releases tab
-  - OpenSSL, libxml2, libicu, liblzma, zlib, libstdc++
+- Its easiest to just grab a binary from the
+  [releases](https://github.com/talisein/dregarnuhr/releases) page. There is a
+  download available for Linux, Mac, and Windows.
 - Building from source
   - Meson
     - There is a meson wrap for all dependencies, so if you can install python,
       meson, ninja, and gcc >= 12 or clang >= 16 you should be good to go.
-      ```
-      # git clone https://github.com/talisein/dregarnuhr.git
-      # cd dregarnuhr
-      # meson setup build
-      # meson compile -C build
-      # meson install -C build # optional, you could also run
-                               # build/src/dregarnuhr directly
-      ```
+   ```
+   # git clone https://github.com/talisein/dregarnuhr.git
+   # cd dregarnuhr
+   # meson setup build
+   # meson compile -C build
+   # sudo meson install -C build # optional, you could also run
+                                 # build/src/dregarnuhr directly
+   ```
   - Ubuntu PPA
     - You can install the Ubuntu PPA:
-    ```
-    # sudo add-apt-repository ppa:talisein/miniz
-    # sudo add-apt-repository ppa:talisein/libxml++5.0
-    # sudo add-apt-repository ppa:talisein/dregarnuhr
-    # sudo apt-get install dregarnuhr
-    ```
+   ```
+   # sudo add-apt-repository ppa:talisein/miniz
+   # sudo add-apt-repository ppa:talisein/libxml++5.0
+   # sudo add-apt-repository ppa:talisein/dregarnuhr
+   # sudo apt-get install dregarnuhr
+   ```
   - Fedora
     - You can install the copr package:
-    ```
-    # sudo dnf copr enable talisein/libxmlplusplus-5.0
-    # sudo dnf copr enable talisein/dregarnuhr
-    # sudo dnf install dregarnuhr
-    ```
+   ```
+   # sudo dnf copr enable talisein/libxmlplusplus-5.0
+   # sudo dnf copr enable talisein/dregarnuhr
+   # sudo dnf install dregarnuhr
+   ```
 
-# Building
+# Running
 
-Its easiest to just grab a binary from the
-[releases](https://github.com/talisein/dregarnuhr/releases) page. If you are
-interested in building:
+You need all of your epubs in a single directory. dregarnuhr will output new
+epubs in the directory provided as the second argument. You can use the `--help`
+option to set a different configuration.
 
 ```
-# meson setup build && ninja -C build
-# # Invoke with:
-# build/src/dregarnuhr ~/Documents/epub_in_dir ~/Documents/epub_out_dir
+# dregarnuhr ~/Documents/epub_in_dir/ ~/Documents/epub_out_dir/
 ```
 
 # Limitations (TODOs)
@@ -101,19 +100,19 @@ are about 3MiB large, a good improvement over the 30MiB originals.
 
 To create a single epub omnibus containing all your volumes:
 ```
-# dregarnuhr --omnibus --prefix=omnibus- ~/Documents/Myne out
+# dregarnuhr --omnibus ~/Documents/Myne out
 ```
 
 That creates a 650MiB file if you have everything from P1V1 to P4V7! If you want
 a 50MiB slim version:
 ```
-# dregarnuhr --omnibus --prefix=omnibus- --suffix=-slim --jpg-quality=75 --jpg-scale=2 "--filter=name=bonus[0-9].(jpg|xhtml)"   ~/Documents/Myne out
+# dregarnuhr --slim ~/Documents/Myne out
 ```
 
 You can add a custom cover image. It must be a JPEG. An example is in the
 covers/ directory of this repo. Custom covers are only for an omnibus.
 ```
-dregarnuhr --omnibus --cover=cover.jpg ~/Documents/Myne out
+dregarnuhr --slim --cover=path/to/cover.jpg ~/Documents/Myne out
 ```
 
 ## Other examples
