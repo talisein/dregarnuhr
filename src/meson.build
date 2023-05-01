@@ -44,13 +44,49 @@ exe = executable('dregarnuhr', src,
 
 test('Simple', exe, args: ['--check'])
 
+
+boost_ut_args = ['-Wall',
+                 '-Wextra',
+                 '-Werror',
+                 '-Wcast-align',
+                 '-Wcast-qual',
+                 '-Wdouble-promotion',
+                 '-Wduplicated-branches',
+                 '-Wduplicated-cond',
+                 '-Wlogical-op',
+                 '-Wmissing-declarations',
+                 '-Wmissing-include-dirs',
+                 '-Wnull-dereference',
+                 '-Wold-style-cast',
+                 '-Wpointer-arith',
+                 '-Wredundant-decls',
+                 '-Wsign-conversion',
+                 '-Wswitch-enum',
+                 '-Wtrampolines',
+                 '-Wunused-but-set-variable',
+                 '-Wunused-result',
+                 '-Wuseless-cast',
+                 '-Wzero-as-null-pointer-constant',
+                 '-Wno-undef',
+                 '-Wno-missing-declarations',
+                 '-Wno-sign-conversion',
+                 '-Wno-float-equal']
+
+test_cpp_args = []
+foreach arg : boost_ut_args
+  if not cpp_compiler.has_argument(arg)
+    test_cpp_args = ['-Wno-unknown-warning-option']
+    break
+  endif
+endforeach
+
 utils_test =  executable('utils_test', 'test_utils.cpp',
                          dependencies: [boostut_dep, deps],
-                         cpp_args: ['-Wno-unknown-warning-option'])
+                         cpp_args: test_cpp_args)
 
 volumes_test =  executable('volumes_test', 'test_volumes.cpp', 'volumes.cpp',
                            dependencies: [boostut_dep, deps],
-                           cpp_args: ['-Wno-unknown-warning-option'])
+                           cpp_args: test_cpp_args)
 
 test('utils', utils_test)
 test('volumes', volumes_test)

@@ -311,14 +311,14 @@ namespace utils
         }
     }
 
-    constexpr auto import_children_except(xmlpp::Node* p, const xmlpp::Node* src, std::initializer_list<std::string_view> list) -> void
+    inline auto import_children_except(xmlpp::Node* p, const xmlpp::Node* src, std::initializer_list<std::string_view> list) -> void
     {
         import_children_except(p, src, [list = std::move(list)](const xmlpp::ustring &name) {
             return std::ranges::end(list) == std::ranges::find_if(list, [name](auto&& sv){ return name == sv; });
         });
     }
 
-    constexpr auto import_children_except(xmlpp::Node* p, const xmlpp::Node* src, std::string_view&& sv) -> void
+    inline auto import_children_except(xmlpp::Node* p, const xmlpp::Node* src, std::string_view&& sv) -> void
     {
         import_children_except(p, src, [sv = std::move(sv)](const xmlpp::ustring &name) {
             return name != sv;

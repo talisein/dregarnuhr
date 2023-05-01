@@ -80,9 +80,6 @@ if not has_chrono
                         default_options: ['use_manual_tzdb=true'])
 endif
 
-boostut_dep = cpp_compiler.find_library('ut',
-                                      has_headers: ['boost/ut.h'],
-                                      required: false)
 boostut_dep = dependency('ut',
                          method: 'cmake',
                          modules: 'Boost::ut',
