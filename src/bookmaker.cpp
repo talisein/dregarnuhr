@@ -347,7 +347,7 @@ namespace epub
                     } else {
                         auto href { utils::xstrcat(to_string_view(def.vol), "/", def.href) };
                         item->set_attribute("href", href);
-                        if (first_chapter_path.empty() && chapter_type::CHAPTER == def.get_chapter_type()) {
+                        if (first_chapter_path.empty() && def.is_bodymatter()) {
                             first_chapter_path = href;
                         }
                         if (toc_path.empty() && chapter_type::TOC == def.get_chapter_type()) {
@@ -473,7 +473,7 @@ namespace epub
         xmlpp::Element *current_volume_element = nullptr;
         for (const auto& def : definition
                  | std::ranges::views::filter([](const auto& def) { return def.toc_label.has_value(); })) {
-            if (get_options()->do_nested && chapter_type::CHAPTER == def.get_chapter_type()) {
+            if (get_options()->do_nested && def.is_bodymatter()) {
                 auto [part, volume] = volume_map.at(def);
                 if (!current_part_element || part != current_part) {
                     current_part = part;
@@ -635,7 +635,7 @@ namespace epub
                         }
                     }
                 }
-                auto str = doc.write_to_string();
+                auto str = doc.write_to_string_formatted();
                 OUTCOME_TRY(writer.add(dst, std::span<const char>(str), get_options()->compression_level));
                 basefiles.remove(src);
                 continue;
@@ -667,7 +667,6 @@ namespace epub
     void
     book_writer::make_landmarks(xmlpp::Element *nav, const xmlpp::Element* src_nav, const xmlpp::ustring& toc_path)
     {
-        static const auto volume_map = get_volume_map();
         auto h1 = nav->add_child_element("h1");
         h1->add_child_text("Landmarks");
         auto ol = nav->add_child_element("ol");
@@ -788,7 +787,7 @@ namespace epub
             xmlpp::Element* current_part_ol = nullptr;
             xmlpp::Element* current_volume_ol = nullptr;
             for (const auto& def : definition | std::ranges::views::filter([](const definition_t::value_type& def){ return def.toc_label.has_value(); }) ) {
-                if (get_options()->do_nested && chapter_type::CHAPTER == def.get_chapter_type()) {
+                if (get_options()->do_nested && def.is_bodymatter()) {
                     auto [part, volume] = volume_map.at(def);
                     if (!current_part_ol || part != current_part) {
                         current_part = part;

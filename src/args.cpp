@@ -50,7 +50,7 @@ namespace {
                  "--jpg-quality=N\t: Low jpg quality to n, where N is between 1-100\n"
                  "--compression-level=[0-10,fastest,smallest]\t: Set compression level; only for generated files.\n"
                  "--no-nested\t: Skip created a nested NCX (table of contents) for omnibus outputs\n"
-                 "--slim\t: Set title, omnibus mode, jpg-scale and quality.\n"
+                 "--slim\t\t: Set title, omnibus mode, jpg-scale and quality.\n"
                  "--mode=dump\t: Dump spine and toc data. Give a path to an epub file instead of a directory. This is mostly for development."
             );
     }

@@ -76,16 +76,16 @@ enum chapter_type {
   NCX = 0,
   STYLESHEET,
   IMAGE,
-  COVER,
   FRONTMATTER,
-  CHARACTERS,
   TOC,
+  COVER,               /* Equivalent Comparison From Here */
+  CHARACTERS,
   CHAPTER,
   MAP_RA_LIBRARY,
+  AURELIA_FAMILY_TREE, /* ------------------------------- */
   MAP_EHRENFEST_CITY,
   MAP_EHRENFEST_DUCHY,
   MAP_YURGENSCHMIDT,
-  AURELIA_FAMILY_TREE,
   AFTERWORD,
   MANGA,
   POLL,
@@ -145,7 +145,19 @@ std::ostream& operator<<(std::ostream& os, volume v);
 std::ostream& operator<<(std::ostream& os, omnibus v);
 std::ostream& operator<<(std::ostream& os, const std::variant<omnibus, volume>& v);
 
+constexpr bool is_bodymatter(chapter_type chapter) noexcept
+{
+    /* Must update enum order */
+    for (const chapter_type c : std::initializer_list<chapter_type>{
+            COVER, CHARACTERS, CHAPTER, MAP_RA_LIBRARY, AURELIA_FAMILY_TREE})
+    {
+        if (c == chapter) {
+            return true;
+        }
+    }
 
+    return false;
+}
 
 struct volume_definition
 {
@@ -174,22 +186,31 @@ struct volume_definition
         return ss.str();
     }
 
-    constexpr chapter_type get_chapter_type() const { return type; };
-
-    constexpr inline friend bool operator==(const volume_definition& lhs, const volume_definition& rhs)
-    {
-        return lhs.get_chapter_type() == rhs.get_chapter_type();
+    constexpr bool is_bodymatter() const noexcept {
+        return ::is_bodymatter(type);
     }
-    constexpr inline friend std::strong_ordering operator<=>(const volume_definition& lhs, const volume_definition& rhs)
+
+    constexpr chapter_type get_chapter_type() const noexcept { return type; };
+
+    constexpr bool operator==(const volume_definition& other) const noexcept
     {
-        return lhs.get_chapter_type() <=> rhs.get_chapter_type();
+        return (type == other.get_chapter_type()) || (is_bodymatter() && other.is_bodymatter());
+    }
+
+    constexpr std::strong_ordering operator<=>(const volume_definition& other) const noexcept
+    {
+        if (is_bodymatter() && other.is_bodymatter())
+            return std::strong_ordering::equivalent;
+
+        return type <=> other.get_chapter_type();
     }
 
     constexpr chapter_type
     evaluate_chapter_type() const {
         constexpr auto cover_regex                     = ctre::search<"cover.xhtml">;
         constexpr auto frontmatter_regex               = ctre::search<"text/front", ctre::case_insensitive>;
-        constexpr auto chapter_regex                   = ctre::search<"(xhtml/p-[0-9]*.xhtml|cover.xhtml|text/character|chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", ctre::case_insensitive>;
+        constexpr auto chapter_regex                   = ctre::search<"(xhtml/p-[0-9]*.xhtml|chapter|prologue|epilogue|x[0-9_]*.xhtml|text/[0-9]*.xhtml|text/insert|extra|side|temple)", ctre::case_insensitive>;
+        constexpr auto chapter2_regex                  = ctre::search<"text/content[0-9]+.xhtml", ctre::case_insensitive>;
         // ehrenfest city is frontmatter3.xhtml
         constexpr auto map_ehrenfest_city_label_regex  = ctre::search<"Map of Ehrenfest", ctre::case_insensitive>; // can also use toc_label but this works for now
         constexpr auto map_ehrenfest_duchy_label_regex = ctre::search<"Map of Ehrenfest Duchy", ctre::case_insensitive>; // can also use toc_label but this works for now
@@ -209,7 +230,7 @@ struct volume_definition
         constexpr auto characters_regex                = ctre::search<"text/character", ctre::case_insensitive>;
         constexpr auto signup_regex                    = ctre::search<"text/signup", ctre::case_insensitive>;
 
-        if (image_regex(mediatype)) {
+        if (image_regex(mediatype)) { // for the .jpg
             return IMAGE;
         }
         if (ncx_regex(mediatype)) {
@@ -222,17 +243,16 @@ struct volume_definition
             return CHAPTER;
         }
         if (cover_regex(href)) {
-            return COVER; // after chapter, so actually they are classified as chapter for now
+            return COVER;
         }
 
         if (volume::FB3 == vol) { // must be before other maps
             if (map_ehrenfest_href_regex(href)) {
-                //return MAP_RA_LIBRARY;
-                return CHAPTER; // Treat the RA Library map as an insert image rather than a map
+                return MAP_RA_LIBRARY;
             }
         }
 
-        if (ctre::search<"text/content[0-9]+.xhtml", ctre::case_insensitive>(href)) {
+        if (chapter2_regex(href)) {
             return CHAPTER;
         }
 
@@ -284,7 +304,7 @@ struct volume_definition
             return TOC;
         }
         if (characters_regex(href)) {
-            return CHARACTERS; // after chapter, so actually they are classified as chapter for now
+            return CHARACTERS;
         }
         if (signup_regex(href)) {
             return SIGNUP;
@@ -321,6 +341,7 @@ struct definition_view_t : public std::ranges::view_interface<definition_view_t<
 using definition_span_view_t = definition_view_t<std::span<const volume_definition>>;
 
 std::ostream& operator<<(std::ostream& os, const volume_definition& v);
+std::ostream& operator<<(std::ostream& os, chapter_type c);
 
 volume get_volume_from_slug(std::string_view sv);
 std::string_view get_slug_from_volume(volume vol);

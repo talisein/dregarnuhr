@@ -124,15 +124,9 @@ namespace utils
          * our stable sort gives the right result. */
         res.clear();
         std::ranges::copy(workbook | std::views::reverse, std::back_inserter(res));
-        std::ranges::stable_sort(res, std::ranges::less(), &volume_definition::type);
+        std::ranges::stable_sort(res, std::ranges::less());
 
-        /* TODO23: In the future this could be a std::view::adjacent<2>
-        for (auto&& view : res | std::views::reverse | std::views::adjacent<2>) {
-            if (std::get<0>(view).toc_label == std::get<1>(view).toc_label) {
-                std::get<0>(view).toc_label = std::nullopt;
-            }
-        }
-        */
+        /* TODO23: In the future this could be a std::view::adjacent<2> */
         std::ranges::for_each(res, std::ref(label_deduplicator));
 
         return res;

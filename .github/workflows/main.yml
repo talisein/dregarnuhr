@@ -54,8 +54,11 @@ jobs:
       - if: ${{ matrix.os == 'ubuntu-22.04' }}
         name: Install deps ubuntu
         run: |
+          sudo add-apt-repository -n ppa:talisein/ctre
+          sudo add-apt-repository -n ppa:talisein/libboost-ext-ut
+          sudo add-apt-repository -n ppa:talisein/outcome
           sudo apt-get update
-          sudo apt-get install meson g++-12 ninja-build libhowardhinnant-date-dev
+          sudo apt-get install meson g++-12 ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev
 
       - if: ${{ matrix.os == 'macos-12' }}
         name: Install deps mac
@@ -160,11 +163,11 @@ jobs:
       - if: ${{ matrix.os == 'ubuntu-22.04'  && startsWith(github.ref, 'refs/tags/v') }}
         name: Get debuild dependencies
         run: |
-          sudo add-apt-repository ppa:talisein/ctre
-          sudo add-apt-repository ppa:talisein/libboost-ext-ut
-          sudo add-apt-repository ppa:talisein/libxml++5.0
-          sudo add-apt-repository ppa:talisein/miniz
-          sudo add-apt-repository ppa:talisein/outcome
+          sudo add-apt-repository -n ppa:talisein/ctre
+          sudo add-apt-repository -n ppa:talisein/libboost-ext-ut
+          sudo add-apt-repository -n ppa:talisein/outcome
+          sudo add-apt-repository -n ppa:talisein/libxml++5.0
+          sudo add-apt-repository -n ppa:talisein/miniz
           sudo apt-get update
           sudo apt-get install cmake libcpp-httplib-dev libctre-dev libboost-ext-ut-dev libxml++5.0-dev libminiz3-dev liboutcome-dev debmake debhelper devscripts equivs distro-info-data distro-info dpkg-dev git-buildpackage
 
