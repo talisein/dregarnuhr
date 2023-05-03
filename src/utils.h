@@ -260,6 +260,11 @@ namespace utils
         }
     }
 
+    inline auto to_element_filter() {
+        return std::views::transform([](const xmlpp::Node* node) { return as_element(node); }) |
+            std::views::filter([](const xmlpp::Element* element) { return nullptr != element; });
+    }
+
     inline auto import_attr(xmlpp::Node* p, const xmlpp::Element* src) -> xmlpp::Element*
     {
         auto elem = as_element(p->import_node(src, false));

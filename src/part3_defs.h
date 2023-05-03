@@ -110,7 +110,7 @@ namespace part_3_defs
 { volume::P3V1, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
 { volume::P3V1, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P3V1, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
-{ volume::P3V1, "Text/poll1.xhtml"sv, "application/xhtml+xml"sv, "The 1st Ascendance of a Bookworm Character Poll!"sv, true },
+{ volume::P3V1, "Text/poll1.xhtml"sv, "application/xhtml+xml"sv, "Character Poll"sv, true },
 { volume::P3V1, "Text/poll2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P3V1, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },

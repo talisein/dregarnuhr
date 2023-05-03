@@ -371,18 +371,28 @@ namespace epub
                     }
                 }
             } else if (base_child->get_name() == "guide") {
-                auto guide = utils::as_element(root->import_node(base_child, false));
-                for (const auto attr : utils::as_element(base_child)->get_attributes()) {
-                    guide->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
+                auto guide = utils::import_attr(root, utils::as_element(base_child));
+                auto add_ref = [&](const auto& type, const auto& title, auto&& href) {
+                    auto text = guide->add_child_element("reference");
+                    text->set_attribute("type", type);
+                    text->set_attribute("title", title);
+                    text->set_attribute("href", std::forward<decltype(href)>(href));
+                };
+                auto add_ref_to_first = [&](const auto &type, const auto& title, chapter_type chapter) {
+                    if (auto iter = std::ranges::find(definition, chapter, &volume_definition::get_chapter_type);
+                        iter != std::ranges::end(definition))
+                    {
+                        add_ref(type, title, utils::xstrcat(to_string_view(iter->vol), "/", iter->href));
+                    }
+                };
+                add_ref_to_first("text", "Text", chapter_type::CHAPTER);
+                add_ref("toc", "Table of Contents", toc_path);
+                add_ref_to_first("copyright-page", "Copyright", chapter_type::SIGNUP);
+                if (get_options()->cover) {
+                    add_ref("cover", "Cover", xmlpp::ustring(USER_COVER_XHTML_PATH));
+                } else {
+                    add_ref_to_first("cover", "Cover", chapter_type::COVER);
                 }
-                { auto text = guide->add_child_element("reference");
-                    text->set_attribute("type", "text");
-                    text->set_attribute("title", "Text");
-                    text->set_attribute("href", first_chapter_path); }
-                { auto text = guide->add_child_element("reference");
-                    text->set_attribute("type", "toc");
-                    text->set_attribute("title", "Table of Contents");
-                    text->set_attribute("href", toc_path); }
             } else {
                 auto x = dynamic_cast<const xmlpp::TextNode*>(base_child);
                 if (!x) {
@@ -610,7 +620,7 @@ namespace epub
                         link->set_attribute("href", utils::xstrcat("../../", to_string_view(def.vol), "/", iter->href));
                     } else if (src_root_child->get_name() == "body") {
                         auto body = utils::as_element(nav_root->import_node(src_root_child, false));
-                        for (const auto &src_iter : src_root_child->get_children()) {
+                        for (const auto src_iter : src_root_child->get_children()) {
                             if (src_iter->get_name() == "nav") {
                                 auto srcattr = utils::as_element(src_iter)->get_attribute("type", "epub");
                                 bool is_toc = srcattr->get_value() == "toc";
@@ -622,10 +632,7 @@ namespace epub
                                     make_toc(nav, utils::as_element(src_iter));
                                     log_verbose("Made toc");
                                 } else if (utils::as_element(src_iter)->get_attribute("type", "epub")->get_value() == "landmarks") {
-                                    auto nav = utils::as_element(body->import_node(src_iter, false));
-                                    for (const auto &attr : utils::as_element(src_iter)->get_attributes()) {
-                                        nav->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
-                                    }
+                                    auto nav = utils::import_attr(body, utils::as_element(src_iter));
                                     make_landmarks(nav, utils::as_element(src_iter), utils::xstrcat("../../", to_string_view(def.vol), "/", def.href));
                                     log_verbose("Made landmarks");
                                 } else {
@@ -670,39 +677,88 @@ namespace epub
         auto h1 = nav->add_child_element("h1");
         h1->add_child_text("Landmarks");
         auto ol = nav->add_child_element("ol");
-        if (auto frontmatter = std::ranges::find(definition, chapter_type::FRONTMATTER, &volume_definition::get_chapter_type);
-            frontmatter != std::ranges::end(definition))
-        {
-            auto li = ol->add_child_element("li");
-            auto a = li->add_child_element("a");
-            a->set_attribute("type", "frontmatter", "epub");
-            a->set_attribute("href", utils::xstrcat("../../", to_string_view(frontmatter->vol), "/", frontmatter->href));
-            a->add_child_text("Color Images");
-        }
 
-        if (auto chapter = std::ranges::find(definition, chapter_type::CHAPTER, &volume_definition::get_chapter_type);
-            chapter != std::ranges::end(definition))
-        {
+        auto add_landmark_path = [&](const auto& type, const auto& title, const auto& path) {
             auto li = ol->add_child_element("li");
             auto a = li->add_child_element("a");
-            a->set_attribute("type", "bodymatter", "epub");
-            a->set_attribute("href", utils::xstrcat("../../", to_string_view(chapter->vol), "/", chapter->href));
-            a->add_child_text("Body");
-        }
+            a->set_attribute("type", type, "epub");
+            a->set_attribute("href", path);
+            a->add_child_text("Color Images");
+        };
+
+        auto add_landmark = [&](const auto& type, const auto& title, const auto& def_iter) {
+            add_landmark_path(type, title, utils::xstrcat("../../", to_string_view(def_iter->vol), "/", def_iter->href));
+        };
+
+        auto add_landmark_to_first = [&](const auto& type, const auto& title, chapter_type chapter) {
+            if (auto iter = std::ranges::find(definition, chapter, &volume_definition::get_chapter_type);
+                iter != std::ranges::end(definition)) {
+                add_landmark(type, title, iter);
+            }
+        };
+
+        add_landmark_to_first("frontmatter", "Color Images", chapter_type::FRONTMATTER);
+
+        add_landmark_to_first("bodymatter", "Body", chapter_type::CHAPTER);
+
 
         if (get_options()->cover) {
-            auto li = ol->add_child_element("li");
-            auto a = li->add_child_element("a");
-            a->set_attribute("type", "cover", "epub");
-            a->set_attribute("href", utils::xstrcat("../../", USER_COVER_XHTML_PATH));
-            a->add_child_text("Cover");
+            add_landmark_path("cover", "Cover", utils::xstrcat("../../", USER_COVER_XHTML_PATH));
+        } else {
+            add_landmark_to_first("cover", "Cover", chapter_type::COVER);
         }
 
-        auto li = ol->add_child_element("li");
-        auto a = li->add_child_element("a");
-        a->set_attribute("type", "toc", "epub");
-        a->set_attribute("href", toc_path);
-        a->add_child_text("Table of Contents");
+        add_landmark_path("toc", "Table of Contents", toc_path);
+
+        bool marked_afterword = false;
+        bool marked_imprint = false;
+        bool marked_copyright = false;
+        if (auto it = std::ranges::find_first_of(definition,
+                                                 std::initializer_list<chapter_type>{
+                                                     chapter_type::MAP_EHRENFEST_CITY,
+                                                     chapter_type::MAP_EHRENFEST_DUCHY,
+                                                     chapter_type::MAP_YURGENSCHMIDT,
+                                                     chapter_type::AFTERWORD,
+                                                     chapter_type::MANGA,
+                                                     chapter_type::POLL,
+                                                     chapter_type::SIGNUP,
+                                                     chapter_type::COPYRIGHT,
+                                                 },
+                                                 std::ranges::equal_to{}, &volume_definition::get_chapter_type);
+            it != std::ranges::end(definition))
+        {
+            if (it->get_chapter_type() == chapter_type::AFTERWORD) {
+                add_landmark("backmatter afterword", "Backmatter", it);
+                marked_afterword = true;
+            } else if (it->get_chapter_type() == chapter_type::SIGNUP) {
+                add_landmark("backmatter imprint", "Backmatter", it);
+                marked_imprint = true;
+            } else if (it->get_chapter_type() == chapter_type::COPYRIGHT) {
+                add_landmark("backmatter copyright-page", "Backmatter", it);
+                marked_copyright = true;
+            } else {
+                add_landmark("backmatter", "Backmatter", it);
+            }
+        }
+
+        if (auto it = std::ranges::find(definition, chapter_type::AFTERWORD, &volume_definition::get_chapter_type);
+            !marked_afterword && it != std::ranges::end(definition))
+        {
+            add_landmark("afterword", "Afterword", it);
+        }
+
+        if (auto it = std::ranges::find(definition, chapter_type::SIGNUP, &volume_definition::get_chapter_type);
+            !marked_imprint && it != std::ranges::end(definition))
+        {
+            add_landmark("imprint", "Imprint", it);
+        }
+
+        if (auto it = std::ranges::find(definition, chapter_type::COPYRIGHT, &volume_definition::get_chapter_type);
+            !marked_copyright && it != std::ranges::end(definition))
+        {
+            add_landmark("copyright-page", "Copyright", it);
+        }
+
     }
 
     void
@@ -710,16 +766,13 @@ namespace epub
     {
         static const auto volume_map = get_volume_map();
 
-        for (const auto &child : src_nav->get_children()) {
+        for (const auto child : src_nav->get_children() | utils::to_element_filter()) {
             if (child->get_name() != "ol") {
                 nav->import_node(child, true);
                 continue;
             }
-            auto root_ol = utils::as_element(nav->import_node(child, false));
-            for (const auto& attr : utils::as_element(child)->get_attributes()) {
-                root_ol->set_attribute(attr->get_name(), attr->get_value(), attr->get_namespace_prefix());
-            }
 
+            auto root_ol = utils::import_attr(nav, child);
             // Insert cover here too
             if (get_options()->omnibus_type && get_options()->cover) {
                 auto li = root_ol->add_child_element("li");
@@ -756,7 +809,7 @@ namespace epub
                 }
                 auto a = li->add_child_element("a");
                 a->set_attribute("href", make_link(def));
-                if (get_options()->omnibus_type) {
+                if (get_options()->omnibus_type && def.is_bodymatter()) {
                     a->add_child_text(utils::xstrcat(to_string_view(def.vol), ": ", def.toc_label.value()));
                 } else {
                     a->add_child_text(xmlpp::ustring(def.toc_label.value()));

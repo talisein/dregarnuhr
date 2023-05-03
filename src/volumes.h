@@ -173,11 +173,22 @@ struct volume_definition
         if (chapter_uniqueness::MULTIPLE == get_uniqueness(type)) {
             os << vol << '-';
         }
+        std::string_view id;
         if (pos == std::string_view::npos) {
-            os << href;
+            id = href;
         } else {
-            os << href.substr(pos+1);
+            id = href.substr(pos+1);
         }
+
+        if (chapter_type::MAP_EHRENFEST_CITY == type) {
+            id = "city_map";
+        } else if (chapter_type::MAP_EHRENFEST_DUCHY == type) {
+            id = "duchy_map";
+        } else if (chapter_type::MAP_YURGENSCHMIDT == type) {
+            id = "country_map";
+        }
+
+        os << id;
     }
 
     std::string get_id() const {
