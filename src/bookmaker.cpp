@@ -111,7 +111,7 @@ img.cover {
             const auto& src_reader = src_readers.at(def.vol);
             const auto& src_book = src_books.at(def.vol);
             const auto root = src_book.rootfile_path.substr(0, src_book.rootfile_path.find_first_of('/')+1);
-            const auto src = utils::strcat(root, def.href);
+            const auto src = utils::strcat(root, to_string_view(def.vol), '/', def.href);
 
             if (get_options()->size_filter) {
                 const auto src_idx = src_reader->zip.locate_file(src.c_str()).value();
@@ -718,6 +718,7 @@ namespace epub
                                                      chapter_type::MAP_EHRENFEST_CITY,
                                                      chapter_type::MAP_EHRENFEST_DUCHY,
                                                      chapter_type::MAP_YURGENSCHMIDT,
+                                                     chapter_type::TABLE_YURGENSCHMIDT_DUCHIES,
                                                      chapter_type::AFTERWORD,
                                                      chapter_type::MANGA,
                                                      chapter_type::POLL,

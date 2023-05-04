@@ -86,6 +86,7 @@ enum chapter_type {
   MAP_EHRENFEST_CITY,
   MAP_EHRENFEST_DUCHY,
   MAP_YURGENSCHMIDT,
+  TABLE_YURGENSCHMIDT_DUCHIES,
   AFTERWORD,
   MANGA,
   POLL,
@@ -110,6 +111,7 @@ get_uniqueness(chapter_type c) {
         case MAP_EHRENFEST_DUCHY:
         case MAP_YURGENSCHMIDT:
         case MAP_RA_LIBRARY:
+        case TABLE_YURGENSCHMIDT_DUCHIES:
         case SIGNUP:
         case COPYRIGHT: return chapter_uniqueness::SINGLE;
         case COVER:
@@ -250,17 +252,19 @@ struct volume_definition
         if (stylesheet_regex(mediatype)) {
             return STYLESHEET;
         }
+        if (volume::FB3 == vol) { // must be before other maps
+            if (map_ehrenfest_href_regex(href)) {
+                return MAP_RA_LIBRARY;
+            }
+            if (toc_label && *toc_label == "Yurgenschmidt Duchies") {
+                return TABLE_YURGENSCHMIDT_DUCHIES;
+            }
+        }
         if (chapter_regex(href)) {
             return CHAPTER;
         }
         if (cover_regex(href)) {
             return COVER;
-        }
-
-        if (volume::FB3 == vol) { // must be before other maps
-            if (map_ehrenfest_href_regex(href)) {
-                return MAP_RA_LIBRARY;
-            }
         }
 
         if (chapter2_regex(href)) {

@@ -177,7 +177,7 @@ parse(int argc, char **argv)
             options.cover = path;
             log_info("Defaulted cover to ", path);
         }
-        options.name_filter = std::make_optional<std::regex>("(bonus[0-9]|frontmatter[0-9]).(jpg|xhtml)"s, std::regex_constants::icase);
+        options.name_filter = std::make_optional<std::regex>("(bonus[0-9]|frontmatter[1-2]).(jpg|xhtml)"s, std::regex_constants::icase);
     }
 
     if (auto it = find_if (args_options, [](const auto& opt){ return opt.starts_with("--suffix="sv); }); it != args_options.end()) {

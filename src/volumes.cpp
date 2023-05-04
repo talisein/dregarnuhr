@@ -228,6 +228,7 @@ std::ostream& operator<<(std::ostream& os, chapter_type c)
         case MAP_EHRENFEST_CITY: os << "MAP_EHRENFEST_CITY"; break;
         case MAP_EHRENFEST_DUCHY: os << "MAP_EHRENFEST_DUCHY"; break;
         case MAP_YURGENSCHMIDT: os << "MAP_YURGENSCHMIDT"; break;
+        case TABLE_YURGENSCHMIDT_DUCHIES: os << "TABLE_YURGENSCHMIDT_DUCHIES"; break;
         case AURELIA_FAMILY_TREE: os << "AURELIA_FAMILY_TREE"; break;
         case AFTERWORD: os << "AFTERWORD"; break;
         case MANGA: os << "MANGA"; break;
