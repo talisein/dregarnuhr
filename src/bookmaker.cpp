@@ -650,7 +650,10 @@ namespace epub
 
             // No special case, just copy it.
             log_verbose("Copying ", src, " to ", dst);
-            OUTCOME_TRY(writer.copy_from(src_reader->zip, src, dst));
+            if (auto res = writer.copy_from(src_reader->zip, src, dst); !res) {
+                log_error("Failed to copy ", to_string_view(def.vol), ":", src, ": ", res.error());
+                return res;
+            }
             log_verbose("Copying ", src, " to ", dst, ": done");
             if (def.vol == base_vol) {
                 auto res = basefiles.remove(src);
@@ -946,17 +949,24 @@ namespace epub
                         }
                 }, book);
             if (res.has_error()) {
-                std::visit([&](auto&& arg) { log_error("Couldn't make ", arg, ": ", res.error().message(), ". Moving on..."); }, book);
+                std::visit(overloaded {
+                        [&](omnibus o) {
+                            log_error("Couldn't make omnibus ", o, ": ", res.error().message());
+                        },
+                        [&](volume v) {
+                            log_error("Couldn't make ", v, ": ", res.error().message(), ". Moving on...");
+                        }
+                }, book);
                 return res.as_failure();
             } else {
                 std::visit([&](auto&& arg) { log_info("Created chronologically ordered ", arg, ": ", res.value() ); }, book);
                 return outcome::success();
             }
         } catch (std::system_error& e) {
-            std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg, ": ", e.what(), ". Moving on..."); }, book);
+            std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg, ": ", e.what()); }, book);
             return e.code();
-        } catch (std::exception& e) {
-            std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg, ": ", e.what(), ". Moving on..."); }, book);
+        } catch (...) {
+            std::visit([&](auto&& arg) { log_error("Couldn't make writer for ", arg); }, book);
             return outcome::error_from_exception();
         }
     }
@@ -968,27 +978,15 @@ namespace epub
 
         if (get_options()->omnibus_type) {
             auto defs = get_definition_view(get_options()->omnibus_type.value());
-            auto res = make_books_impl(std::move(defs), *get_options()->omnibus_type);
-            if (res) {
-                ++created_books;
-            } else {
-                log_info(res.error());
-            }
+            OUTCOME_TRY(make_books_impl(std::move(defs), *get_options()->omnibus_type));
+            ++created_books;
         } else {
             for (volume defined_volume : defined_volumes) {
-                auto res = make_books_impl(get_definition_view(defined_volume), defined_volume);
-                if (res) {
-                    ++created_books;
-                } else {
-                    log_error("Got error ", res.error(), ". Stopping.");
-                    break;
-                }
+                OUTCOME_TRY(make_books_impl(get_definition_view(defined_volume), defined_volume));
             }
         }
-        if (0 == created_books) {
-            log_info("Sorry, no books could be created.");
-            return std::errc::no_such_file_or_directory;
-        }
+
+        log_info("Created ", created_books, " new books.");
         return outcome::success();
     }
 

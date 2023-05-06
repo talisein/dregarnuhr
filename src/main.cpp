@@ -161,13 +161,12 @@ int main(int argc, char* argv[])
         auto res = print_books(get_options()->input_dir);
 
         if (res.has_error()) {
-            log_error("Failed to make books: ", res.error());
             if (get_options()->output_created) {
                 std::error_code ec;
                 if (std::filesystem::is_empty(get_options()->output_dir, ec) && !ec) {
-                    log_verbose("No ebooks created successfully. Cleaning up created directory.");
+                    log_verbose("No ebooks created. Cleaning up created empty directory.");
                     fs::remove(get_options()->output_dir, ec);
-                    if (ec) {
+                    if (ec != std::error_code{}) {
                         log_error("unable to delete empty output directory ", get_options()->output_dir, ": ", ec);
                     }
                 }
