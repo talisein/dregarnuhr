@@ -68,7 +68,8 @@ enum class volume
     SSDRAMACD3,  // Hartmut @ Name Swearing P4V7
     SSDRAMACD4,  // Ferdinand Hair Stick P4V9
     SSTOBBONUS1, // Raimund P4V6
-    SSUP1        // Anastasius/Hannelore P5V1
+    SSUP1,       // Anastasius/Hannelore P5V1
+    SSUFTSS1,    // Unofficial Fan Translated Side Stories (compilation of above)
 };
 
 // The order here determines the sort order
@@ -88,6 +89,8 @@ enum chapter_type {
   MAP_YURGENSCHMIDT,
   TABLE_YURGENSCHMIDT_DUCHIES,
   AFTERWORD,
+  RECORDING_REPORT,
+  TOBOOKS_MANGA,
   MANGA,
   POLL,
   BONUS,
@@ -120,7 +123,9 @@ get_uniqueness(chapter_type c) {
         case IMAGE:
         case STYLESHEET:
         case MANGA:
+        case TOBOOKS_MANGA:
         case AFTERWORD:
+        case RECORDING_REPORT:
         case POLL:
         case BONUS:
         case AURELIA_FAMILY_TREE:
@@ -139,7 +144,6 @@ enum class omnibus
     ALL
 };
 
-OUTCOME_V2_NAMESPACE::result<volume> identify_volume(std::string_view uid);
 std::string_view to_string_view(volume vol);
 std::string_view to_string_view(omnibus vol);
 
@@ -188,6 +192,8 @@ struct volume_definition
             id = "duchy_map";
         } else if (chapter_type::MAP_YURGENSCHMIDT == type) {
             id = "country_map";
+        } else if (chapter_type::TABLE_YURGENSCHMIDT_DUCHIES == type) {
+            id = "duchies_table";
         }
 
         os << id;
@@ -244,85 +250,102 @@ struct volume_definition
         constexpr auto signup_regex                    = ctre::search<"text/signup", ctre::case_insensitive>;
 
         if (image_regex(mediatype)) { // for the .jpg
-            return IMAGE;
+            return chapter_type::IMAGE;
         }
         if (ncx_regex(mediatype)) {
-            return NCX;
+            return chapter_type::NCX;
         }
         if (stylesheet_regex(mediatype)) {
-            return STYLESHEET;
+            return chapter_type::STYLESHEET;
         }
         if (volume::FB3 == vol) { // must be before other maps
             if (map_ehrenfest_href_regex(href)) {
-                return MAP_RA_LIBRARY;
+                return chapter_type::MAP_RA_LIBRARY;
             }
             if (toc_label && *toc_label == "Yurgenschmidt Duchies") {
-                return TABLE_YURGENSCHMIDT_DUCHIES;
+                return chapter_type::TABLE_YURGENSCHMIDT_DUCHIES;
             }
         }
-        if (chapter_regex(href)) {
-            return CHAPTER;
+
+        if (volume::SSUFTSS1 == vol) {
+            if (ctre::search<"/1.xhtml">(href))
+                return chapter_type::FRONTMATTER;
+            if (ctre::search<"/[0-9]-[0-9].xhtml">(href))
+                return chapter_type::FRONTMATTER;
+            if (ctre::search<"/[5-9].xhtml">(href))
+                return chapter_type::RECORDING_REPORT;
+            if (ctre::search<"/10-[0-9].xhtml">(href))
+                return chapter_type::RECORDING_REPORT;
+            if (ctre::search<"/11-[0-9].xhtml">(href))
+                return chapter_type::CHAPTER;
+            if (ctre::search<"/(12|13|14|15|16|17).xhtml">(href))
+                return chapter_type::TOBOOKS_MANGA;
         }
+
+        if (chapter_regex(href)) {
+            return chapter_type::CHAPTER;
+        }
+
         if (cover_regex(href)) {
-            return COVER;
+            return chapter_type::COVER;
         }
 
         if (chapter2_regex(href)) {
-            return CHAPTER;
+            return chapter_type::CHAPTER;
         }
 
         if (toc_label) {
             if (map_ehrenfest_duchy_label_regex(*toc_label)) {
-                return MAP_EHRENFEST_DUCHY;
+                return chapter_type::MAP_EHRENFEST_DUCHY;
             }
             if (map_yurgenschmidt_label_regex(*toc_label)) {
-                return MAP_YURGENSCHMIDT;
+                return chapter_type::MAP_YURGENSCHMIDT;
             }
             if (map_ehrenfest_city_label_regex(*toc_label)) {
-                return MAP_EHRENFEST_CITY;
+                return chapter_type::MAP_EHRENFEST_CITY;
             }
         } else {
             if (map_ehrenfest_href_regex(href)) {
-                return MAP_EHRENFEST_DUCHY;
+                return chapter_type::MAP_EHRENFEST_DUCHY;
             }
             if (map_yurgenschmidt_href_regex(href)) {
-                return MAP_YURGENSCHMIDT;
+                return chapter_type::MAP_YURGENSCHMIDT;
             }
         }
 
         if (frontmatter_regex(href)) {
-            return FRONTMATTER; // must be after maps
+            return chapter_type::FRONTMATTER; // must be after maps
         }
         if (volume::P4V5 == vol && family_tree_regex(href)) {
             if (toc_label.has_value()) {
-                return AURELIA_FAMILY_TREE;
+                return chapter_type::AURELIA_FAMILY_TREE;
             } else {
-                return CHAPTER;
+                return chapter_type::CHAPTER;
             }
         }
         if (afterword_regex(href)) {
-            return AFTERWORD;
+            return chapter_type::AFTERWORD;
         }
         if (manga_regex(href)) {
-            return MANGA;
+            return chapter_type::MANGA;
         }
         if (poll_regex(href)) {
-            return POLL;
+            return chapter_type::POLL;
         }
         if (bonus_regex(href)) {
-            return BONUS;
+            return chapter_type::BONUS;
         }
         if (copyright_regex(href)) {
-            return COPYRIGHT;
+            return chapter_type::COPYRIGHT;
         }
         if (toc_regex(href)) {
-            return TOC;
+            return chapter_type::TOC;
         }
         if (characters_regex(href)) {
-            return CHARACTERS;
+            return chapter_type::CHARACTERS;
         }
         if (signup_regex(href)) {
-            return SIGNUP;
+            return chapter_type::SIGNUP;
         }
 
         throw std::logic_error("Unable to identify chapter type");

@@ -9,61 +9,6 @@
 
 namespace {
     using namespace std::string_view_literals;
-    const std::map<std::string_view, volume> volume_map {
-        {"9781718344631"sv, volume::FB1},
-        {"9781718344648"sv, volume::FB2},
-        {"9781718344655"sv, volume::FB3},
-        {"9781718346734"sv, volume::RA1},
-        {"9781718346758"sv, volume::SSC1},
-        {"9781718346017"sv, volume::P1V1},
-        {"9781718346031"sv, volume::P1V2},
-        {"9781718346055"sv, volume::P1V3},
-        {"9781718346079"sv, volume::P2V1},
-        {"9781718346093"sv, volume::P2V2},
-        {"9781718346116"sv, volume::P2V3},
-        {"9781718346130"sv, volume::P2V4},
-        {"9781718346154"sv, volume::P3V1},
-        {"9781718346178"sv, volume::P3V2},
-        {"9781718346192"sv, volume::P3V3},
-        {"9781718346215"sv, volume::P3V4},
-        {"9781718346239"sv, volume::P3V5},
-        {"9781718346253"sv, volume::P4V1},
-        {"9781718346277"sv, volume::P4V2},
-        {"9781718346291"sv, volume::P4V3},
-        {"9781718346314"sv, volume::P4V4},
-        {"9781718346338"sv, volume::P4V5},
-        {"9781718346352"sv, volume::P4V6},
-        {"9781718346376"sv, volume::P4V7},
-        {"9781718346390"sv, volume::P4V8},
-        {"9781718346413"sv, volume::P4V9},
-        {"9781718346437"sv, volume::P5V1},
-        {"9781718346451"sv, volume::P5V2},
-        {"9781718346475"sv, volume::P5V3},
-        {"9781718338005"sv, volume::MP1V1},
-        {"9781718338029"sv, volume::MP1V2},
-        {"9781718338043"sv, volume::MP1V3},
-        {"9781718338067"sv, volume::MP1V4},
-        {"9781718338081"sv, volume::MP1V5},
-        {"9781718338104"sv, volume::MP1V6},
-        {"9781718338128"sv, volume::MP1V7},
-        {"9781718338142"sv, volume::MP2V1},
-        {"9781718338166"sv, volume::MP2V2},
-        {"9781718338180"sv, volume::MP2V3},
-        {"9781718338203"sv, volume::MP2V4},
-        {"9781718338227"sv, volume::MP2V5},
-        {"9781718338241"sv, volume::MP2V6},
-        {"9781718338265"sv, volume::MP2V7},
-        {"96908895-C96B-4376-BBF8-6A25E96F72F3"sv, volume::SSBDOVA1},
-        {"22BC23BD-BEB1-4F8F-9104-825FA616AD4C"sv, volume::SSJBUNKO1},
-        {"DEB588FB-32EF-4512-8ADF-D8A5CB49D9CD"sv, volume::SSTEASET},
-        {"5F99914F-5229-482E-A63D-D38002C442FD"sv, volume::SSWN1},
-        {"94A7C755-6459-4B4A-A48C-9AEE66C3E58A"sv, volume::SSWN2},
-        {"614AD11F-85BA-499A-9A35-74C4DBCCA288"sv, volume::SSDRAMACD2},
-        {"E490F42A-CF20-476A-8327-59E034AE8928"sv, volume::SSDRAMACD3},
-        {"EADEFA73-BCAD-4166-8745-0137BEAC38EC"sv, volume::SSDRAMACD4},
-        {"7D41D170-FCB5-480A-82AD-D4F921AB5B61"sv, volume::SSTOBBONUS1},
-        {"CE71D400-5EF9-4B8E-80C1-CED953C285C6"sv, volume::SSUP1},
-    };
 
     const std::map<std::string_view, volume> slug_map {
         {"ascendance-of-a-bookworm-fanbook-1"sv, volume::FB1},
@@ -155,6 +100,7 @@ std::string_view to_string_view(volume vol)
         case volume::SSDRAMACD4: return "SSDRAMACD4"sv;
         case volume::SSTOBBONUS1: return "SSTOBBONUS1"sv;
         case volume::SSUP1: return "SSUP1"sv;
+        case volume::SSUFTSS1: return "SSUFTSS1"sv;
     }
     assert(false);
     return "UNKNOWN"sv;
@@ -173,16 +119,6 @@ std::string_view to_string_view(omnibus v)
     return "UnknownOmnibus"sv;
 }
 
-OUTCOME_V2_NAMESPACE::result<volume>
-identify_volume(std::string_view uid)
-{
-    auto iter = volume_map.find(uid);
-    if (iter == volume_map.end()) {
-        return std::errc::invalid_argument;
-    }
-    return iter->second;
-}
-
 std::ostream& operator<<(std::ostream& os, volume v)
 {
     os << to_string_view(v);
@@ -191,7 +127,9 @@ std::ostream& operator<<(std::ostream& os, volume v)
 
 std::ostream& operator<<(std::ostream& os, const volume_definition& v)
 {
-    os << "{ volume::" << v.vol << ", " << std::quoted(v.href)
+    os << "{ volume::" << v.vol << ", "
+       << "/* " << v.type << " */ "
+       << std::quoted(v.href)
        << ", " << std::quoted(v.mediatype) << ", ";
     if (v.toc_label)
         os << std::quoted(v.toc_label.value());
@@ -231,7 +169,9 @@ std::ostream& operator<<(std::ostream& os, chapter_type c)
         case TABLE_YURGENSCHMIDT_DUCHIES: os << "TABLE_YURGENSCHMIDT_DUCHIES"; break;
         case AURELIA_FAMILY_TREE: os << "AURELIA_FAMILY_TREE"; break;
         case AFTERWORD: os << "AFTERWORD"; break;
+        case RECORDING_REPORT: os << "RECORDING_REPORT"; break;
         case MANGA: os << "MANGA"; break;
+        case TOBOOKS_MANGA: os << "TOBOOKS_MANGA"; break;
         case POLL: os << "POLL"; break;
         case BONUS: os << "BONUS"; break;
         case SIGNUP: os << "SIGNUP"; break;

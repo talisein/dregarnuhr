@@ -224,6 +224,12 @@ namespace part_1_defs
 { volume::SSJBUNKO1, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
 { volume::SSJBUNKO1, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "The Common Factor of the Rampaging Little Gremlins"sv, true },
 
+{ volume::SSUFTSS1, "text/side1.xhtml"sv, "application/xhtml+xml"sv, "The Common Factor of the Rampaging Little Gremlins"sv, true },
+{ volume::SSUFTSS1, "text/side1-image.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSUFTSS1, "text/side1-1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSUFTSS1, "styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+{ volume::SSUFTSS1, "images/side1image.png"sv, "image/png"sv, std::nullopt, false },
+
 { volume::P1V2, "Text/chapter13.xhtml"sv, "application/xhtml+xml"sv, "The Guildmaster’s Granddaughter"sv, true },
 { volume::P1V2, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, "Freida’s Hair Ornaments"sv, true },
 { volume::P1V2, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "Delivering the Hair Ornaments"sv, true },
@@ -376,6 +382,9 @@ constexpr std::array vol_3 = std::to_array<volume_definition>({
 { volume::SSBDOVA1, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
 { volume::SSBDOVA1, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "New Developments"sv, true }, // Otto
 
+{ volume::SSUFTSS1, "text/side2.xhtml"sv, "application/xhtml+xml"sv, "New Developments"sv, true },
+{ volume::SSUFTSS1, "styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P1V3, "Text/epilogue.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
 { volume::P1V3, "Text/extra5.xhtml"sv, "application/xhtml+xml"sv, "The Life of an Apprentice Merchant"sv, true },
 { volume::P1V3, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -383,7 +392,17 @@ constexpr std::array vol_3 = std::to_array<volume_definition>({
 { volume::P1V3, "Text/extra1.xhtml"sv, "application/xhtml+xml"sv, "Tuuli — Visiting Corinna"sv, true },
 { volume::P1V3, "Text/insert7.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V3, "Text/extra1_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
-//{ volume::MP1V7, "xhtml/p-209.xhtml"sv, "application/xhtml+xml"sv, "Story: As the Gilberta Company's Successor"sv, true },
+
+{ volume::SSUFTSS1, "text/11-1.xhtml"sv, "application/xhtml+xml"sv, "Tuuli's Worries"sv, true },
+{ volume::SSUFTSS1, "text/11-2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSUFTSS1, "text/11-3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSUFTSS1, "text/11-4.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSUFTSS1, "images/P2V1_ToBooks_TuulisWorries_1.png"sv, "image/png"sv, std::nullopt, false },
+{ volume::SSUFTSS1, "images/P2V1_ToBooks_TuulisWorries_2.png"sv, "image/png"sv, std::nullopt, false },
+{ volume::SSUFTSS1, "images/P2V1_ToBooks_TuulisWorries_3.png"sv, "image/png"sv, std::nullopt, false },
+{ volume::SSUFTSS1, "images/P2V1_ToBooks_TuulisWorries_4.png"sv, "image/png"sv, std::nullopt, false },
+
+
 { volume::MP1V7, "xhtml/p-210.xhtml"sv, "application/xhtml+xml"sv, "Story: As the Gilberta Company's Successor"sv, true },
 { volume::MP1V7, "xhtml/p-211.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::MP1V7, "xhtml/p-212.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },

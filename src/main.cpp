@@ -50,7 +50,7 @@ result<void> print_books(const fs::path& input_dir)
                 log_verbose("Info: Dump error for ", std::quoted(dir_entry.path().string()), ": ", book.error().message());
                 continue;
             }
-            auto vol = identify_volume(book.value().manifest.toc.dtb_uid);
+            auto vol = identify_volume(book.value());
             if (vol.has_failure()) {
                 log_verbose("Info: Failed to identify ", std::quoted(dir_entry.path().string()),
                             ": Unknown uid ", std::quoted(book.value().manifest.toc.dtb_uid),
@@ -62,14 +62,25 @@ result<void> print_books(const fs::path& input_dir)
         }
     }
 
-    for (const auto& it : book_readers ) {
-        log_info("Found ", to_string_view(it.first), ": ", it.second->path);
-    }
     if (books.end() == books.find(volume::FB1)) {
         log_info("Couldn't find Fanbook 1, so those chapters will be skipped in the new epubs.");
     }
     if (books.end() == books.find(volume::FB2)) {
         log_info("Couldn't find Fanbook 2, so those chapters will be skipped in the new epubs.");
+    }
+
+    if (books.end() != books.find(volume::SSUFTSS1)) {
+        // Prefer UFTSS1 over the others
+        for (auto vol : {volume::SSJBUNKO1, volume::SSBDOVA1, volume::SSTEASET,
+                volume::SSDRAMACD2, volume::SSTOBBONUS1, volume::SSDRAMACD3,
+                volume::SSDRAMACD4})
+        {
+            books.erase(vol);
+            book_readers.erase(vol);
+        }
+    }
+    for (const auto& it : book_readers ) {
+        log_info("Found ", to_string_view(it.first), ": ", it.second->path);
     }
     auto tags = get_updated();
     bool need_updates = false;
@@ -116,7 +127,7 @@ void do_dump()
     auto book = res.value();
     using namespace std::string_view_literals;
     std::string dump_volume {"VTMP"};
-    if (auto it = identify_volume(book.manifest.toc.dtb_uid); it.has_value()) {
+    if (auto it = identify_volume(book); it.has_value()) {
         dump_volume = to_string_view(it.value());
     } else if (get_options()->dump_volume) {
         dump_volume = *get_options()->dump_volume;
@@ -124,7 +135,10 @@ void do_dump()
     std::cout << "{" << std::quoted(book.manifest.toc.dtb_uid) << "sv, volume::"sv
               <<  dump_volume << "},\n";
     for (const auto& item : book.manifest.items) {
-        std::cout << "{ volume::" << dump_volume << ", "
+//        std::cout << "Identifying " << item.href << std::endl;
+        volume_definition v {identify_volume(book).value(),  item.href, item.media_type, item.toc_label, item.in_spine};
+        std::cout << v << "," << std::endl;
+/*        std::cout << "{ volume::" << dump_volume << ", "
                   <<  std::quoted(item.href) << "sv, "
                   << std::quoted(item.media_type) <<  "sv, ";
         if (item.toc_label) {
@@ -132,7 +146,7 @@ void do_dump()
         } else {
             std::cout << "std::nullopt";
         }
-        std::cout << ", " << std::boolalpha << item.in_spine <<  " },\n";
+        std::cout << ", " << std::boolalpha << item.in_spine <<  " },\n"; */
     }
 }
 

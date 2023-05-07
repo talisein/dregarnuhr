@@ -169,6 +169,7 @@ namespace part_2_defs
 { volume::MP2V3, "image/i-178.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::MP2V3, "image/i-179.jpg"sv, "image/jpeg"sv, std::nullopt, false },
 { volume::P2V1, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "After the Festival"sv, true },
+
 { volume::P2V1, "Text/chapter21.xhtml"sv, "application/xhtml+xml"sv, "Lutz’s Path Through Life"sv, true },
 { volume::P2V1, "Text/chapter22.xhtml"sv, "application/xhtml+xml"sv, "Lutz Running Away from Home"sv, true },
 { volume::P2V1, "Text/insert8.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -206,6 +207,14 @@ namespace part_2_defs
 { volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
 
 { volume::P2V1, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
+
+{ volume::SSUFTSS1, "text/13.xhtml"sv, "application/xhtml+xml"sv, "TOBooks Manga"sv, true }, // After the festival
+{ volume::SSUFTSS1, "images/P2V4_Tobooks_Manga.png"sv, "image/png"sv, std::nullopt, false },
+{ volume::SSUFTSS1, "styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
+{ volume::SSUFTSS1, "text/14.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true }, // Family Meeting at the Temple
+{ volume::SSUFTSS1, "images/P2V5_Tobooks_Manga.png"sv, "image/png"sv, std::nullopt, false },
+
 { volume::P2V1, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P2V1, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V1, "Text/signup.xhtml"sv, "application/xhtml+xml"sv, "About J-Novel Club"sv, true },
@@ -385,6 +394,16 @@ constexpr std::array vol_2 = std::to_array<volume_definition>({
 { volume::P2V2, "Text/insert8.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V2, "Text/epilogue_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V2, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
+
+{ volume::SSUFTSS1, "text/15.xhtml"sv, "application/xhtml+xml"sv, "TOBooks Manga"sv, true },
+{ volume::SSUFTSS1, "images/P2V6_Tobooks_Manga.png"sv, "image/png"sv, std::nullopt, false },
+{ volume::SSUFTSS1, "styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
+{ volume::SSUFTSS1, "text/16.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSUFTSS1, "images/P2V7_Tobooks_Manga.png"sv, "image/png"sv, std::nullopt, false },
+{ volume::SSUFTSS1, "text/17.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSUFTSS1, "images/P2V8_Tobooks_Manga.png"sv, "image/png"sv, std::nullopt, false },
+
 { volume::P2V2, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P2V2, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V2, "Text/signup.xhtml"sv, "application/xhtml+xml"sv, "About J-Novel Club"sv, true },
@@ -453,6 +472,10 @@ constexpr std::array vol_2 = std::to_array<volume_definition>({
 { volume::P2V3, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V3, "Text/chapter16_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V3, "Text/chapter17.xhtml"sv, "application/xhtml+xml"sv, "The Wild and Uncontrollable Blue Priest"sv, true },
+
+{ volume::SSUFTSS1, "text/side9.xhtml"sv, "application/xhtml+xml"sv, "Intuition and Charm"sv, true }, // Sylvester
+{ volume::SSUFTSS1, "styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P2V3, "Text/chapter18.xhtml"sv, "application/xhtml+xml"sv, "Visit to the Orphanage and Workshop"sv, true },
 { volume::P2V3, "Text/insert7.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P2V3, "Text/chapter18_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },

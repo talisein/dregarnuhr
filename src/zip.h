@@ -34,17 +34,7 @@ namespace detail
 
         virtual std::error_condition default_error_condition(int c) const noexcept override final
         {
-            switch (static_cast<mz_zip_error>(c))
-            {
-                case MZ_ZIP_FILE_TOO_LARGE:
-                    return make_error_condition(std::errc::file_too_large);
-                case MZ_ZIP_ALLOC_FAILED:
-                    return make_error_condition(std::errc::not_enough_memory);
-                case MZ_ZIP_FILE_NOT_FOUND:
-                    return make_error_condition(std::errc::no_such_file_or_directory);
-                default:
-                    return std::error_condition(c, *this);
-            }
+            return std::error_condition(c, *this);
         }
     };
 }

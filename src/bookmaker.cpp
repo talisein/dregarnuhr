@@ -983,6 +983,7 @@ namespace epub
         } else {
             for (volume defined_volume : defined_volumes) {
                 OUTCOME_TRY(make_books_impl(get_definition_view(defined_volume), defined_volume));
+                ++created_books;
             }
         }
 
