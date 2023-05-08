@@ -24,6 +24,11 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace')
 
 has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>')
 
+zlib_dep = dependency('zlib', fallback: ['zlib'])
+
+# Fedora libjpeg-turbo-devel, Ubuntu libjpeg-turbo8-dev
+png_dep = dependency('libpng', fallback: ['libpng'])
+
 # Fedora libjpeg-turbo-devel, Ubuntu libjpeg-turbo8-dev
 jpeg_dep = dependency('libjpeg', version: '>=2.1.0', fallback: ['libjpeg-turbo'])
 
@@ -45,7 +50,6 @@ else
 endif
 
 # zlib is needed by libxml2. Specify fallback to our wrap to avoid strawberry perl on windows
-zlib_dep = dependency('zlib', fallback: ['zlib'])
 lzma_dep = dependency('liblzma', fallback: ['liblzma'])
 
 # Fedora libxml2-devel, Ubuntu libxml2-dev

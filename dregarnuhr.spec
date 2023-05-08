@@ -16,6 +16,7 @@ BuildRequires:  brotli-devel
 BuildRequires:  zlib-devel
 BuildRequires:  cpp-httplib-devel
 BuildRequires:  date-devel
+BuildRequires:  libpng-devel
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  miniz-devel
 BuildRequires:  outcome-devel

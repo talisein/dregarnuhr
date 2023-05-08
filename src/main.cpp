@@ -135,18 +135,20 @@ void do_dump()
     std::cout << "{" << std::quoted(book.manifest.toc.dtb_uid) << "sv, volume::"sv
               <<  dump_volume << "},\n";
     for (const auto& item : book.manifest.items) {
-//        std::cout << "Identifying " << item.href << std::endl;
-        volume_definition v {identify_volume(book).value(),  item.href, item.media_type, item.toc_label, item.in_spine};
-        std::cout << v << "," << std::endl;
-/*        std::cout << "{ volume::" << dump_volume << ", "
-                  <<  std::quoted(item.href) << "sv, "
-                  << std::quoted(item.media_type) <<  "sv, ";
-        if (item.toc_label) {
-            std::cout << std::quoted(*item.toc_label) << "sv";
-        } else {
-            std::cout << "std::nullopt";
+        try {
+            volume_definition v {identify_volume(book).value(),  item.href, item.media_type, item.toc_label, item.in_spine};
+            std::cout << v << "," << std::endl;
+        } catch (std::exception &) {
+            std::cout << "{ volume::" << dump_volume << ", /* ??? */ "
+                      <<  std::quoted(item.href) << "sv, "
+                      << std::quoted(item.media_type) <<  "sv, ";
+            if (item.toc_label) {
+                std::cout << std::quoted(*item.toc_label) << "sv";
+            } else {
+                std::cout << "std::nullopt";
+            }
+            std::cout << ", " << std::boolalpha << item.in_spine <<  " },\n";
         }
-        std::cout << ", " << std::boolalpha << item.in_spine <<  " },\n"; */
     }
 }
 

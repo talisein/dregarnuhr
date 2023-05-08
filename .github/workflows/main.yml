@@ -24,7 +24,7 @@ on:
 jobs:
   build:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: [ubuntu-22.04, macos-12, windows-latest]
         include:
@@ -66,21 +66,25 @@ jobs:
           brew search gcc@
           brew install meson gcc@12 ninja
 
-      - if: ${{ matrix.os == 'windows-latest' }}
-        name: Setup Python Windows
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
+#      - if: ${{ matrix.os == 'windows-latest' }}
+#        name: Setup Python Windows
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: '3.x'
 
       - if: ${{ matrix.os == 'windows-latest' }}
         name: Install Meson/Ninja Windows
-        run: pip install meson ninja
+        run: |
+          python -m pip install meson
 
       - if: ${{ matrix.os == 'windows-latest' }}
-        name: Prepare MSVC
-        uses: bus1/cabuild/action/msdevshell@v1
-        with:
-          architecture: x64
+        uses: ilammy/msvc-dev-cmd@v1
+
+#      - if: ${{ matrix.os == 'windows-latest' }}
+#        name: Prepare MSVC
+#        uses: bus1/cabuild/action/msdevshell@v1
+#        with:
+#          architecture: x64
 
       - if: ${{ matrix.os == 'ubuntu-22.04' && !startsWith(github.ref, 'refs/tags/v') }}
         name: Initialize CodeQL
@@ -111,17 +115,17 @@ jobs:
       - if: ${{ matrix.os == 'ubuntu-22.04' }}
         name: Configure Ubuntu 22
         run: |
-          meson setup  --warnlevel 3 --buildtype release --default-library static --force-fallback-for libjpeg build
+          meson setup  --warnlevel 3 --buildtype release --default-library static --force-fallback-for libjpeg,libpng build
 
       - if: ${{ matrix.os == 'macos-12' }}
         name: Configure MacOS 12
         run: |
-          meson setup --warnlevel 3 --buildtype release --default-library static -Dcpp_link_args="-static-libstdc++ -static-libgcc" --force-fallback-for libjpeg build
+          meson setup --warnlevel 3 --buildtype release --default-library static -Dcpp_link_args="-static-libstdc++ -static-libgcc" --force-fallback-for libjpeg,libpng build
 
       - if: ${{ matrix.os == 'windows-latest' }}
         name: Configure Windows Latest
         run: |
-          meson setup  --warnlevel 3 --buildtype release -Dc_std=c17 -Dcpp_std=c++20 --default-library static -Dcpp_eh=a -Dlibxml2:warning_level=0 -Dminiz:warning_level=0 -Dlibjpeg-turbo:warning_level=0 -Dcpp-httplib:cpp-httplib_openssl=disabled --force-fallback-for zlib,liblzma,libxml2 build
+          meson setup  --warnlevel 3 --buildtype release -Dc_std=c17 -Dcpp_std=c++20 --default-library static -Dcpp_eh=a -Dlibxml2:warning_level=0 -Dminiz:warning_level=0 -Dlibjpeg-turbo:warning_level=0 -Dcpp-httplib:cpp-httplib_openssl=disabled --force-fallback-for zlib,libpng,liblzma,libxml2 build
 
       - name: Compile
         run: ninja -C build
