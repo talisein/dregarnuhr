@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstring>
 #include "png_reader.h"
 #include "log.h"
@@ -185,7 +186,9 @@ png::reader::scale(int scale)
 
             // Get the average. The denominator is scale squared.
             for (unsigned int component = 0; component < channels; ++component) {
-                out_p[component] = sum_p[component] / (scale*scale);
+                out_p[component] = std::clamp<unsigned int>(sum_p[component] / (scale*scale),
+                                                            std::numeric_limits<unsigned char>::min(),
+                                                            std::numeric_limits<unsigned char>::max());
             }
             out_p += channels;
         }

@@ -1,3 +1,8 @@
+dregarnuhr (1.0.13-1) jammy; urgency=medium
+
+  * UFTSS1
+ -- Andrew Potter <talisein@gmail.com>  Sun, 30 Apr 2023 19:27:47 -0700
+
 dregarnuhr (1.0.12-5) jammy; urgency=medium
 
   * Made sure the .deb has depends too

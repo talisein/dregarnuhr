@@ -1,5 +1,5 @@
 Name:           dregarnuhr
-Version:        1.0.12
+Version:        1.0.13
 Release:        1
 Summary:        Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
@@ -50,6 +50,9 @@ Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 
 %changelog
+* Sun Apr 23 2023 Andrew Potter <agpotter@gmail.com> - v1.0.13-1
+- Add UFTSS1
+
 * Sun Apr 23 2023 Andrew Potter <agpotter@gmail.com> - v1.0.12-1
 - Add SSC1
 
