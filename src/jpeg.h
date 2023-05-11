@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdlib>
 #include <cstdio>
 #include <memory>
@@ -5,6 +6,11 @@
 #include "jpeglib.h"
 #include "jerror.h"
 #include "log.h"
+
+#include "outcome/result.hpp"
+#include "outcome/utils.hpp"
+
+namespace outcome = OUTCOME_V2_NAMESPACE;
 
 namespace std
 {
@@ -67,6 +73,7 @@ namespace jpeg
         compressor();
 
         outcome::result<std::span<const unsigned char>> compress_from(decompressor& decompressor, std::optional<int> quality, std::optional<int> scale);
+        outcome::result<std::span<const unsigned char>> compress_rgb(JDIMENSION width, JDIMENSION height, std::span<unsigned char> buf, std::optional<int> quality);
 
     private:
         struct compress_deleter {

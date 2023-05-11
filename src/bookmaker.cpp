@@ -19,6 +19,7 @@
 #include "outcome/try.hpp"
 #include "jpeg.h"
 #include "utils.h"
+#include "png_reader.h"
 
 namespace {
     using namespace std::literals;
@@ -355,7 +356,11 @@ namespace epub
                         }
                     }
 
-                    item->set_attribute("media-type", xmlpp::ustring(def.mediatype));
+                    if (def.href.ends_with(".png") && !ctre::search<"jnovelclubCMYK.png">(def.href) && (get_options()->jpg_quality || get_options()->jpg_scale)) {
+                        item->set_attribute("media-type", "image/jpeg");
+                    } else {
+                        item->set_attribute("media-type", xmlpp::ustring(def.mediatype));
+                    }
 
                     // TODO: Maybe just use the source for most of the above properties
                     auto src_iter = std::ranges::find(src_book->second.manifest.items, def.href, &manifest::item::href);
@@ -579,6 +584,28 @@ namespace epub
                 continue;
             }
 
+            if (src.ends_with(".png") && !ctre::search<"jnovelclubCMYK.png">(src) && (get_options()->jpg_quality || get_options()->jpg_scale)) {
+                OUTCOME_TRY(const auto idx, src_reader->zip.locate_file(src.c_str()));
+                OUTCOME_TRY(const auto buf, src_reader->zip.extract_raw(idx));
+                png::reader reader {buf};
+                OUTCOME_TRY(auto unscaled_rgb_data, reader.read());
+                auto scaled_rgb_data = unscaled_rgb_data;
+                if (get_options()->jpg_scale) {
+                    OUTCOME_TRY(auto b, reader.scale(get_options()->jpg_scale.value()));
+                    scaled_rgb_data = b;
+                }
+                jpeg::compressor comp;
+                OUTCOME_TRY(auto jpg_data, comp.compress_rgb(reader.get_width(), reader.get_height(), scaled_rgb_data, get_options()->jpg_quality));
+//                const auto pos = dst.find(".png");
+//                const auto renamed_dst = std::string(dst).replace(pos, 4, ".jpg");
+                const auto to_percent = [](float nom, float denom) { return 100.0f * nom / denom; };
+                log_verbose("PNG->JPG compression: ", dst, " From ", buf.size(), " to ", jpg_data.size_bytes(), ". ",
+                            to_percent(jpg_data.size_bytes(), buf.size()), "%");
+                OUTCOME_TRY(writer.add(dst, jpg_data, std::nullopt));
+                basefiles.remove(src);
+                continue;
+            }
+
             // toc.xhtml needs to be rewritten
             if (item && item->properties.has_value() && item->properties.value() == "nav") {
                 OUTCOME_TRY(const auto src_idx, src_reader->zip.locate_file(src.c_str()));
@@ -788,7 +815,12 @@ namespace epub
             }
 
             constexpr auto make_link = [](const volume_definition& def) -> xmlpp::ustring {
-                return utils::xstrcat("../../", to_string_view(def.vol), "/", def.href);
+                auto src = def.href;
+//                if (src.ends_with(".png") && !ctre::search<"jnovelclubCMYK.png">(src) && (get_options()->jpg_quality || get_options()->jpg_scale)) {
+//                    const auto pos = src.find(".png");
+//                    src = std::string(src).replace(pos, 4, ".jpg");
+//                };
+                return utils::xstrcat("../../", to_string_view(def.vol), "/", src);
             };
 
             const auto ns_map = xmlpp::Element::PrefixNsMap{{"html", "http://www.w3.org/1999/xhtml"}};
