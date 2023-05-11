@@ -56,7 +56,7 @@ namespace epub
         result<void> add_ncx();
         result<std::string> create_rootfile();
         result<void> start_book();
-        void make_landmarks(xmlpp::Element *nav_node, const xmlpp::Element *src_nav, const xmlpp::ustring& toc_path);
+        void make_landmarks(xmlpp::Element *nav_node, const xmlpp::ustring& toc_path);
         void make_toc(xmlpp::Element *nav_node, const xmlpp::Element *src_nav);
         result<std::string> get_ncx_id() const;
     private:

@@ -250,6 +250,19 @@ namespace utils
         return res;
     }
 
+    template<std::integral To, std::integral From>
+    [[nodiscard]] auto clamping_int_cast(From from) -> std::remove_cvref_t<To> {
+        using UnrefTo = std::remove_cvref_t<To>;
+        if (!std::in_range<UnrefTo>(from)) {
+            log_info("Warning: clamping ", from);
+        }
+
+        auto clamped = std::clamp<std::remove_cvref_t<From>>(from,
+                                                             std::numeric_limits<UnrefTo>::min(),
+                                                             std::numeric_limits<UnrefTo>::max());
+        return static_cast<UnrefTo>(clamped);
+    }
+
     template<typename Node>
     constexpr auto as_element(Node node) -> std::conditional_t<std::is_const_v<std::remove_pointer_t<Node>>, const xmlpp::Element*, xmlpp::Element*>
     {

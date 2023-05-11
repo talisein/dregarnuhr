@@ -290,7 +290,7 @@ jobs:
       - run: chmod u+x dregarnuhr-macos-12/dregarnuhr
       - run: tar -C ./dregarnuhr-macos-12 -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
       - run: zip -j "./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}" dregarnuhr-windows-latest/dregarnuhr.exe
-
+      - run: ls
       - name: Release Linux Artifact
         uses: actions/upload-release-asset@v1
         env:

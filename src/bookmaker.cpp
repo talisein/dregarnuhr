@@ -598,7 +598,7 @@ namespace epub
                 OUTCOME_TRY(auto jpg_data, comp.compress_rgb(reader.get_width(), reader.get_height(), scaled_rgb_data, get_options()->jpg_quality));
 //                const auto pos = dst.find(".png");
 //                const auto renamed_dst = std::string(dst).replace(pos, 4, ".jpg");
-                const auto to_percent = [](float nom, float denom) { return 100.0f * nom / denom; };
+                const auto to_percent = [](auto nom, auto denom) -> float { return 100.0f * static_cast<float>(nom) / static_cast<float>(denom); };
                 log_verbose("PNG->JPG compression: ", dst, " From ", buf.size(), " to ", jpg_data.size_bytes(), ". ",
                             to_percent(jpg_data.size_bytes(), buf.size()), "%");
                 OUTCOME_TRY(writer.add(dst, jpg_data, std::nullopt));
@@ -660,7 +660,7 @@ namespace epub
                                     log_verbose("Made toc");
                                 } else if (utils::as_element(src_iter)->get_attribute("type", "epub")->get_value() == "landmarks") {
                                     auto nav = utils::import_attr(body, utils::as_element(src_iter));
-                                    make_landmarks(nav, utils::as_element(src_iter), utils::xstrcat("../../", to_string_view(def.vol), "/", def.href));
+                                    make_landmarks(nav, utils::xstrcat("../../", to_string_view(def.vol), "/", def.href));
                                     log_verbose("Made landmarks");
                                 } else {
                                     body->import_node(src_iter, true);
@@ -702,7 +702,7 @@ namespace epub
     }
 
     void
-    book_writer::make_landmarks(xmlpp::Element *nav, const xmlpp::Element* src_nav, const xmlpp::ustring& toc_path)
+    book_writer::make_landmarks(xmlpp::Element *nav, const xmlpp::ustring& toc_path)
     {
         auto h1 = nav->add_child_element("h1");
         h1->add_child_text("Landmarks");
@@ -713,7 +713,7 @@ namespace epub
             auto a = li->add_child_element("a");
             a->set_attribute("type", type, "epub");
             a->set_attribute("href", path);
-            a->add_child_text("Color Images");
+            a->add_child_text(title);
         };
 
         auto add_landmark = [&](const auto& type, const auto& title, const auto& def_iter) {

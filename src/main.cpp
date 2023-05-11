@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
     } catch (std::exception &e) {
         // MacOS has issues
         std::setlocale(LC_ALL, "");
-        log_info("Warning: Couldn't set locale, but we will continue.");
+        log_info("Warning: Couldn't set locale, but we will continue: ", e.what());
     }
 
     if (auto res = parse(argc, argv); res.has_failure()) {

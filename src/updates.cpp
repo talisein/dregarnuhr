@@ -22,7 +22,7 @@ namespace {
             auto slug_sv = std::string_view(std::ranges::begin(slug_r), std::ranges::end(slug_r));
             std::ranges::advance(colon_it, 1, std::ranges::end(colon_split));
             if (colon_it == std::ranges::end(colon_split)) continue;
-            auto no_ws = std::views::drop_while(*colon_it, [](unsigned char c) {return std::isspace(c);});
+            auto no_ws = std::views::drop_while(*colon_it, [](unsigned char c) noexcept {return std::isspace(c);});
             std::chrono::seconds::rep ts;
             auto [ptr, ec] = std::from_chars(std::to_address(std::ranges::begin(no_ws)),
                                              std::to_address(std::ranges::end(no_ws)), ts);
