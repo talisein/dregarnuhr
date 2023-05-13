@@ -59,7 +59,7 @@ jobs:
           sudo add-apt-repository -n ppa:talisein/ctre
           sudo add-apt-repository -n ppa:talisein/libboost-ext-ut
           sudo add-apt-repository -n ppa:talisein/outcome
-          sudo add-apt-repository -n ppa:talisein/magic_enum
+          sudo add-apt-repository -n ppa:talisein/magic-enum
           sudo apt-get update
           sudo apt-get install meson g++-12 ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev
 
