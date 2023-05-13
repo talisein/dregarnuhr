@@ -95,4 +95,7 @@ add_project_arguments('-DBOOST_UT_DISABLE_MODULE', language: 'cpp')
 ctre_dep = dependency('ctre',
                       fallback: ['ctre'])
 
+magic_enum_dep = dependency('magic_enum',
+                           fallback: ['magic_enum'])
+
 subdir('src')

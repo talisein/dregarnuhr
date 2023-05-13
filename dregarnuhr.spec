@@ -23,6 +23,7 @@ BuildRequires:  outcome-devel
 BuildRequires:  libxml++50-devel >= 5.0.2
 BuildRequires:  boost-ext-ut-static
 BuildRequires:  ctre-static
+BuildRequires:  libmagicenum-static
 
 
 %description

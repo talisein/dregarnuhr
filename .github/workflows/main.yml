@@ -59,8 +59,9 @@ jobs:
           sudo add-apt-repository -n ppa:talisein/ctre
           sudo add-apt-repository -n ppa:talisein/libboost-ext-ut
           sudo add-apt-repository -n ppa:talisein/outcome
+          sudo add-apt-repository -n ppa:talisein/magic_enum
           sudo apt-get update
-          sudo apt-get install meson g++-12 ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev
+          sudo apt-get install meson g++-12 ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev
 
       - if: ${{ matrix.os == 'macos-12' }}
         name: Install deps mac
@@ -169,13 +170,10 @@ jobs:
       - if: ${{ matrix.os == 'ubuntu-22.04'  && startsWith(github.ref, 'refs/tags/v') }}
         name: Get debuild dependencies
         run: |
-          sudo add-apt-repository -n ppa:talisein/ctre
-          sudo add-apt-repository -n ppa:talisein/libboost-ext-ut
-          sudo add-apt-repository -n ppa:talisein/outcome
           sudo add-apt-repository -n ppa:talisein/libxml++5.0
           sudo add-apt-repository -n ppa:talisein/miniz
           sudo apt-get update
-          sudo apt-get install cmake libcpp-httplib-dev libctre-dev libboost-ext-ut-dev libxml++5.0-dev libminiz3-dev liboutcome-dev debmake debhelper devscripts equivs distro-info-data distro-info dpkg-dev git-buildpackage
+          sudo apt-get install cmake libcpp-httplib-dev libxml++5.0-dev libminiz3-dev debmake debhelper devscripts equivs distro-info-data distro-info dpkg-dev git-buildpackage
 
       - if: ${{ matrix.os == 'ubuntu-22.04'  && startsWith(github.ref, 'refs/tags/v') }}
         name: Generate PPA tarball
@@ -283,7 +281,7 @@ jobs:
       - id: myref
         env:
           REF: ${{ github.event.ref }}
-        run: echo "::set-output name=MYREF::`echo $REF | tr -d refs/tags`"
+        run: echo "::set-output name=MYREF::`echo $REF | cut -b 11-`"
 
       - run: chmod u+x dregarnuhr-ubuntu-22.04/dregarnuhr
       - run: tar -C ./dregarnuhr-ubuntu-22.04 -cJvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz" dregarnuhr

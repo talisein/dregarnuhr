@@ -2,6 +2,7 @@
 #include <map>
 #include <variant>
 #include "epub.h"
+#include "volume_definition.h"
 #include "volumes.h"
 
 namespace epub

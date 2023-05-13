@@ -15,6 +15,7 @@ Build-Depends: debhelper-compat (= 13),
 	       libboost-ext-ut-dev (>= 1.1.9-4),
 	       liboutcome-dev,
 	       libctre-dev,
+           libmagicenum-dev,
 	       libminiz3-dev,
 	       libxml++5.0-dev
 Standards-Version: 4.6.0

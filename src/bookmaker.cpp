@@ -239,7 +239,7 @@ namespace epub
     result<std::string>
     book_writer::get_ncx_id() const
     {
-        auto it = std::ranges::find(definition, NCX, &volume_definition::get_chapter_type);
+        auto it = std::ranges::find(definition, chapter_type::NCX, &volume_definition::get_chapter_type);
         if (definition.end() == it) {
             log_error("No NCX found in volume definition");
             return std::errc::invalid_argument;
@@ -413,7 +413,7 @@ namespace epub
     result<void>
     book_writer::add_ncx()
     {
-        auto def_iter = std::ranges::find(definition, NCX, &volume_definition::get_chapter_type);
+        auto def_iter = std::ranges::find(definition, chapter_type::NCX, &volume_definition::get_chapter_type);
         if (def_iter == std::ranges::end(definition)) {
             log_error("Couldn't find ncx");
             return std::errc::no_such_file_or_directory;

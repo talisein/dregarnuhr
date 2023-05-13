@@ -14,6 +14,7 @@
 #include "libxml++/libxml++.h"
 #include "libxml++/ustring.h"
 #include "volumes.h"
+#include "volume_definition.h"
 #include "log.h"
 
 namespace utils
@@ -43,7 +44,7 @@ namespace utils
         bool operator()(const volume_definition& def)
         {
             const auto chapter_type = def.get_chapter_type();
-            if (chapter_type == STYLESHEET) {
+            if (chapter_type == chapter_type::STYLESHEET) {
                 if (style_set.contains(def.vol)) {
                     return false;
                 } else {

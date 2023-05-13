@@ -30,6 +30,8 @@ src = ['main.cpp',
        'args.cpp',
        'epub.cpp',
        'volumes.cpp',
+       'chapter_type.cpp',
+       'volume_definition.cpp',
        'bookmaker.cpp',
        'jpeg.cpp',
        'png_reader.cpp',
@@ -87,7 +89,7 @@ utils_test =  executable('utils_test', 'test_utils.cpp',
                          dependencies: [boostut_dep, deps],
                          cpp_args: test_cpp_args)
 
-volumes_test =  executable('volumes_test', 'test_volumes.cpp', 'volumes.cpp',
+volumes_test =  executable('volumes_test', 'test_volumes.cpp', 'volumes.cpp', 'chapter_type.cpp',
                            dependencies: [boostut_dep, deps],
                            cpp_args: test_cpp_args)
 

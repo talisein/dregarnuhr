@@ -125,20 +125,6 @@ std::ostream& operator<<(std::ostream& os, volume v)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const volume_definition& v)
-{
-    os << "{ volume::" << v.vol << ", "
-       << "/* " << v.type << " */ "
-       << std::quoted(v.href)
-       << ", " << std::quoted(v.mediatype) << ", ";
-    if (v.toc_label)
-        os << std::quoted(v.toc_label.value());
-    else
-        os << "std::nullopt";
-    os << ", " << std::boolalpha << v.in_spine << " }";
-    return os;
-}
-
 std::ostream& operator<<(std::ostream& os, const std::variant<omnibus, volume>& v)
 {
     std::visit([&os](auto&& arg) { os << to_string_view(arg); }, v);
@@ -148,35 +134,6 @@ std::ostream& operator<<(std::ostream& os, const std::variant<omnibus, volume>& 
 std::ostream& operator<<(std::ostream& os, omnibus v)
 {
     os << to_string_view(v);
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, chapter_type c)
-{
-    switch (c) {
-        case NCX: os << "NCX"; break;
-        case STYLESHEET: os << "STYLESHEET"; break;
-        case IMAGE: os << "IMAGE"; break;
-        case COVER: os << "COVER"; break;
-        case FRONTMATTER: os << "FRONTMATTER"; break;
-        case CHARACTERS: os << "CHARACTERS"; break;
-        case TOC: os << "TOC"; break;
-        case CHAPTER: os << "CHAPTER"; break;
-        case MAP_RA_LIBRARY: os << "MAP_RA_LIBRARY"; break;
-        case MAP_EHRENFEST_CITY: os << "MAP_EHRENFEST_CITY"; break;
-        case MAP_EHRENFEST_DUCHY: os << "MAP_EHRENFEST_DUCHY"; break;
-        case MAP_YURGENSCHMIDT: os << "MAP_YURGENSCHMIDT"; break;
-        case TABLE_YURGENSCHMIDT_DUCHIES: os << "TABLE_YURGENSCHMIDT_DUCHIES"; break;
-        case AURELIA_FAMILY_TREE: os << "AURELIA_FAMILY_TREE"; break;
-        case AFTERWORD: os << "AFTERWORD"; break;
-        case RECORDING_REPORT: os << "RECORDING_REPORT"; break;
-        case MANGA: os << "MANGA"; break;
-        case TOBOOKS_MANGA: os << "TOBOOKS_MANGA"; break;
-        case POLL: os << "POLL"; break;
-        case BONUS: os << "BONUS"; break;
-        case SIGNUP: os << "SIGNUP"; break;
-        case COPYRIGHT: os << "COPYRIGHT"; break;
-    }
     return os;
 }
 
