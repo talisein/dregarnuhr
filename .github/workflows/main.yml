@@ -30,7 +30,7 @@ jobs:
       matrix:
         flavor: [ubuntu, mac, windows]
         compiler: [gcc, clang, msvc]
-        experimental: false
+        experimental: [false]
         include:
           # define operating systems
           - flavor: ubuntu
