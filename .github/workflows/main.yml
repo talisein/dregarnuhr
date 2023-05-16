@@ -30,7 +30,7 @@ jobs:
       matrix:
         flavor: [ubuntu, mac, windows]
         compiler: [gcc, clang, msvc]
-            include:
+        include:
           # define operating systems
           - flavor: ubuntu
             os: ubuntu-22.04
