@@ -30,20 +30,14 @@ jobs:
       matrix:
         flavor: [ubuntu, mac, windows]
         compiler: [gcc, clang, msvc]
-        experimental: [false]
+        is-experimental: [false]
         include:
           # define operating systems
           - flavor: ubuntu
-            experimental: false
-            os: ubuntu-22.04
-          - flavor: ubuntu
-            experimental: true
             os: ubuntu-22.04
           - flavor: mac
-            experimental: false
             os: macos-12
           - flavor: windows
-            experimental: false
             os: windows-latest
           # CC
           - compiler: gcc
@@ -52,7 +46,7 @@ jobs:
           - compiler: clang
             CC: clang-16
             CXX: clang++-16
-            experimental: true
+            is-experimental: true
           # Mac stuff
           - DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
             flavor: mac
@@ -77,7 +71,7 @@ jobs:
       DEVELOPER_DIR: ${{ matrix.DEVELOPER_DIR }}
       DEBEMAIL: ${{ vars.DEBEMAIL }}
       DEBFULLNAME: ${{ vars.DEBFULLNAME }}
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: ${{ matrix.is-experimental }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
