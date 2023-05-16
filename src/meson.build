@@ -18,7 +18,7 @@ config = configure_file(input: 'config.h.in',
                         output: 'config.h',
                         configuration: conf_data)
 
-deps = [zlib_dep, lzma_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep, http_dep, ctre_dep, png_dep]
+deps = [zlib_dep, lzma_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep, http_dep, ctre_dep, png_dep, magic_enum_dep]
 
 if not has_chrono
   deps += date_dep
@@ -48,50 +48,11 @@ exe = executable('dregarnuhr', src,
 test('Simple', exe, args: ['--check'])
 
 
-boost_ut_args = ['-Wall',
-                 '-Wextra',
-                 '-Werror',
-                 '-Wcast-align',
-                 '-Wcast-qual',
-                 '-Wdouble-promotion',
-                 '-Wduplicated-branches',
-                 '-Wduplicated-cond',
-                 '-Wlogical-op',
-                 '-Wmissing-declarations',
-                 '-Wmissing-include-dirs',
-                 '-Wnull-dereference',
-                 '-Wold-style-cast',
-                 '-Wpointer-arith',
-                 '-Wredundant-decls',
-                 '-Wsign-conversion',
-                 '-Wswitch-enum',
-                 '-Wtrampolines',
-                 '-Wunused-but-set-variable',
-                 '-Wunused-result',
-                 '-Wuseless-cast',
-                 '-Wzero-as-null-pointer-constant',
-                 '-Wno-undef',
-                 '-Wno-missing-declarations',
-                 '-Wno-sign-conversion',
-                 '-Wno-float-equal']
-
-test_cpp_args = []
-foreach arg : boost_ut_args
-  if not cpp_compiler.has_argument(arg)
-    if cpp_compiler.has_argument('-Wno-unknown-warning-option')
-      test_cpp_args = ['-Wno-unknown-warning-option']
-    endif
-    break
-  endif
-endforeach
-
 utils_test =  executable('utils_test', 'test_utils.cpp',
-                         dependencies: [boostut_dep, deps],
-                         cpp_args: test_cpp_args)
+                         dependencies: [boostut_dep, deps])
 
 volumes_test =  executable('volumes_test', 'test_volumes.cpp', 'volumes.cpp', 'chapter_type.cpp',
-                           dependencies: [boostut_dep, deps],
-                           cpp_args: test_cpp_args)
+                           dependencies: [boostut_dep, deps])
 
 test('utils', utils_test)
 test('volumes', volumes_test)

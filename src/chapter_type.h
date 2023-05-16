@@ -140,7 +140,7 @@ evaluate_chapter_type(volume vol,
         }
     }
 
-    if (volume::SSUFTSS1 == vol) {
+    if (volume::UFTSS1 == vol) {
         if (ctre::search<"/1.xhtml">(href))
             return chapter_type::FRONTMATTER;
         if (ctre::search<"/[0-9]-[0-9].xhtml">(href))

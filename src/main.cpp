@@ -69,7 +69,7 @@ result<void> print_books(const fs::path& input_dir)
         log_info("Couldn't find Fanbook 2, so those chapters will be skipped in the new epubs.");
     }
 
-    if (books.end() != books.find(volume::SSUFTSS1)) {
+    if (books.end() != books.find(volume::UFTSS1)) {
         // Prefer UFTSS1 over the others
         for (auto vol : {volume::SSJBUNKO1, volume::SSBDOVA1, volume::SSTEASET,
                 volume::SSDRAMACD2, volume::SSTOBBONUS1, volume::SSDRAMACD3,
@@ -79,9 +79,17 @@ result<void> print_books(const fs::path& input_dir)
             book_readers.erase(vol);
         }
     }
-    for (const auto& it : book_readers ) {
-        log_info("Found ", to_string_view(it.first), ": ", it.second->path);
+
+    std::stringstream found_volumes_ss;
+    bool is_first = true;
+    for (const auto& it : book_readers) {
+        log_verbose("Found ", to_string_view(it.first), ": ", it.second->path);
+        if (!is_first) found_volumes_ss << ", ";
+        is_first = false;
+        found_volumes_ss << it.first;
     }
+    log_info("Found ", found_volumes_ss.str());
+
     auto tags = get_updated();
     bool need_updates = false;
     for (const auto &it : books) {

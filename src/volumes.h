@@ -12,6 +12,7 @@
 #include <ranges>
 
 #include "outcome/result.hpp"
+namespace outcome = OUTCOME_V2_NAMESPACE;
 
 enum class volume
 {
@@ -44,31 +45,29 @@ enum class volume
     FB3,
     RA1,
     SSC1,
-    MP1V1,
-    MP1V2,
-    MP1V3,
-    MP1V4,
-    MP1V5,
-    MP1V6,
-    MP1V7,
-    MP2V1,
-    MP2V2,
-    MP2V3,
-    MP2V4,
-    MP2V5,
-    MP2V6,
-    MP2V7,
+    M1V1,
+    M1V2,
+    M1V3,
+    M1V4,
+    M1V5,
+    M1V6,
+    M1V7,
+    M2V1,
+    M2V2,
+    M2V3,
+    M2V4,
+    M2V5,
+    M2V6,
+    M2V7,
     SSBDOVA1,    // Otto P1V3
     SSJBUNKO1,   // Benno P1V2
     SSTEASET,    // Ferdinand & Rozemyne P3V1
-    SSWN1,       // Hartmut P3V1
-    SSWN2,       // Charlotte P4V4
     SSDRAMACD2,  // Tulli P4V3
     SSDRAMACD3,  // Hartmut @ Name Swearing P4V7
     SSDRAMACD4,  // Ferdinand Hair Stick P4V9
     SSTOBBONUS1, // Raimund P4V6
     SSUP1,       // Anastasius/Hannelore P5V1
-    SSUFTSS1,    // Unofficial Fan Translated Side Stories (compilation of above)
+    UFTSS1,    // Unofficial Fan Translated Side Stories (compilation of above)
 };
 
 enum class omnibus
@@ -90,3 +89,6 @@ std::ostream& operator<<(std::ostream& os, const std::variant<omnibus, volume>& 
 
 volume get_volume_from_slug(std::string_view sv);
 std::string_view get_slug_from_volume(volume vol);
+
+outcome::result<volume> get_volume_from_uid(std::string_view uid) noexcept;
+outcome::result<std::string_view> get_uid_from_volume(volume vol) noexcept;

@@ -2,7 +2,11 @@
 #include "volumes.h"
 #include "omnibus.h"
 #include <boost/ut.hpp>
+#include "magic_enum.hpp"
+#include "magic_enum_switch.hpp"
 
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 int main() {
     using namespace boost::ut;
@@ -13,7 +17,24 @@ int main() {
 
         for (auto v : defined_volumes) {
             expect(nothrow([&](){get_slug_from_volume(v);}));
+            expect(nothrow([&](){get_volume_from_slug(get_slug_from_volume(v));}));
             expect(eq(v, get_volume_from_slug(get_slug_from_volume(v))));
         }
     };
-};
+
+    "uid volume map"_test = [] {
+        for (volume v : magic_enum::enum_values<volume>()) {
+            magic_enum::enum_switch(overloaded {
+                    /* UFTSS1 has a duplicated uid, so its not in the map */
+                    [](magic_enum::enum_constant<volume::UFTSS1>) {
+                        auto res = get_uid_from_volume(volume::UFTSS1);
+                        expect(eq(false, res.has_value()));
+                    },
+                    [](volume v) {
+                        auto res = get_uid_from_volume(v);
+                        expect(res.has_value());
+                        expect(eq(v, get_volume_from_uid(res.value()).value()));
+                    }}, v);
+        }
+    };
+}

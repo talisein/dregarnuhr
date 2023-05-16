@@ -48,8 +48,8 @@ namespace part_3_defs
 { volume::SSTEASET, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
 { volume::SSTEASET, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "Preparing the Temple's Tablewear"sv, true },
 
-{ volume::SSUFTSS1, /* CHAPTER */ "text/side3.xhtml", "application/xhtml+xml", "Preparing the Temple's Tablewear", true },
-{ volume::SSUFTSS1, /* STYLESHEET */ "styles/stylesheet.css", "text/css", std::nullopt, false },
+{ volume::UFTSS1, /* CHAPTER */ "text/side3.xhtml", "application/xhtml+xml", "Preparing the Temple's Tablewear", true },
+{ volume::UFTSS1, /* STYLESHEET */ "styles/stylesheet.css", "text/css", std::nullopt, false },
 
 { volume::P3V1, "Text/extra1.xhtml"sv, "application/xhtml+xml"sv, "Being My Little Sister’s Knight"sv, true },
 { volume::P3V1, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "A Noble’s Baptism Ceremony"sv, true },
@@ -66,7 +66,7 @@ namespace part_3_defs
 
 { volume::SSTEASET, "text/content0002.xhtml"sv, "application/xhtml+xml"sv, "Tableware for the Temple"sv, true },
 
-{ volume::SSUFTSS1, /* CHAPTER */ "text/side4.xhtml", "application/xhtml+xml", "Tableware for the Temple", true },
+{ volume::UFTSS1, /* CHAPTER */ "text/side4.xhtml", "application/xhtml+xml", "Tableware for the Temple", true },
 
 { volume::P3V1, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, "Reunited at Last"sv, true },
 { volume::P3V1, "Text/insert3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -203,9 +203,9 @@ namespace part_3_defs
 { volume::P3V2, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P3V2, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 
-{ volume::SSUFTSS1, /* STYLESHEET */ "styles/stylesheet.css", "text/css", std::nullopt, false },
-{ volume::SSUFTSS1, /* TOBOOKS_MANGA */ "text/12.xhtml", "application/xhtml+xml", "TOBooks Manga", true },
-{ volume::SSUFTSS1, /* IMAGE */ "images/P3V5_ToBooksBonus.png", "image/png", std::nullopt, false },
+{ volume::UFTSS1, /* STYLESHEET */ "styles/stylesheet.css", "text/css", std::nullopt, false },
+{ volume::UFTSS1, /* TOBOOKS_MANGA */ "text/12.xhtml", "application/xhtml+xml", "TOBooks Manga", true },
+{ volume::UFTSS1, /* IMAGE */ "images/P3V5_ToBooksBonus.png", "image/png", std::nullopt, false },
 
 { volume::P3V2, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P3V2, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
