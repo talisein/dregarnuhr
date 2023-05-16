@@ -34,10 +34,16 @@ jobs:
         include:
           # define operating systems
           - flavor: ubuntu
+            experimental: false
+            os: ubuntu-22.04
+          - flavor: ubuntu
+            experimental: true
             os: ubuntu-22.04
           - flavor: mac
+            experimental: false
             os: macos-12
           - flavor: windows
+            experimental: false
             os: windows-latest
           # CC
           - compiler: gcc
