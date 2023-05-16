@@ -79,13 +79,14 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 16
-          sudo apt-get install libc++-16-dev libc++abi-16-dev
+          # libc++-16 doesn't have std::views::join yet
+          # sudo apt-get install libc++-16-dev libc++abi-16-dev
+          sudo apt-get install libstdc++-12-dev
 
-      # Meson us using libstdc++ even with clang, so we need a stdc++ that's decent
-      - if: ${{ matrix.flavor == 'ubuntu' }}
+      - if: ${{ matrix.compiler == 'gcc' && matrix.flavor == 'ubuntu' }}
         name: Install gcc ubuntu
         run: |
-          sudo apt-get install g++-12
+          sudo apt-get install g++-12 libstdc++-12-dev
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
           sudo update-alternatives --set gcc /usr/bin/gcc-12
@@ -227,19 +228,23 @@ jobs:
           dput $REPOSITORY ../*.changes
 
       # Capture the binary
-      - if: ${{ matrix.flavor != 'windows' }}
+      - if: ${{ matrix.flavor != 'windows' && (success() || failure()) }}
         name: Binary Ubuntu/Mac
         uses: actions/upload-artifact@v3
         with:
           name: dregarnuhr-${{ matrix.os }}-${{ matrix.compiler }}
-          path: build/src/dregarnuhr
+          path: |
+            build/src/dregarnuhr
+            build/src/*_test
 
-      - if: ${{ matrix.flavor == 'windows' }}
+      - if: ${{ matrix.flavor == 'windows' && (success() || failure()) }}
         name: Binary Windows
         uses: actions/upload-artifact@v3
         with:
           name: dregarnuhr-${{ matrix.os }}
-          path: build/src/dregarnuhr.exe
+          path: |
+            build/src/dregarnuhr.exe
+            build/src/*_test.exe
 
   check-run-linux:
     needs: build
