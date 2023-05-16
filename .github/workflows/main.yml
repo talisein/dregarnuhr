@@ -71,7 +71,6 @@ jobs:
       DEBFULLNAME: ${{ vars.DEBFULLNAME }}
     runs-on: ${{ matrix.os }}
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
       - if: ${{ matrix.compiler == 'clang' && matrix.flavor == 'ubuntu' }}
@@ -80,11 +79,17 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 16
+          sudo apt-get install libc++-16-dev libc++abi-16-dev
 
-      - if: ${{ matrix.compiler == 'gcc' && matrix.flavor == 'ubuntu' }}
+      # Meson us using libstdc++ even with clang, so we need a stdc++ that's decent
+      - if: ${{ matrix.flavor == 'ubuntu' }}
         name: Install gcc ubuntu
         run: |
           sudo apt-get install g++-12
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
+          sudo update-alternatives --set gcc /usr/bin/gcc-12
+          sudo update-alternatives --set g++ /usr/bin/g++-12
 
       - if: ${{ matrix.flavor == 'ubuntu' }}
         name: Install deps ubuntu
