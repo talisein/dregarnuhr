@@ -30,6 +30,7 @@ jobs:
       matrix:
         flavor: [ubuntu, mac, windows]
         compiler: [gcc, clang, msvc]
+        experimental: false
         include:
           # define operating systems
           - flavor: ubuntu
@@ -45,6 +46,7 @@ jobs:
           - compiler: clang
             CC: clang-16
             CXX: clang++-16
+            experimental: true
           # Mac stuff
           - DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
             flavor: mac
@@ -69,6 +71,7 @@ jobs:
       DEVELOPER_DIR: ${{ matrix.DEVELOPER_DIR }}
       DEBEMAIL: ${{ vars.DEBEMAIL }}
       DEBFULLNAME: ${{ vars.DEBFULLNAME }}
+    continue-on-error: ${{ matrix.experimental }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -162,7 +165,10 @@ jobs:
 
       - if: ${{ matrix.flavor == 'ubuntu' }}
         name: ldd ubuntu
-        run: ldd build/src/dregarnuhr
+        run: |
+          ldd build/src/dregarnuhr
+          ldd build/src/utils_test
+          ldd build/src/volumes_test
         continue-on-error: true
 
       - if: ${{ matrix.flavor == 'mac' }}
@@ -176,7 +182,15 @@ jobs:
         continue-on-error: true
 
       - name: Test
-        run: ninja -C build test
+        id: unittests
+        run: meson test -C build --print-errorlogs
+
+      - if: ${{ steps.unittests.conclusion == 'failure' && failure() }}
+        name: Test backtrace
+        run: |
+          sudo apt-get install gdb
+          gdb --batch -ex "run" -ex "bt full" -ex "quit"  --args build/src/utils_test
+          gdb --batch -ex "run" -ex "bt full" -ex "quit"  --args build/src/volumes_test
 
       - name: Save logs
         if: ${{ always() }}

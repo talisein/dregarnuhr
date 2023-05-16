@@ -31,9 +31,11 @@ int main() {
                         expect(eq(false, res.has_value()));
                     },
                     [](volume v) {
-                        auto res = get_uid_from_volume(v);
-                        expect(res.has_value());
-                        expect(eq(v, get_volume_from_uid(res.value()).value()));
+                        auto uid_res = get_uid_from_volume(v);
+                        expect(uid_res.has_value());
+                        auto vol_res = get_volume_from_uid(uid_res.value());
+                        expect(vol_res.has_value());
+                        expect(eq(v, vol_res.value()));
                     }}, v);
         }
     };
