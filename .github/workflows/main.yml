@@ -48,6 +48,8 @@ jobs:
           - compiler: clang
             CC: clang-17
             CXX: clang++-17
+            C_LD: lld
+            CXX_LD: lld
             is-experimental: true
           # Mac stuff
           - DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
