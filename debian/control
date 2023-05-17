@@ -1,0 +1,32 @@
+Source: dregarnuhr
+Priority: optional
+Maintainer: Andrew Potter <talisein@gmail.com>
+Build-Depends: debhelper-compat (= 13),
+	       g++-12,
+	       meson,
+	       pkg-config,
+	       cmake,
+	       zlib1g-dev,
+	       libjpeg-turbo8-dev,
+	       libpng-dev,
+	       liblzma-dev,
+	       libhowardhinnant-date-dev,
+	       libcpp-httplib-dev,
+	       libboost-ext-ut-dev (>= 1.1.9-4),
+	       liboutcome-dev,
+	       libctre-dev,
+           libmagicenum-dev,
+	       libminiz3-dev,
+	       libxml++5.0-dev
+Standards-Version: 4.6.0
+Section: libs
+Homepage: https://github.com/talisein/dregarnuhr
+Rules-Requires-Root: no
+
+Package: dregarnuhr
+Section: utils
+Architecture: any
+Multi-Arch: same
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Rearrange Ascendence of a Bookworm epubs
+ Rearranges AoaB epubs from J-Novel club into chronological order.

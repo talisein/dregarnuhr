@@ -493,3 +493,23 @@ namespace epub
         }
     }
 }
+
+result<volume>
+epub::identify_volume(const epub::book& book)
+{
+    std::string_view uid = book.manifest.toc.dtb_uid;
+    OUTCOME_TRY(auto uid_volume, get_volume_from_uid(uid));
+
+    if (volume::SSDRAMACD3 == uid_volume) {
+        if (book.manifest.toc.title == "Ascendance of a Bookworm: Unofficial Fan Translated Side Stories Vol. 1") {
+            return volume::UFTSS1;
+        } else if (book.manifest.toc.title == "Ascendance of a Bookworm P4V7 Drama CD 3 SS: Witnessing the Name Swearing") {
+            return volume::SSDRAMACD3;
+        } else {
+            log_error("Unexpected title: ", book.manifest.toc.title);
+            return std::errc::invalid_argument;
+        }
+    } else {
+        return uid_volume;
+    }
+}

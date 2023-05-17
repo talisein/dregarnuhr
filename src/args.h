@@ -27,6 +27,7 @@ struct args
     std::optional<std::string> suffix;
     std::optional<std::string> title;
     std::optional<fs::path> cover;
+    std::string basename;
     fs::path input_file;
     fs::path input_dir;
     fs::path output_dir;

@@ -2,7 +2,7 @@
 
 #include <array>
 #include <span>
-#include "volumes.h"
+#include "volume_definition.h"
 
 namespace part_5_defs
 {
@@ -98,7 +98,7 @@ namespace part_5_defs
 { volume::P5V1, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
 { volume::P5V1, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P5V1, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
-{ volume::P5V1, "Text/poll1.xhtml"sv, "application/xhtml+xml"sv, "The 3rd Ascendance of a Bookworm Character Poll!"sv, true },
+{ volume::P5V1, "Text/poll1.xhtml"sv, "application/xhtml+xml"sv, "Character Poll"sv, true },
 { volume::P5V1, "Text/poll2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P5V1, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P5V1, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -188,11 +188,103 @@ namespace part_5_defs
 { volume::P5V2, "Text/copyright.xhtml"sv, "application/xhtml+xml"sv, "Copyright"sv, true },
         });
 
+constexpr std::array vol_3 = std::to_array<volume_definition>({
+{ volume::P5V3, "toc.ncx"sv, "application/x-dtbncx+xml"sv, std::nullopt, false },
+{ volume::P5V3, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+{ volume::P5V3, "Images/jnovelclubCMYK.png"sv, "image/png"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Map2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Map.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Manga2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Manga1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Insert10.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Insert9.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Insert8.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Insert7.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Insert6.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Insert5.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Insert4.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Insert3.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Insert2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Insert1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/FrontMatter2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/FrontMatter1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Cover.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Characters3.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Characters2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Characters1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Bonus2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Images/Bonus1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::P5V3, "Text/cover.xhtml"sv, "application/xhtml+xml"sv, "Cover"sv, true },
+{ volume::P5V3, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
+{ volume::P5V3, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/characters1.xhtml"sv, "application/xhtml+xml"sv, "Characters"sv, true },
+{ volume::P5V3, "Text/characters2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/characters3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/toc.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/prologue.xhtml"sv, "application/xhtml+xml"sv, "Prologue"sv, true },
+{ volume::P5V3, "Text/insert1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/prologue_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter1.xhtml"sv, "application/xhtml+xml"sv, "Awakening and Reports"sv, true },
+{ volume::P5V3, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "Preparing for the Interduchy Tournament"sv, true },
+{ volume::P5V3, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Raimund’s Research and Hirschur’s Warning"sv, true },
+{ volume::P5V3, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "The Interduchy Tournament (Third Year)"sv, true },
+{ volume::P5V3, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter4_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, "Socializing with Dunkelfelger"sv, true },
+{ volume::P5V3, "Text/insert3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter5_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, "Socializing with Ahrensbach"sv, true },
+
+{ volume::P5V3, "Text/chapter18.xhtml"sv, "application/xhtml+xml"sv, "Resolve at the Interduchy Tournament"sv, true },
+
+{ volume::P5V3, "Text/chapter7.xhtml"sv, "application/xhtml+xml"sv, "Socializing with Royalty"sv, true },
+{ volume::P5V3, "Text/insert4.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter7_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter8.xhtml"sv, "application/xhtml+xml"sv, "Socializing with Other Duchies"sv, true },
+
+{ volume::P5V3, "Text/chapter19.xhtml"sv, "application/xhtml+xml"sv, "My Daughter’s Perspective and Resolve"sv, true },
+
+{ volume::P5V3, "Text/chapter9.xhtml"sv, "application/xhtml+xml"sv, "Socializing with Frenbeltag"sv, true },
+{ volume::P5V3, "Text/chapter10.xhtml"sv, "application/xhtml+xml"sv, "Ditter and Dunkelfelger’s Demonstration"sv, true },
+{ volume::P5V3, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter10_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter11.xhtml"sv, "application/xhtml+xml"sv, "My First Awards Ceremony"sv, true },
+{ volume::P5V3, "Text/chapter12.xhtml"sv, "application/xhtml+xml"sv, "Dinner with Ferdinand"sv, true },
+{ volume::P5V3, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter12_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter13.xhtml"sv, "application/xhtml+xml"sv, "Farewells and the Coming-of-Age Ceremony"sv, true },
+{ volume::P5V3, "Text/insert7.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter13_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/insert8.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter13_2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, "Detlinde’s Dedication Whirl"sv, true },
+{ volume::P5V3, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "A Discussion with Eglantine"sv, true },
+{ volume::P5V3, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter15_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "Lending Books and a Place for One’s Heart"sv, true },
+
+{ volume::P5V3, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "Suspicions and Gewinnen"sv, true },
+
+{ volume::P5V3, "Text/chapter17.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
+{ volume::P5V3, "Text/insert10.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/chapter17_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
+{ volume::P5V3, "Text/map2.xhtml"sv, "application/xhtml+xml"sv, "Map of Yurgenschmidt"sv, true },
+{ volume::P5V3, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
+{ volume::P5V3, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
+{ volume::P5V3, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
+{ volume::P5V3, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::P5V3, "Text/signup.xhtml"sv, "application/xhtml+xml"sv, "About J-Novel Club"sv, true },
+{ volume::P5V3, "Text/copyright.xhtml"sv, "application/xhtml+xml"sv, "Copyright"sv, true },
+    });
+
     constexpr definition_span_view_t vol_1_def { std::span<const volume_definition, std::dynamic_extent>(vol_1), volume::P5V1 };
     constexpr definition_span_view_t vol_2_def { std::span<const volume_definition, std::dynamic_extent>(vol_2), volume::P5V2 };
+    constexpr definition_span_view_t vol_3_def { std::span<const volume_definition, std::dynamic_extent>(vol_3), volume::P5V3 };
 
     constexpr std::array part_5_arr { std::to_array<definition_span_view_t>({
-                vol_1_def, vol_2_def,
+                vol_1_def, vol_2_def, vol_3_def,
             }) };
 
     constexpr definition_view_t part_5_def { std::span<const definition_span_view_t, std::dynamic_extent>(part_5_arr), omnibus::PART5 };

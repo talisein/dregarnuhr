@@ -20,14 +20,16 @@ const args* get_options() { return &options; }
 
 namespace {
     using namespace std::string_view_literals;
-    static constexpr std::string_view DEFAULT_PREFIX { "chronological-"sv };
-    static constexpr std::string_view DEFAULT_OMNIBUS_PART1_TITLE { "Ascendence of a Bookworm: Part 1 Chronological Omnibus"sv };
-    static constexpr std::string_view DEFAULT_OMNIBUS_PART2_TITLE { "Ascendence of a Bookworm: Part 2 Chronological Omnibus"sv };
-    static constexpr std::string_view DEFAULT_OMNIBUS_PART3_TITLE { "Ascendence of a Bookworm: Part 3 Chronological Omnibus"sv };
-    static constexpr std::string_view DEFAULT_OMNIBUS_PART4_TITLE { "Ascendence of a Bookworm: Part 4 Chronological Omnibus"sv };
-    static constexpr std::string_view DEFAULT_OMNIBUS_PART5_TITLE { "Ascendence of a Bookworm: Part 5 Chronological Omnibus"sv };
-    static constexpr std::string_view DEFAULT_OMNIBUS_TITLE { "Ascendence of a Bookworm: Chronological Omnibus"sv };
-    static constexpr mz_uint DEFAULT_COMPRESSION_LEVEL = MZ_DEFAULT_LEVEL;
+    constexpr std::string_view DEFAULT_PREFIX { "chronological-"sv };
+    constexpr std::string_view DEFAULT_BASENAME { "ascendence-of-a-bookworm"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_SUFFIX { "-omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_PART1_TITLE { "Ascendence of a Bookworm: Part 1 Chronological Omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_PART2_TITLE { "Ascendence of a Bookworm: Part 2 Chronological Omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_PART3_TITLE { "Ascendence of a Bookworm: Part 3 Chronological Omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_PART4_TITLE { "Ascendence of a Bookworm: Part 4 Chronological Omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_PART5_TITLE { "Ascendence of a Bookworm: Part 5 Chronological Omnibus"sv };
+    constexpr std::string_view DEFAULT_OMNIBUS_TITLE { "Ascendence of a Bookworm: Chronological Omnibus"sv };
+    constexpr mz_uint DEFAULT_COMPRESSION_LEVEL = MZ_DEFAULT_LEVEL;
 }
 
 namespace {
@@ -42,11 +44,13 @@ namespace {
                  "--cover=XXX.jpg\t: Add a custom cover image. Only for omnibus.\n"
                  "--prefix=XXX\t: Created filenames will be prefixed with XXX. The default is ", std::quoted(DEFAULT_PREFIX), "\n",
                  "--suffix=XXX\t: Created filenames will be suffixed with XXX. The default is blank.\n",
+                 "--basename=XXX\t: Created filenames will have a base name with XXX. The default is ", std::quoted(DEFAULT_BASENAME), "\n",
                  "--verbose\t: Print a lot of debugging information\n",
                  "--jpg-scale=N\t: Scale jpg images down by 1/N, where N is between 1-16\n",
                  "--jpg-quality=N\t: Re-encode jpg quality to n, where N is between 1-100\n"
                  "--compression-level=[0-10,fastest,smallest]\t: Set compression level; only for generated files. The default is ", DEFAULT_COMPRESSION_LEVEL, '\n',
-                 "--no-nested\t: Skip creating a nested NCX (table of contents) for omnibus outputs.\n"
+                 "--no-nested\t: Skip creating a nested NCX (table of contents) for omnibus outputs\n"
+                 "--slim\t\t: Set title, omnibus mode, jpg-scale and quality.\n"
                  "--mode=dump\t: Dump spine and toc data. Give a path to an epub file instead of a directory. This is mostly for development."
             );
     }
@@ -160,6 +164,7 @@ std::expected<void, std::error_code>
 parse(int argc, char** argv)
 {
     using namespace std::string_view_literals;
+    using namespace std::string_literals;
     using namespace std::ranges;
     auto args_sv = std::views::counted(argv, argc) | std::views::drop(1) | std::views::transform([](const char *p) -> std::string_view { return std::string_view(p); });
 
@@ -177,6 +182,21 @@ parse(int argc, char** argv)
     }
     if (find (args_options, "--verbose"sv) != args_options.end()) {
         options.verbose = true;
+    }
+
+    if (find (args_options, "--slim"sv) != args_options.end()) {
+        options.jpg_quality = std::make_optional<int>( 70 );
+        options.jpg_scale = std::make_optional<int>( 2 );
+        options.prefix = std::make_optional<std::string>("slim-");
+        options.omnibus_type = omnibus::ALL;
+        options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_TITLE);
+
+        fs::path path = "../covers/omnibus.jpg";
+        if (fs::exists(path)) {
+            options.cover = path;
+            log_info("Defaulted cover to ", path);
+        }
+        options.name_filter = std::make_optional<std::regex>("(bonus[0-9]|frontmatter[1-2]).(jpg|xhtml)"s, std::regex_constants::icase);
     }
 
     options.suffix = utils::find_if_optarg<std::string>(args_options, "--suffix="sv, std::identity{});
@@ -353,6 +373,15 @@ parse(int argc, char** argv)
         }
     }
 
+    options.basename = utils::find_if_optarg(args_options, "--base="sv).and_then([](const auto& basename) -> std::optional<std::string> {
+            if (basename.size() == 0) {
+                log_error("Setting a blank basename is invalid");
+                return std::nullopt;
+            }
+            log_info("Basename set to ", std::quoted(basename));
+            return std::make_optional<std::string>(basename);
+        }).value_or(std::string(DEFAULT_BASENAME));
+
     if (find (args_options, "--check"sv) != args_options.end()) {
         auto map = get_updated();
         if (map.size() > 0) {
@@ -373,6 +402,11 @@ parse(int argc, char** argv)
     if (!options.prefix && !options.suffix) {
         options.prefix = std::make_optional<std::string>(DEFAULT_PREFIX);
     }
+
+    if (options.omnibus_type && !options.suffix) {
+        options.suffix = std::make_optional<std::string>(DEFAULT_OMNIBUS_SUFFIX);
+    }
+
     if (!options.compression_level) {
         options.compression_level = DEFAULT_COMPRESSION_LEVEL;
     }

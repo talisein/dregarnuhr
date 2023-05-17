@@ -1,6 +1,6 @@
 project('dregarnuhr', ['c', 'cpp'],
         license : 'GPLv3+',
-        version : '1.0.9',
+        version : '1.0.13',
         default_options : ['c_std=gnu17',
                            'buildtype=release',
                            'default_library=static',
@@ -39,6 +39,11 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace', args: cpp23_ar
 
 has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>', args: cpp23_args)
 
+zlib_dep = dependency('zlib', fallback: ['zlib'])
+
+# Fedora libjpeg-turbo-devel, Ubuntu libjpeg-turbo8-dev
+png_dep = dependency('libpng', fallback: ['libpng'])
+
 # Fedora libjpeg-turbo-devel, Ubuntu libjpeg-turbo8-dev
 jpeg_dep = dependency('libjpeg', version: '>=2.1.0', fallback: ['libjpeg-turbo'])
 
@@ -60,7 +65,6 @@ else
 endif
 
 # zlib is needed by libxml2. Specify fallback to our wrap to avoid strawberry perl on windows
-zlib_dep = dependency('zlib', fallback: ['zlib'])
 lzma_dep = dependency('liblzma', fallback: ['liblzma'])
 
 # Fedora libxml2-devel, Ubuntu libxml2-dev
@@ -90,7 +94,7 @@ libxmlpp_dep = dependency('libxml++-5.0',
 if not has_chrono
   # Fedora date-devel, Ubuntu libhowardhinnant-date-dev
   # Note: Only needed until GCC implements c++20 <chrono>. Maybe in 13?
-  date_dep = dependency('date',
+  date_dep = dependency('date', 'howardhinnant-date',
                         fallback: ['hinnant-date', 'date_dep'],
                         default_options: ['use_manual_tzdb=true'])
 endif
@@ -105,6 +109,9 @@ add_project_arguments('-DBOOST_UT_DISABLE_MODULE', language: 'cpp')
 
 ctre_dep = dependency('ctre',
                       fallback: ['ctre'])
+
+magic_enum_dep = dependency('magic_enum',
+                           fallback: ['magic_enum'])
 
 subdir('src')
 subdir('test')

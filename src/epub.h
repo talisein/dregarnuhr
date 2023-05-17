@@ -10,6 +10,7 @@
 #include "outcome/result.hpp"
 #include "zip.h"
 #include "config.h"
+#include "volumes.h"
 
 namespace epub
 {
@@ -65,6 +66,7 @@ namespace epub
         std::string rootfile_path;
         struct manifest manifest;
     };
+    result<volume> identify_volume(const book& book);
 
     class file_reader
     {

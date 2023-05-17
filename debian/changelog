@@ -1,0 +1,30 @@
+dregarnuhr (1.0.13-1) jammy; urgency=medium
+
+  * UFTSS1
+ -- Andrew Potter <talisein@gmail.com>  Sun, 30 Apr 2023 19:27:47 -0700
+
+dregarnuhr (1.0.12-5) jammy; urgency=medium
+
+  * Made sure the .deb has depends too
+ -- Andrew Potter <talisein@gmail.com>  Sun, 30 Apr 2023 19:27:47 -0700
+
+dregarnuhr (1.0.12-4) jammy; urgency=medium
+
+  * Add httplib dep
+ -- Andrew Potter <talisein@gmail.com>  Sun, 30 Apr 2023 19:27:47 -0700
+
+dregarnuhr (1.0.12-3) jammy; urgency=medium
+
+  * Add even more build deps
+ -- Andrew Potter <talisein@gmail.com>  Sun, 30 Apr 2023 19:27:47 -0700
+
+dregarnuhr (1.0.12-2) jammy; urgency=medium
+
+  * Add more build deps
+ -- Andrew Potter <talisein@gmail.com>  Sun, 30 Apr 2023 19:27:47 -0700
+
+dregarnuhr (1.0.12-1) jammy; urgency=medium
+
+  * Initial release
+
+ -- Andrew Potter <talisein@gmail.com>  Sun, 30 Apr 2023 17:19:47 -0700

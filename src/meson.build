@@ -18,7 +18,7 @@ config = configure_file(input: 'config.h.in',
                         output: 'config.h',
                         configuration: conf_data)
 
-deps = [zlib_dep, lzma_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep, http_dep, ctre_dep]
+deps = [zlib_dep, lzma_dep, libxml_dep, libxmlpp_dep, miniz_dep, outcome_dep, jpeg_dep, http_dep, ctre_dep, png_dep, magic_enum_dep]
 
 if not has_chrono
   deps += date_dep
@@ -29,8 +29,11 @@ lib_srcs = ['zip.cpp',
        'args.cpp',
        'epub.cpp',
        'volumes.cpp',
+       'chapter_type.cpp',
+       'volume_definition.cpp',
        'bookmaker.cpp',
        'jpeg.cpp',
+       'png_reader.cpp',
        'omnibus.cpp',
        'utils.cpp',
        'updates.cpp',

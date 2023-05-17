@@ -96,6 +96,7 @@ namespace jpeg
                 decompressor.cinfo.scale_denom = scale.value();
             }
             jpeg_calc_output_dimensions(&decompressor.cinfo);
+
             cinfo.image_width = decompressor.cinfo.output_width;
             cinfo.image_height = decompressor.cinfo.output_height;
             if (scale) {
@@ -104,6 +105,8 @@ namespace jpeg
             cinfo.input_components = decompressor.cinfo.output_components;
             cinfo.in_color_space = decompressor.cinfo.out_color_space;
             jpeg_set_defaults(&cinfo);
+            cinfo.optimize_coding = TRUE;
+
             if (quality)
                 jpeg_set_quality(&cinfo, quality.value(), TRUE);
             jpeg_start_decompress(&decompressor.cinfo);
@@ -121,6 +124,45 @@ namespace jpeg
             return outcome::error_from_exception();
         }
     }
+
+
+    outcome::result<std::span<const unsigned char>>
+    compressor::compress_rgb(JDIMENSION width, JDIMENSION height, std::span<JSAMPLE> buf, std::optional<int> quality)
+    {
+        try {
+            cinfo.image_width = width;
+            cinfo.image_height = height;
+            cinfo.input_components = 3;
+            cinfo.in_color_space = JCS_RGB;
+            jpeg_set_defaults(&cinfo);
+            cinfo.optimize_coding = TRUE;
+
+            if (quality)
+                jpeg_set_quality(&cinfo, quality.value(), TRUE);
+            jpeg_start_compress(&cinfo, TRUE);
+            const auto row_stride = cinfo.image_width * cinfo.input_components;
+
+            auto rows = std::make_unique<JSAMPROW[]>(height);
+            for (JDIMENSION i = 0; i < height; ++i) {
+                const auto start = buf.data();
+                auto p = start + row_stride * i;
+                rows[i] = p;
+            }
+
+            auto res = jpeg_write_scanlines(&cinfo, rows.get(), height);
+            if (res != height) {
+                log_error("compress_rgb: write_scanlines wrote only ", res, " lines, whigh is less than height ", height);
+                return std::errc::io_error;
+            }
+
+            jpeg_finish_compress(&cinfo);
+            return std::span<const unsigned char>(outbuf, outsize);
+
+        } catch (...) {
+            return outcome::error_from_exception();
+        }
+    }
+
     decompressor::decompressor(std::span<const unsigned char> src)
     {
         cinfo.err = jpeg_std_error(&jerr);

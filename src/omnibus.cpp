@@ -17,8 +17,8 @@ get_volume_map()
         for (const auto& vol : part.defs) {
             auto v = std::get<volume>(vol.name);
             auto pair = std::make_pair(o, v);
-            for (const auto& def : vol.defs |
-                     std::views::filter([](const auto &d) { return d.get_chapter_type() == chapter_type::CHAPTER;})) {
+            for (const auto& def : vol.defs | std::views::filter(&volume_definition::is_bodymatter))
+            {
                 m.try_emplace(def, pair);
             }
         }

@@ -22,13 +22,18 @@ namespace {
             auto slug_sv = std::string_view(slug_r);
             std::ranges::advance(colon_it, 1, std::ranges::end(colon_split));
             if (colon_it == std::ranges::end(colon_split)) continue;
-            auto no_ws = std::views::drop_while(*colon_it, [](unsigned char c) {return std::isspace(c);});
+            auto no_ws = std::views::drop_while(*colon_it, [](unsigned char c) noexcept {return std::isspace(c);});
             std::chrono::seconds::rep ts;
             auto [ptr, ec] = std::from_chars(std::to_address(std::ranges::begin(no_ws)),
                                              std::to_address(std::ranges::end(no_ws)), ts);
             if (ec != std::errc()) continue;
-            auto it = map.emplace(get_volume_from_slug(slug_sv), std::chrono::seconds(ts));
-            log_verbose("Emplaced ", it.first->first, ": ", it.first->second.time_since_epoch());
+            try {
+                auto v = get_volume_from_slug(slug_sv);
+                auto it = map.emplace(v, std::chrono::seconds(ts));
+                log_verbose("Emplaced ", it.first->first, ": ", it.first->second.time_since_epoch());
+            } catch(std::system_error &e) {
+                log_error("Slug ", slug_sv, " unknown: ", e);
+            }
         }
 
         return map;

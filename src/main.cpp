@@ -53,7 +53,7 @@ result<void> print_books(const fs::path& input_dir)
                 log_verbose("Info: Dump error for ", std::quoted(dir_entry.path().string()), ": ", book.error().message());
                 continue;
             }
-            auto vol = identify_volume(book.value().manifest.toc.dtb_uid);
+            auto vol = identify_volume(book.value());
             if (vol.has_failure()) {
                 log_verbose("Info: Failed to identify ", std::quoted(dir_entry.path().string()),
                             ": Unknown uid ", std::quoted(book.value().manifest.toc.dtb_uid),
@@ -65,15 +65,34 @@ result<void> print_books(const fs::path& input_dir)
         }
     }
 
-    for (const auto& it : book_readers ) {
-        log_info("Found ", to_string_view(it.first), ": ", it.second->path);
-    }
     if (books.end() == books.find(volume::FB1)) {
         log_info("Couldn't find Fanbook 1, so those chapters will be skipped in the new epubs.");
     }
     if (books.end() == books.find(volume::FB2)) {
         log_info("Couldn't find Fanbook 2, so those chapters will be skipped in the new epubs.");
     }
+
+    if (books.end() != books.find(volume::UFTSS1)) {
+        // Prefer UFTSS1 over the others
+        for (auto vol : {volume::SSJBUNKO1, volume::SSBDOVA1, volume::SSTEASET,
+                volume::SSDRAMACD2, volume::SSTOBBONUS1, volume::SSDRAMACD3,
+                volume::SSDRAMACD4})
+        {
+            books.erase(vol);
+            book_readers.erase(vol);
+        }
+    }
+
+    std::stringstream found_volumes_ss;
+    bool is_first = true;
+    for (const auto& it : book_readers) {
+        log_verbose("Found ", to_string_view(it.first), ": ", it.second->path);
+        if (!is_first) found_volumes_ss << ", ";
+        is_first = false;
+        found_volumes_ss << it.first;
+    }
+    log_info("Found ", found_volumes_ss.str());
+
     auto tags = get_updated();
     bool need_updates = false;
     for (const auto &it : books) {
@@ -119,7 +138,7 @@ void do_dump()
     auto book = res.value();
     using namespace std::string_view_literals;
     std::string dump_volume {"VTMP"};
-    if (auto it = identify_volume(book.manifest.toc.dtb_uid); it.has_value()) {
+    if (auto it = identify_volume(book); it.has_value()) {
         dump_volume = to_string_view(it.value());
     } else if (get_options()->dump_volume) {
         dump_volume = *get_options()->dump_volume;
@@ -127,15 +146,20 @@ void do_dump()
     std::cout << "{" << std::quoted(book.manifest.toc.dtb_uid) << "sv, volume::"sv
               <<  dump_volume << "},\n";
     for (const auto& item : book.manifest.items) {
-        std::cout << "{ volume::" << dump_volume << ", "
-                  <<  std::quoted(item.href) << "sv, "
-                  << std::quoted(item.media_type) <<  "sv, ";
-        if (item.toc_label) {
-            std::cout << std::quoted(*item.toc_label) << "sv";
-        } else {
-            std::cout << "std::nullopt";
+        try {
+            volume_definition v {identify_volume(book).value(),  item.href, item.media_type, item.toc_label, item.in_spine};
+            std::cout << v << "," << std::endl;
+        } catch (std::exception &) {
+            std::cout << "{ volume::" << dump_volume << ", /* ??? */ "
+                      <<  std::quoted(item.href) << "sv, "
+                      << std::quoted(item.media_type) <<  "sv, ";
+            if (item.toc_label) {
+                std::cout << std::quoted(*item.toc_label) << "sv";
+            } else {
+                std::cout << "std::nullopt";
+            }
+            std::cout << ", " << std::boolalpha << item.in_spine <<  " },\n";
         }
-        std::cout << ", " << std::boolalpha << item.in_spine <<  " },\n";
     }
 }
 
@@ -174,10 +198,10 @@ int main(int argc, char* argv[])
         } else {
             std::locale::global(std::locale(""));
         }
-    } catch (std::exception &) {
+    } catch (std::exception &e) {
         // MacOS has issues
         std::setlocale(LC_ALL, "");
-        log_info("Warning: Couldn't set locale, but we will continue.");
+        log_info("Warning: Couldn't set locale, but we will continue: ", e.what());
     }
 
     if (auto res = parse(argc, argv); !res.has_value()) {
@@ -193,13 +217,12 @@ int main(int argc, char* argv[])
         auto res = print_books(get_options()->input_dir);
 
         if (res.has_error()) {
-            log_error("Failed to make books: ", res.error());
             if (get_options()->output_created) {
                 std::error_code ec;
                 if (std::filesystem::is_empty(get_options()->output_dir, ec) && !ec) {
-                    log_verbose("No ebooks created successfully. Cleaning up created directory.");
+                    log_verbose("No ebooks created. Cleaning up created empty directory.");
                     fs::remove(get_options()->output_dir, ec);
-                    if (ec) {
+                    if (ec != std::error_code{}) {
                         log_error("unable to delete empty output directory ", get_options()->output_dir, ": ", ec);
                     }
                 }

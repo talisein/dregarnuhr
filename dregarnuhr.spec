@@ -1,5 +1,5 @@
 Name:           dregarnuhr
-Version:        1.0.9
+Version:        1.0.13
 Release:        1
 Summary:        Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
@@ -16,12 +16,14 @@ BuildRequires:  brotli-devel
 BuildRequires:  zlib-devel
 BuildRequires:  cpp-httplib-devel
 BuildRequires:  date-devel
+BuildRequires:  libpng-devel
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  miniz-devel
 BuildRequires:  outcome-devel
 BuildRequires:  libxml++50-devel >= 5.0.2
 BuildRequires:  boost-ext-ut-static
 BuildRequires:  ctre-static
+BuildRequires:  libmagicenum-static
 
 
 %description
@@ -49,7 +51,19 @@ Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 
 %changelog
-* Thu Jan 26 2022 Andrew Potter <agpotter@gmail.com> - v1.0.9-1
+* Sun Apr 23 2023 Andrew Potter <agpotter@gmail.com> - v1.0.13-1
+- Add UFTSS1
+
+* Sun Apr 23 2023 Andrew Potter <agpotter@gmail.com> - v1.0.12-1
+- Add SSC1
+
+* Wed Apr 12 2023 Andrew Potter <agpotter@gmail.com> - v1.0.11-1
+- Fix missing slug bug
+
+* Tue Apr 4 2023 Andrew Potter <agpotter@gmail.com> - v1.0.10-1
+- Add M2V7 and P5V3
+
+* Thu Jan 26 2023 Andrew Potter <agpotter@gmail.com> - v1.0.9-1
 - P5V2
 
 * Fri Dec 30 2022 Andrew Potter <agpotter@gmail.com> - v1.0.8-1

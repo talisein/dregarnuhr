@@ -383,7 +383,7 @@ namespace zip
         OUTCOME_TRY(auto src_idx, reader.locate_file(src_filename.c_str()));
         OUTCOME_TRY(auto stat, reader.stat(src_idx));
         _log_level_and_flags(src_filename, stat);
-        auto level = stat.m_bit_flag & 0xF;
+        mz_uint level = MZ_DEFAULT_LEVEL;
         if (0 == stat.m_method)
             level = 0;
         OUTCOME_TRY(auto buf, reader.extract(src_idx, (0 == level) ? 0 : MZ_ZIP_FLAG_COMPRESSED_DATA));
@@ -401,6 +401,15 @@ namespace zip
                                                    0 == level ? 0 : stat.m_crc32,
                                                    modified == ZIP_TIME_UNSET ? NULL : &modified,
                                                    nullptr, 0, nullptr, 0);
+            log_verbose("Copying ", src_filename, " to ", dst_filename, ". Parameters:\n\t",
+                        "buf size: ", buf.size(), "\n\t",
+                        "comment: ", stat.m_comment, "\n\t",
+                        "comment size:", stat.m_comment_size, "\n\t",
+                        "level: ", level, "\n\t",
+                        "uncomp size: ", stat.m_uncomp_size, "\n\t",
+                        "crc2: ", stat.m_crc32 , "\n\t",
+                        "modified:", modified);
+
             if (modified != stat.m_time) {
                 log_verbose("Writer changed the modified time?? from ", stat.m_time, " to ", modified);
             }

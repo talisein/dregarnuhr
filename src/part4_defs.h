@@ -2,7 +2,7 @@
 
 #include <array>
 #include <span>
-#include "volumes.h"
+#include "volume_definition.h"
 
 namespace part_4_defs
 {
@@ -47,10 +47,17 @@ namespace part_4_defs
 { volume::P4V1, "Text/insert1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/prologue_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter1.xhtml"sv, "application/xhtml+xml"sv, "Just Call Me Urashima Taro"sv, true },
+
 { volume::P4V1, "Text/chapter24.xhtml"sv, "application/xhtml+xml"sv, "Myne Awakes"sv, true },
 { volume::P4V1, "Text/insert10.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter24_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "Moving to the Castle"sv, true },
+
+{ volume::SSC1, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "Hirschur — Special Accommodations"sv, true },
+{ volume::SSC1, "Text/insert8.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert8.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P4V1, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Dinnertime"sv, true },
 { volume::P4V1, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/chapter3_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -58,7 +65,6 @@ namespace part_4_defs
 
 { volume::FB3, "Text/45.xhtml"sv, "application/xhtml+xml"sv, "Yurgenschmidt Duchies"sv, true },
 { volume::FB3, "Images/Image45.jpg"sv, "image/jpeg"sv, std::nullopt, false },
-
 
 { volume::P4V1, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, "The Gifting Ceremony"sv, true },
 { volume::P4V1, "Text/chapter6.xhtml"sv, "application/xhtml+xml"sv, "The Winter Playroom and Our Departure"sv, true },
@@ -112,7 +118,7 @@ namespace part_4_defs
 { volume::P4V1, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
 { volume::P4V1, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P4V1, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
-{ volume::P4V1, "Text/poll1.xhtml"sv, "application/xhtml+xml"sv, "The 2nd Ascendance of a Bookworm Character Poll!"sv, true },
+{ volume::P4V1, "Text/poll1.xhtml"sv, "application/xhtml+xml"sv, "Character Poll"sv, true },
 { volume::P4V1, "Text/poll2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V1, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P4V1, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -160,6 +166,13 @@ namespace part_4_defs
 { volume::P4V2, "Text/insert1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V2, "Text/chapter2_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V2, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "I Want to Found the Library Committee"sv, true },
+
+{ volume::SSC1, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "Roderick — She Who Saved My Heart"sv, true },
+{ volume::SSC1, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert9.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/chapter16_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P4V2, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Preparing a Tea Party for Solange"sv, true },
 { volume::P4V2, "Text/chapter5.xhtml"sv, "application/xhtml+xml"sv, "My First Tea Party at the Royal Academy"sv, true },
 { volume::P4V2, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -299,6 +312,9 @@ namespace part_4_defs
 { volume::P4V3, "Text/chapter7_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::SSDRAMACD2, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
 { volume::SSDRAMACD2, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "A Royal Commission"sv, true },
+{ volume::UFTSS1, /* STYLESHEET */ "styles/stylesheet.css", "text/css", std::nullopt, false },
+{ volume::UFTSS1, /* CHAPTER */ "text/side5.xhtml", "application/xhtml+xml", "A Royal Commission", true },
+
 { volume::P4V3, "Text/chapter8.xhtml"sv, "application/xhtml+xml"sv, "A Week of Socializing"sv, true },
 { volume::P4V3, "Text/chapter9.xhtml"sv, "application/xhtml+xml"sv, "Justus and Preparing for the Interduchy Tournament"sv, true },
 { volume::P4V3, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -322,12 +338,21 @@ namespace part_4_defs
 { volume::P4V3, "Text/chapter22.xhtml"sv, "application/xhtml+xml"sv, "The Blessing at the Graduation Ceremony"sv, true },
 { volume::P4V3, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, "Year One: Complete"sv, true },
 { volume::RA1, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "Hannelore — Ehrenfest’s Books"sv, true },
-{ volume::RA1, "Text/prologue.xhtml"sv, "application/xhtml+xml"sv, "Solange — Prologue"sv, true },
 { volume::P4V3, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "Buying Information and the Mana Compression Lecture"sv, true },
+
+{ volume::SSC1, "Text/chapter17.xhtml"sv, "application/xhtml+xml"sv, "Philine — Coming Home from the Royal Academy"sv, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P4V3, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "Philine’s Family Circumstances"sv, true },
 { volume::P4V3, "Text/insert8.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V3, "Text/chapter16_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::RA1, "Text/prologue.xhtml"sv, "application/xhtml+xml"sv, "Solange — Prologue"sv, true },
+
 { volume::P4V3, "Text/chapter17.xhtml"sv, "application/xhtml+xml"sv, "Taking Konrad to the Temple"sv, true },
+
+{ volume::SSC1, "Text/chapter18.xhtml"sv, "application/xhtml+xml"sv, "Philine — My Knight in Shining Armor"sv, true },
+
 { volume::P4V3, "Text/chapter18.xhtml"sv, "application/xhtml+xml"sv, "The Book Fair and the Follow-Up Meeting"sv, true },
 { volume::P4V3, "Text/chapter19.xhtml"sv, "application/xhtml+xml"sv, "A Promise"sv, true },
 { volume::P4V3, "Text/insert9.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -387,9 +412,17 @@ namespace part_4_defs
 { volume::P4V4, "Text/insert1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V4, "Text/prologue_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V4, "Text/chapter1.xhtml"sv, "application/xhtml+xml"sv, "The Feast Celebrating Spring"sv, true },
-{ volume::SSWN2, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
-{ volume::SSWN2, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "Taking a New Step"sv, true },
+
+{ volume::SSC1, "Text/chapter19.xhtml"sv, "application/xhtml+xml"sv, "Charlotte — A New Step Forward"sv, true },
+{ volume::SSC1, "Text/insert10.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Insert10.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/chapter19_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P4V4, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "Meeting the Scholars"sv, true },
+
+{ volume::SSC1, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "Charlotte — My Task"sv, true },
+
 { volume::P4V4, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Life in the Temple"sv, true },
 { volume::P4V4, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V4, "Text/chapter3_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -476,6 +509,10 @@ namespace part_4_defs
 { volume::P4V5, "Text/prologue_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V5, "Text/chapter1.xhtml"sv, "application/xhtml+xml"sv, "Apprentices and the Temple"sv, true },
 { volume::P4V5, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "A Discussion with the Lower City"sv, true },
+
+{ volume::SSC1, "Text/chapter21.xhtml"sv, "application/xhtml+xml"sv, "Philine — I Serve Lady Rozemyne"sv, true },
+{ volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
+
 { volume::P4V5, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Going to the Italian Restaurant"sv, true },
 { volume::P4V5, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Evolved Cooking"sv, true },
 { volume::P4V5, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -495,6 +532,7 @@ namespace part_4_defs
 { volume::P4V5, "Text/insert10.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V5, "Text/chapter21_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V5, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "Reaching a Crossroads"sv, true },
+{ volume::P4V5, "Text/tree.xhtml"sv, "application/xhtml+xml"sv, "Family Tree"sv, true }, // Family Tree for "Reaching a Crossroads"
 { volume::P4V5, "Text/chapter10.xhtml"sv, "application/xhtml+xml"sv, "Post-Competition and the Harvest Festival"sv, true },
 { volume::P4V5, "Text/chapter11.xhtml"sv, "application/xhtml+xml"sv, "Groschel and the Harvest Festival"sv, true },
 { volume::P4V5, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -515,12 +553,27 @@ namespace part_4_defs
 { volume::P4V5, "Text/epilogue.xhtml"sv, "application/xhtml+xml"sv, "Epilogue"sv, true },
 { volume::P4V5, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
 { volume::P4V5, "Text/map2.xhtml"sv, "application/xhtml+xml"sv, "Map of Yurgenschmidt"sv, true },
-{ volume::P4V5, "Text/tree.xhtml"sv, "application/xhtml+xml"sv, "Family Tree"sv, true }, // Family Tree related to Aurelia
 { volume::P4V5, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
 { volume::P4V5, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P4V5, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::SSC1, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
+{ volume::SSC1, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Manga1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Images/Manga2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+
 { volume::P4V5, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
 { volume::P4V5, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::SSC1, "Text/frontmatter1.xhtml"sv, "application/xhtml+xml"sv, "Color Illustrations"sv, true },
+{ volume::SSC1, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/FrontMatter1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Images/FrontMatter2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
+{ volume::SSC1, "Text/bonus2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+{ volume::SSC1, "Images/Bonus1.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+{ volume::SSC1, "Images/Bonus2.jpg"sv, "image/jpeg"sv, std::nullopt, false },
+
 { volume::P4V5, "Text/signup.xhtml"sv, "application/xhtml+xml"sv, "About J-Novel Club"sv, true },
 { volume::P4V5, "Text/copyright.xhtml"sv, "application/xhtml+xml"sv, "Copyright"sv, true },
         });
@@ -582,8 +635,12 @@ namespace part_4_defs
 { volume::P4V6, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V6, "Text/chapter12_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V6, "Text/chapter13.xhtml"sv, "application/xhtml+xml"sv, "Professor Hirschur’s Disciple"sv, true },
+
 { volume::SSTOBBONUS1, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
 { volume::SSTOBBONUS1, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "The Relationship Between My Duchy And My Mentor-Disciple Bond"sv, true },
+{ volume::UFTSS1, /* STYLESHEET */ "styles/stylesheet.css", "text/css", std::nullopt, false },
+{ volume::UFTSS1, /* CHAPTER */ "text/side6.xhtml", "application/xhtml+xml", "The Relationship Between My Duchy And My Mentor-Disciple Bond", true },
+
 { volume::P4V6, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, "Changing Schwartz and Weiss"sv, true },
 { volume::P4V6, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V6, "Text/chapter14_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -675,6 +732,9 @@ namespace part_4_defs
 { volume::P4V7, "Text/chapter11_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::SSDRAMACD3, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
 { volume::SSDRAMACD3, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "Witnessing the Name Swearing"sv, true },
+{ volume::UFTSS1, /* STYLESHEET */ "styles/stylesheet.css", "text/css", std::nullopt, false },
+{ volume::UFTSS1, /* CHAPTER */ "text/side7.xhtml", "application/xhtml+xml", "Witnessing the Name Swearing", true },
+
 { volume::P4V7, "Text/chapter12.xhtml"sv, "application/xhtml+xml"sv, "Interduchy Tournament (Second Year)"sv, true },
 { volume::P4V7, "Text/chapter13.xhtml"sv, "application/xhtml+xml"sv, "The Ditter Match"sv, true },
 { volume::P4V7, "Text/insert7.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -694,6 +754,17 @@ namespace part_4_defs
 { volume::P4V7, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
 { volume::P4V7, "Text/map2.xhtml"sv, "application/xhtml+xml"sv, "Map of Yurgenschmidt"sv, true },
 { volume::P4V7, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
+{ volume::UFTSS1, /* RECORDING_REPORT */ "text/5.xhtml", "application/xhtml+xml", "Drama CD Recording Report", true },
+{ volume::UFTSS1, /* RECORDING_REPORT */ "text/6.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::UFTSS1, /* RECORDING_REPORT */ "text/7.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::UFTSS1, /* RECORDING_REPORT */ "text/8.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::UFTSS1, /* RECORDING_REPORT */ "text/9.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::UFTSS1, /* IMAGE */ "images/Manga_01.png", "image/png", std::nullopt, false },
+{ volume::UFTSS1, /* IMAGE */ "images/Manga_02.png", "image/png", std::nullopt, false },
+{ volume::UFTSS1, /* IMAGE */ "images/Manga_03.png", "image/png", std::nullopt, false },
+{ volume::UFTSS1, /* IMAGE */ "images/Manga_04.png", "image/png", std::nullopt, false },
+{ volume::UFTSS1, /* IMAGE */ "images/Manga_05.png", "image/png", std::nullopt, false },
+
 { volume::P4V7, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P4V7, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V7, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
@@ -831,6 +902,11 @@ namespace part_4_defs
 { volume::P4V9, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "The Harvest Festival and a Meeting"sv, true },
 { volume::SSDRAMACD4, "styles/style001.css"sv, "text/css"sv, std::nullopt, false },
 { volume::SSDRAMACD4, "text/content0001.xhtml"sv, "application/xhtml+xml"sv, "The Rainbow Feystone Hair Stick"sv, true },
+{ volume::UFTSS1, /* STYLESHEET */ "styles/stylesheet.css", "text/css", std::nullopt, false },
+{ volume::UFTSS1, /* CHAPTER */ "text/side8.xhtml", "application/xhtml+xml", "Side Story: Ferdinand – The Rainbow Feystone Hair Stick", true },
+
+
+
 { volume::P4V9, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "The Farewell Dinner"sv, true },
 { volume::P4V9, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Farewell Gifts"sv, true },
 { volume::P4V9, "Text/insert3.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
@@ -870,6 +946,17 @@ namespace part_4_defs
 { volume::P4V9, "Text/map.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest Duchy"sv, true },
 { volume::P4V9, "Text/map2.xhtml"sv, "application/xhtml+xml"sv, "Map of Yurgenschmidt"sv, true },
 { volume::P4V9, "Text/afterword.xhtml"sv, "application/xhtml+xml"sv, "Afterword"sv, true },
+{ volume::UFTSS1, /* RECORDING_REPORT */ "text/10-1.xhtml", "application/xhtml+xml", "Drama CD Recording Report", true },
+{ volume::UFTSS1, /* RECORDING_REPORT */ "text/10-2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::UFTSS1, /* RECORDING_REPORT */ "text/10-3.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::UFTSS1, /* RECORDING_REPORT */ "text/10-4.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::UFTSS1, /* RECORDING_REPORT */ "text/10-5.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::UFTSS1, /* IMAGE */ "images/CD4_Manga_01.png", "image/png", std::nullopt, false },
+{ volume::UFTSS1, /* IMAGE */ "images/CD4_Manga_02.png", "image/png", std::nullopt, false },
+{ volume::UFTSS1, /* IMAGE */ "images/CD4_Manga_03.png", "image/png", std::nullopt, false },
+{ volume::UFTSS1, /* IMAGE */ "images/CD4_Manga_04.png", "image/png", std::nullopt, false },
+{ volume::UFTSS1, /* IMAGE */ "images/CD4_Manga_05.png", "image/png", std::nullopt, false },
+
 { volume::P4V9, "Text/manga1.xhtml"sv, "application/xhtml+xml"sv, "A Comfy Life with My Family by You Shiina"sv, true },
 { volume::P4V9, "Text/manga2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V9, "Text/bonus1.xhtml"sv, "application/xhtml+xml"sv, "Bonus High Resolution Illustrations"sv, true },
