@@ -20,6 +20,9 @@ if cpp_compiler.get_argument_syntax() == 'msvc'
 else
   if cpp_compiler.has_argument('-std=c++23')
     cpp23_args = ['-std=c++23']
+    if cpp_compiler.get_id() == 'clang'
+      cpp23_args += '-stdlib=libc++'
+    endif
   else
     cpp23_args = ['-std=c++2b']
   endif
@@ -31,6 +34,7 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_string_view', required: tru
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges', required: true, args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_source_location', required: true, args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_concepts', required: true, args: cpp23_args)
+cpp_compiler.compute_int('__cpp_concepts', prefix: '#include<version>', args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_functions', required: true, args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_expected', required: true, args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_size_t_suffix', args: cpp23_args)
