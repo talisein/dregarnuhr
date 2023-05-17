@@ -1,7 +1,7 @@
 
 test('Simple', exe, args: ['--check'])
 
-volumes_test =  executable('volumes_test', 'test_volumes.cpp',
+volumes_test =  executable('volumes_test', 'volumes.cpp',
                            dependencies: [boostut_dep, dep])
 test('volumes', volumes_test)
 

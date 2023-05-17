@@ -1,6 +1,7 @@
 #include <optional>
 #include "volumes.h"
 #include "omnibus.h"
+#include "omnibus_defs.h"
 #include <boost/ut.hpp>
 #include "magic_enum.hpp"
 
