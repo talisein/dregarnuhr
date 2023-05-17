@@ -367,7 +367,7 @@ namespace zip
             if (flags & MZ_ZIP_FLAG_WRITE_ALLOW_READING) ss << "MZ_ZIP_FLAG_WRITE_ALLOW_READING ";
             if (flags & MZ_ZIP_FLAG_ASCII_FILENAME) ss << "MZ_ZIP_FLAG_ASCII_FILENAME ";
             if (flags & MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE) ss << "MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE ";
-            log_verbose("File: ", filename, " Level: ", level, " Flags: 0x", std::hex, (flags & 0xF0), std::dec, " ", ss.view(),
+            log_verbose("File: ", filename, " Level: ", level, " Flags: 0x", std::hex, (flags & 0xF0), std::dec, " ", ss.str(),
                         " crc: ", std::hex, stat.m_crc32, std::dec, " comp_size: ", stat.m_comp_size, " uncomp_size: ", stat.m_uncomp_size,
                         " method: ", stat.m_method, " external_attr: ", std::hex, stat.m_external_attr, std::dec,
                         " modified: ", stat.m_time, " hex modified: ", std::hex, stat.m_time, std::dec);
@@ -440,13 +440,14 @@ namespace zip
             in.clear();
             in.seekg(0, std::ios_base::beg);
 
-            const time_t file_time = modified.transform([](const auto &time) {
+            const time_t file_time = modified.transform([](const auto &time) -> std::chrono::time_point<std::chrono::system_clock> {
 #if HAVE_CHRONO
-                return std::chrono::clock_cast<std::chrono::system_clock>(time);
+                return std::chrono::time_point_cast<std::chrono::system_clock::duration>(std::chrono::clock_cast<std::chrono::system_clock>(time));
 #else
-                return date::clock_cast<std::chrono::system_clock>(time);
+                return std::chrono::time_point_cast<std::chrono::system_clock::duration>(date::clock_cast<std::chrono::system_clock>(time));
 #endif
-            }).or_else([] { return std::make_optional(std::chrono::system_clock::now());
+            }).or_else([] {
+                return std::make_optional<std::chrono::time_point<std::chrono::system_clock>>(std::chrono::system_clock::now());
             }).transform(&std::chrono::system_clock::to_time_t).value();
 
             auto res = mz_zip_writer_add_read_buf_callback(&zip,

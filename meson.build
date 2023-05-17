@@ -20,19 +20,23 @@ if cpp_compiler.get_argument_syntax() == 'msvc'
 else
   if cpp_compiler.has_argument('-std=c++23')
     cpp23_args = ['-std=c++23']
-    if cpp_compiler.get_id() == 'clang'
-      cpp23_args += '-stdlib=libc++'
-      add_global_link_arguments('-stdlib=libc++', language: 'cpp')
-      if get_option('buildtype') == 'debug'
-        cpp23_args += '-gdwarf-4'
-        add_global_arguments('-gdwarf-4', language: 'c')
-      endif
-    endif
-
   else
     cpp23_args = ['-std=c++2b']
   endif
+
+  if cpp_compiler.get_id() == 'clang'
+    cpp23_args += '-stdlib=libc++'
+    add_global_link_arguments('-stdlib=libc++', language: 'cpp')
+
+    if get_option('buildtype') == 'debug'
+      cpp23_args += '-gdwarf-4'
+      add_global_arguments('-gdwarf-4', language: 'c')
+    endif
+  endif
+
 endif
+
+message('Adding cpp23 args: ', cpp23_args)
 add_global_arguments(cpp23_args, language: 'cpp')
 
 cpp_compiler.has_header_symbol('version', '__cpp_lib_filesystem', required: true, args: cpp23_args)
