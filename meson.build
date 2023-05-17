@@ -26,6 +26,7 @@ else
 
   if cpp_compiler.get_id() == 'clang'
     cpp23_args += '-stdlib=libc++'
+    cpp23_args += '-fexperimental-library'
     add_global_link_arguments('-stdlib=libc++', language: 'cpp')
 
     if get_option('buildtype') == 'debug'
@@ -50,6 +51,7 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_expected', required: true, 
 cpp_compiler.has_header_symbol('version', '__cpp_size_t_suffix', args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip', args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace', args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_spanstream', args: cpp23_args)
 
 has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>', args: cpp23_args)
 

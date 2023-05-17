@@ -1,5 +1,4 @@
 #include <vector>
-#include <spanstream>
 #include <optional>
 
 #include <boost/ut.hpp>
@@ -35,6 +34,7 @@ int main() {
     "omnibus all"_test = [] (const auto& arg) {
         const char *argv[] = {"dregarnuhr", arg};
         auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(not res.has_value());
         expect(get_options()->omnibus_type.has_value());
         expect(get_options()->omnibus_type.value() == omnibus::ALL);
     } | std::vector<const char*>{"--omnibus", "--omnibus=", "--omnibus=all", "--omnibus=ALL", "--omnibus=AlL"};
@@ -43,6 +43,7 @@ int main() {
     "omnibus part1"_test = [] (const auto& arg) {
         const char *argv[] = {"dregarnuhr", arg, "..", "."};
         auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
         expect(get_options()->omnibus_type.has_value());
         expect(eq(get_options()->omnibus_type.value(), omnibus::PART1));
     } | std::vector<const char*>{"--omnibus=part1", "--omnibus=Part1", "--omnibus=PART1"};
@@ -50,6 +51,7 @@ int main() {
     "omnibus part2"_test = [] (const auto& arg) {
         const char *argv[] = {"dregarnuhr", arg, "..", "."};
         auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
         expect(get_options()->omnibus_type.has_value());
         expect(eq(get_options()->omnibus_type.value(), omnibus::PART2));
     } | std::vector<const char*>{"--omnibus=part2", "--omnibus=Part2", "--omnibus=PART2"};
@@ -57,6 +59,7 @@ int main() {
     "omnibus part3"_test = [] (const auto& arg) {
         const char *argv[] = {"dregarnuhr", arg, "..", "."};
         auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
         expect(get_options()->omnibus_type.has_value());
         expect(eq(get_options()->omnibus_type.value(), omnibus::PART3));
     } | std::vector<const char*>{"--omnibus=part3", "--omnibus=Part3", "--omnibus=PART3"};
@@ -64,6 +67,7 @@ int main() {
     "omnibus part4"_test = [] (const auto& arg) {
         const char *argv[] = {"dregarnuhr", arg, "..", "."};
         auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
         expect(get_options()->omnibus_type.has_value());
         expect(eq(get_options()->omnibus_type.value(), omnibus::PART4));
     } | std::vector<const char*>{"--omnibus=part4", "--omnibus=Part4", "--omnibus=PART4"};
@@ -71,6 +75,7 @@ int main() {
     "omnibus part5"_test = [] (const auto& arg) {
         const char *argv[] = {"dregarnuhr", arg, "..", "."};
         auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
         expect(get_options()->omnibus_type.has_value());
         expect(eq(get_options()->omnibus_type.value(), omnibus::PART5));
     } | std::vector<const char*>{"--omnibus=part5", "--omnibus=Part5", "--omnibus=PART5"};
