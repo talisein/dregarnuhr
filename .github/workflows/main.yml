@@ -107,7 +107,7 @@ jobs:
           sudo add-apt-repository -n ppa:talisein/outcome
           sudo add-apt-repository -n ppa:talisein/magic-enum
           sudo apt-get update
-          sudo apt-get install meson ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev
+          sudo apt-get install meson ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev jq findutils
 
       - if: ${{ matrix.flavor == 'mac' }}
         name: Install deps mac
@@ -175,9 +175,7 @@ jobs:
       - if: ${{ matrix.flavor == 'ubuntu' }}
         name: ldd ubuntu
         run: |
-          ldd build/src/dregarnuhr
-          ldd build/src/utils_test
-          ldd build/src/volumes_test
+          meson introspect --targets build | jq '.[] | select(.type == "executable" and .subproject == null) | .filename[]'  | xargs ldd
         continue-on-error: true
 
       - if: ${{ matrix.flavor == 'mac' }}
