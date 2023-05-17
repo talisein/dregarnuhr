@@ -3,6 +3,7 @@
 #include <cctype>
 #include <charconv>
 
+#include <exception> /* Used by httplib.h */
 #include "httplib.h"
 #include "updates.h"
 #include "log.h"

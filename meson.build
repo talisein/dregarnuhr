@@ -78,11 +78,18 @@ libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
 # Note: Ubuntu is not header-only; it has a shared library. So for building
 # distributable, we do not use the ubuntu package to keep the oddball dynamic
 # dependencies low.
+
+if cpp_compiler.get_id() == 'clang'
+http_dep = dependency('httplib', 'cpp-httplib',
+                      fallback: ['cpp-httplib', 'cpp_httplib_dep'],
+                      default_options: ['cpp-httplib_compile=false',
+                                        'cpp-httplib_brotli=disabled'])
+else
 http_dep = dependency('httplib', 'cpp-httplib',
                       fallback: ['cpp-httplib', 'cpp_httplib_dep'],
                       default_options: ['cpp-httplib_compile=true',
                                         'cpp-httplib_brotli=disabled'])
-
+endif
 # Fedora libxml++-devel. Ubuntu doesn't have a -5.0 package.
 # Note: I submitted some patches upstream, so the wrap has better performance
 # until there is a 5.0.2 release
