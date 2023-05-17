@@ -22,6 +22,7 @@ else
     cpp23_args = ['-std=c++23']
     if cpp_compiler.get_id() == 'clang'
       cpp23_args += '-stdlib=libc++'
+      add_global_link_arguments('-stdlib=libc++', language: 'cpp')
       if get_option('buildtype') == 'debug'
         cpp23_args += '-gdwarf-4'
         add_global_arguments('-gdwarf-4', language: 'c')
