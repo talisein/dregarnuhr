@@ -28,16 +28,41 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-12, windows-latest]
+        flavor: [ubuntu, mac, windows]
+        compiler: [gcc, clang, msvc]
         include:
-          - CC: gcc-12
-          - CXX: g++-12
-          - CC:
-            os: windows-latest
-          - CXX:
-            os: windows-latest
-          - DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+          # define operating systems
+          - flavor: ubuntu
+            os: ubuntu-22.04
+          - flavor: mac
             os: macos-12
+          - flavor: windows
+            os: windows-latest
+          # CC
+          - compiler: msvc
+            is-experimental: false
+          - compiler: gcc
+            CC: gcc-12
+            CXX: g++-12
+            is-experimental: false
+          - compiler: clang
+            CC: clang-16
+            CXX: clang++-16
+            is-experimental: true
+          # Mac stuff
+          - DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+            flavor: mac
+        exclude:
+          - flavor: windows
+            compiler: gcc
+          - flavor: windows
+            compiler: clang
+          - flavor: mac
+            compiler: clang
+          - flavor: mac
+            compiler: msvc
+          - flavor: ubuntu
+            compiler: msvc
     permissions:
       actions: read
       contents: read
@@ -48,12 +73,31 @@ jobs:
       DEVELOPER_DIR: ${{ matrix.DEVELOPER_DIR }}
       DEBEMAIL: ${{ vars.DEBEMAIL }}
       DEBFULLNAME: ${{ vars.DEBFULLNAME }}
+    continue-on-error: ${{ matrix.is-experimental }}
     runs-on: ${{ matrix.os }}
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - if: ${{ matrix.os == 'ubuntu-22.04' }}
+      - if: ${{ matrix.compiler == 'clang' && matrix.flavor == 'ubuntu' }}
+        name: Install clang ubuntu
+        run: |
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 16
+          # libc++-16 doesn't have std::views::join yet
+          # sudo apt-get install libc++-16-dev libc++abi-16-dev
+          sudo apt-get install libstdc++-12-dev
+
+      - if: ${{ matrix.compiler == 'gcc' && matrix.flavor == 'ubuntu' }}
+        name: Install gcc ubuntu
+        run: |
+          sudo apt-get install g++-12 libstdc++-12-dev
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
+          sudo update-alternatives --set gcc /usr/bin/gcc-12
+          sudo update-alternatives --set g++ /usr/bin/g++-12
+
+      - if: ${{ matrix.flavor == 'ubuntu' }}
         name: Install deps ubuntu
         run: |
           sudo add-apt-repository -n ppa:talisein/ctre
@@ -61,35 +105,23 @@ jobs:
           sudo add-apt-repository -n ppa:talisein/outcome
           sudo add-apt-repository -n ppa:talisein/magic-enum
           sudo apt-get update
-          sudo apt-get install meson g++-12 ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev
+          sudo apt-get install meson ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev
 
-      - if: ${{ matrix.os == 'macos-12' }}
+      - if: ${{ matrix.flavor == 'mac' }}
         name: Install deps mac
         run: |
           brew search gcc@
           brew install meson gcc@12 ninja
 
-#      - if: ${{ matrix.os == 'windows-latest' }}
-#        name: Setup Python Windows
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.x'
-
-      - if: ${{ matrix.os == 'windows-latest' }}
+      - if: ${{ matrix.flavor == 'windows' }}
         name: Install Meson/Ninja Windows
         run: |
           python -m pip install meson
 
-      - if: ${{ matrix.os == 'windows-latest' }}
+      - if: ${{ matrix.flavor == 'windows' }}
         uses: ilammy/msvc-dev-cmd@v1
 
-#      - if: ${{ matrix.os == 'windows-latest' }}
-#        name: Prepare MSVC
-#        uses: bus1/cabuild/action/msdevshell@v1
-#        with:
-#          architecture: x64
-
-      - if: ${{ matrix.os == 'ubuntu-22.04' && !startsWith(github.ref, 'refs/tags/v') }}
+      - if: ${{ matrix.flavor == 'ubuntu' && matrix.compiler == 'gcc' && !startsWith(github.ref, 'refs/tags/v') }}
         name: Initialize CodeQL
         uses: github/codeql-action/init@v2
 
@@ -105,27 +137,32 @@ jobs:
             meson-build-cache-
             meson-build-cache
 
-      - if: ${{ (steps.meson-cache.outputs.cache-hit == 'true') && (matrix.os != 'windows-latest') }}
+      - if: ${{ (steps.meson-cache.outputs.cache-hit == 'true') && (matrix.flavor != 'windows') }}
         name: List cache
         run: ls subprojects/packagecache
         continue-on-error: true
 
-      - if: ${{ (steps.meson-cache.outputs.cache-hit == 'true') && (matrix.os == 'windows-latest') }}
+      - if: ${{ (steps.meson-cache.outputs.cache-hit == 'true') && (matrix.flavor == 'windows') }}
         name: List cache
         run: dir subprojects/packagecache
         continue-on-error: true
 
-      - if: ${{ matrix.os == 'ubuntu-22.04' }}
-        name: Configure Ubuntu 22
+      - if: ${{ matrix.flavor == 'ubuntu'  && !startsWith(github.ref, 'refs/tags/v') }}
+        name: Configure Ubuntu 22 (Debug)
+        run: |
+          meson setup  --warnlevel 3 --buildtype debug --default-library static --force-fallback-for libjpeg,libpng build
+
+      - if: ${{ matrix.flavor == 'ubuntu'  && startsWith(github.ref, 'refs/tags/v') }}
+        name: Configure Ubuntu 22 (Release)
         run: |
           meson setup  --warnlevel 3 --buildtype release --default-library static --force-fallback-for libjpeg,libpng build
 
-      - if: ${{ matrix.os == 'macos-12' }}
+      - if: ${{ matrix.flavor == 'mac' }}
         name: Configure MacOS 12
         run: |
           meson setup --warnlevel 3 --buildtype release --default-library static -Dcpp_link_args="-static-libstdc++ -static-libgcc" --force-fallback-for libjpeg,libpng build
 
-      - if: ${{ matrix.os == 'windows-latest' }}
+      - if: ${{ matrix.flavor == 'windows' }}
         name: Configure Windows Latest
         run: |
           meson setup  --warnlevel 3 --buildtype release -Dc_std=c17 -Dcpp_std=c++20 --default-library static -Dcpp_eh=a -Dlibxml2:warning_level=0 -Dminiz:warning_level=0 -Dlibjpeg-turbo:warning_level=0 -Dcpp-httplib:cpp-httplib_openssl=disabled --force-fallback-for zlib,libpng,liblzma,libxml2 build
@@ -133,41 +170,52 @@ jobs:
       - name: Compile
         run: ninja -C build
 
-      - if: ${{ matrix.os == 'ubuntu-22.04' }}
+      - if: ${{ matrix.flavor == 'ubuntu' }}
         name: ldd ubuntu
-        run: ldd build/src/dregarnuhr
+        run: |
+          ldd build/src/dregarnuhr
+          ldd build/src/utils_test
+          ldd build/src/volumes_test
         continue-on-error: true
 
-      - if: ${{ matrix.os == 'macos-12' }}
+      - if: ${{ matrix.flavor == 'mac' }}
         name: ldd macos
         run: otool -L build/src/dregarnuhr
         continue-on-error: true
 
-      - if: ${{ matrix.os == 'windows-latest' }}
+      - if: ${{ matrix.flavor == 'windows' }}
         name: ldd windows
         run: dumpbin /DEPENDENTS build/src/dregarnuhr.exe
         continue-on-error: true
 
       - name: Test
-        run: ninja -C build test
+        id: unittests
+        run: meson test -C build --print-errorlogs
+
+      - if: ${{ steps.unittests.conclusion == 'failure' && failure() }}
+        name: Test backtrace
+        run: |
+          sudo apt-get install gdb
+          gdb --batch -ex "run" -ex "bt full" -ex "quit"  --args build/src/utils_test
+          gdb --batch -ex "run" -ex "bt full" -ex "quit"  --args build/src/volumes_test
 
       - name: Save logs
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
-          name: meson-log ${{ matrix.os }}
+          name: meson-log ${{ matrix.os }} ${{ matrix.compiler }}
           path: |
             build/meson-logs/meson-log.txt
             build/meson-logs/testlog.txt
           if-no-files-found: ignore
           retention-days: 5
 
-      - if: ${{ matrix.os == 'ubuntu-22.04'  && !startsWith(github.ref, 'refs/tags/v') }}
+      - if: ${{ matrix.flavor == 'ubuntu' && matrix.compiler == 'gcc'  && !startsWith(github.ref, 'refs/tags/v') }}
         name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
       # Generate tarball for PPA
-      - if: ${{ matrix.os == 'ubuntu-22.04'  && startsWith(github.ref, 'refs/tags/v') }}
+      - if: ${{ matrix.flavor == 'ubuntu' && matrix.compiler == 'gcc' && startsWith(github.ref, 'refs/tags/v') }}
         name: Get debuild dependencies
         run: |
           sudo add-apt-repository -n ppa:talisein/libxml++5.0
@@ -175,7 +223,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install cmake libcpp-httplib-dev libxml++5.0-dev libminiz3-dev debmake debhelper devscripts equivs distro-info-data distro-info dpkg-dev git-buildpackage
 
-      - if: ${{ matrix.os == 'ubuntu-22.04'  && startsWith(github.ref, 'refs/tags/v') }}
+      - if: ${{ matrix.flavor == 'ubuntu' && matrix.compiler == 'gcc' && startsWith(github.ref, 'refs/tags/v') }}
         name: Generate PPA tarball
         run: |
           git config user.email "$DEBEMAIL"
@@ -185,7 +233,7 @@ jobs:
           cd build/meson-dist
           tar -xf dregarnuhr*.tar.gz
 
-      - if: ${{ matrix.os == 'ubuntu-22.04'  && startsWith(github.ref, 'refs/tags/v') }}
+      - if: ${{ matrix.flavor == 'ubuntu' && matrix.compiler == 'gcc' && startsWith(github.ref, 'refs/tags/v') }}
         name: Publish PPA Snapshot
         env:
           LD_PRELOAD:
@@ -201,19 +249,23 @@ jobs:
           dput $REPOSITORY ../*.changes
 
       # Capture the binary
-      - if: ${{ matrix.os != 'windows-latest' }}
+      - if: ${{ matrix.flavor != 'windows' && (success() || failure()) }}
         name: Binary Ubuntu/Mac
         uses: actions/upload-artifact@v3
         with:
-          name: dregarnuhr-${{ matrix.os }}
-          path: build/src/dregarnuhr
+          name: dregarnuhr-${{ matrix.os }}-${{ matrix.compiler }}
+          path: |
+            build/src/dregarnuhr
+            build/src/*_test
 
-      - if: ${{ matrix.os == 'windows-latest' }}
+      - if: ${{ matrix.flavor == 'windows' && (success() || failure()) }}
         name: Binary Windows
         uses: actions/upload-artifact@v3
         with:
           name: dregarnuhr-${{ matrix.os }}
-          path: build/src/dregarnuhr.exe
+          path: |
+            build/src/dregarnuhr.exe
+            build/src/*_test.exe
 
   check-run-linux:
     needs: build
@@ -223,8 +275,8 @@ jobs:
         uses: actions/download-artifact@v3
 
       - run: |
-          chmod u+x dregarnuhr-ubuntu-22.04/dregarnuhr
-          dregarnuhr-ubuntu-22.04/dregarnuhr --check --verbose
+          chmod u+x dregarnuhr-ubuntu-22.04-gcc/dregarnuhr
+          dregarnuhr-ubuntu-22.04-gcc/dregarnuhr --check --verbose
 
   check-run-macos-11:
     needs: build
@@ -234,8 +286,8 @@ jobs:
         uses: actions/download-artifact@v3
 
       - run: |
-          chmod u+x dregarnuhr-macos-12/dregarnuhr
-          dregarnuhr-macos-12/dregarnuhr --check --verbose
+          chmod u+x dregarnuhr-macos-12-gcc/dregarnuhr
+          dregarnuhr-macos-12-gcc/dregarnuhr --check --verbose
 
   check-run-macos-12:
     needs: build
@@ -245,8 +297,8 @@ jobs:
         uses: actions/download-artifact@v3
 
       - run: |
-          chmod u+x dregarnuhr-macos-12/dregarnuhr
-          dregarnuhr-macos-12/dregarnuhr --check --verbose
+          chmod u+x dregarnuhr-macos-12-gcc/dregarnuhr
+          dregarnuhr-macos-12-gcc/dregarnuhr --check --verbose
 
   check-run-win:
     needs: build
@@ -283,10 +335,10 @@ jobs:
           REF: ${{ github.event.ref }}
         run: echo "::set-output name=MYREF::`echo $REF | cut -b 11-`"
 
-      - run: chmod u+x dregarnuhr-ubuntu-22.04/dregarnuhr
-      - run: tar -C ./dregarnuhr-ubuntu-22.04 -cJvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz" dregarnuhr
-      - run: chmod u+x dregarnuhr-macos-12/dregarnuhr
-      - run: tar -C ./dregarnuhr-macos-12 -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
+      - run: chmod u+x dregarnuhr-ubuntu-22.04-gcc/dregarnuhr
+      - run: tar -C ./dregarnuhr-ubuntu-22.04-gcc -cJvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz" dregarnuhr
+      - run: chmod u+x dregarnuhr-macos-12-gcc/dregarnuhr
+      - run: tar -C ./dregarnuhr-macos-12-gcc -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
       - run: zip -j "./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}" dregarnuhr-windows-latest/dregarnuhr.exe
       - run: ls
       - name: Release Linux Artifact

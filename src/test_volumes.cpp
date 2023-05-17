@@ -8,6 +8,8 @@
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
+template<> auto boost::ut::cfg<boost::ut::override> = boost::ut::runner<boost::ut::reporter<boost::ut::printer>>{};
+
 int main() {
     using namespace boost::ut;
     using namespace std::string_literals;
@@ -31,9 +33,11 @@ int main() {
                         expect(eq(false, res.has_value()));
                     },
                     [](volume v) {
-                        auto res = get_uid_from_volume(v);
-                        expect(res.has_value());
-                        expect(eq(v, get_volume_from_uid(res.value()).value()));
+                        auto uid_res = get_uid_from_volume(v);
+                        expect(uid_res.has_value());
+                        auto vol_res = get_volume_from_uid(uid_res.value());
+                        expect(vol_res.has_value());
+                        expect(eq(v, vol_res.value()));
                     }}, v);
         }
     };
