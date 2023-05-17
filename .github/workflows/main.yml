@@ -46,8 +46,10 @@ jobs:
             CXX: g++-12
             is-experimental: false
           - compiler: clang
-            CC: clang-16
-            CXX: clang++-16
+            CC: clang-17
+            CXX: clang++-17
+            CC_LD: lld-17
+            CXX_LD: lld-17
             is-experimental: true
           # Mac stuff
           - DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
@@ -83,9 +85,9 @@ jobs:
         run: |
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 16
+          sudo ./llvm.sh 17
           # libc++-16 doesn't have std::views::join yet
-          # sudo apt-get install libc++-16-dev libc++abi-16-dev
+          sudo apt-get install libc++-17-dev libc++abi-17-dev
           sudo apt-get install libstdc++-12-dev
 
       - if: ${{ matrix.compiler == 'gcc' && matrix.flavor == 'ubuntu' }}
@@ -105,7 +107,7 @@ jobs:
           sudo add-apt-repository -n ppa:talisein/outcome
           sudo add-apt-repository -n ppa:talisein/magic-enum
           sudo apt-get update
-          sudo apt-get install meson ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev
+          sudo apt-get install meson ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev jq findutils
 
       - if: ${{ matrix.flavor == 'mac' }}
         name: Install deps mac
@@ -173,9 +175,7 @@ jobs:
       - if: ${{ matrix.flavor == 'ubuntu' }}
         name: ldd ubuntu
         run: |
-          ldd build/src/dregarnuhr
-          ldd build/src/utils_test
-          ldd build/src/volumes_test
+          meson introspect --targets build | jq '.[] | select(.type == "executable" and .subproject == null) | .filename[]'  | xargs ldd
         continue-on-error: true
 
       - if: ${{ matrix.flavor == 'mac' }}

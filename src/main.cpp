@@ -4,8 +4,11 @@
 #include <chrono>
 #include <system_error>
 #include <locale>
+#include <utility>
 #include <clocale>
 
+#include "libxml/xmlerror.h"
+#include "libxml++/libxml++.h"
 #include "outcome/result.hpp"
 #include "outcome/try.hpp"
 #include "args.h"
@@ -160,6 +163,33 @@ void do_dump()
     }
 }
 
+namespace {
+    extern "C" {
+        void _xmlStructuredErrorFunc (void *, xmlErrorPtr error)
+        {
+            switch (error->level) {
+                case XML_ERR_NONE:
+                    log_info("libxml2: ", xmlpp::format_xml_error(error));
+                    break;
+                case XML_ERR_WARNING:
+                    log_info("Warning: libxml2: ", xmlpp::format_xml_error(error));
+                    break;
+                case XML_ERR_ERROR:
+                case XML_ERR_FATAL:
+                    log_error("libxml2: ", xmlpp::format_xml_error(error));
+                    break;
+                default:
+                    std::unreachable();
+            }
+        }
+    }
+}
+
+void init()
+{
+    xmlSetStructuredErrorFunc(nullptr, _xmlStructuredErrorFunc);
+}
+
 int main(int argc, char* argv[])
 {
     try {
@@ -174,14 +204,16 @@ int main(int argc, char* argv[])
         log_info("Warning: Couldn't set locale, but we will continue: ", e.what());
     }
 
-    if (auto res = parse(argc, argv); res.has_failure()) {
-        log_error("Failed to parse arguments: ", res.error().message());
+    if (auto res = parse(argc, argv); !res.has_value()) {
+        log_error("Failed to parse arguments: ", res.error());
         return EXIT_SUCCESS;
     }
 
-    if (args::command::DUMP == get_options()->command) {
+    init();
+
+    if (args::command_e::DUMP == get_options()->command) {
         do_dump();
-    } else if (args::command::NORMAL == get_options()->command) {
+    } else if (args::command_e::NORMAL == get_options()->command) {
         auto res = print_books(get_options()->input_dir);
 
         if (res.has_error()) {

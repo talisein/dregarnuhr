@@ -9,6 +9,13 @@
 #include "utils.h"
 #include "config.h"
 
+#if HAVE_CHRONO
+#include <chrono>
+#else
+// for clock_cast
+#include "date/tz.h"
+#endif
+
 namespace {
     static constexpr time_t ZIP_TIME_UNSET = 312796800;
 
@@ -36,6 +43,21 @@ namespace {
                 return 0;
             }
         }
+
+        size_t
+        _mz_file_read_func(void *pOpaque, mz_uint64 file_ofs, void *pBuf, size_t n)
+        {
+            std::istream *in = static_cast<std::istream*>(pOpaque);
+            if (in->eof()) return 0ULL;
+            const std::istream::traits_type::pos_type desired_pos{utils::safe_int_cast<std::istream::traits_type::off_type>(file_ofs)};
+            const auto cur_ofs = in->tellg();
+            if (cur_ofs != desired_pos) [[unlikely]] {
+                in->seekg(desired_pos);
+            }
+            in->read(static_cast<char*>(pBuf), utils::safe_int_cast<std::streamsize>(n));
+            return utils::safe_int_cast<size_t>(in->gcount());
+        }
+
     }
 
 }
@@ -58,9 +80,9 @@ namespace zip
         size_t _zip_file_read_func(void *pOpaque, mz_uint64 file_ofs, void *pBuf, size_t n)
         {
             auto istream = static_cast<std::ifstream*>(pOpaque);
-            auto desired_pos = std::ifstream::traits_type::pos_type(file_ofs);
-            auto cur_ofs = istream->tellg();
-            if (std::cmp_not_equal(desired_pos - cur_ofs, 0)) {
+            const std::ifstream::traits_type::pos_type desired_pos{utils::safe_int_cast<std::ifstream::traits_type::off_type>(file_ofs)};
+            const auto cur_ofs = istream->tellg();
+            if (desired_pos != cur_ofs) {
                 istream->seekg(desired_pos);
             }
             istream->read(static_cast<char *>(pBuf), n);
@@ -308,12 +330,12 @@ namespace zip
         {
             auto ostream = static_cast<std::ofstream*>(pOpaque);
             auto cur_pos = ostream->tellp();
-            auto desired_pos = std::ifstream::traits_type::pos_type(file_ofs);
-            if (std::cmp_not_equal(desired_pos - cur_pos, 0)) {
+            const std::ofstream::traits_type::pos_type desired_pos{utils::safe_int_cast<std::ofstream::traits_type::off_type>(file_ofs)};
+            if (cur_pos != desired_pos) {
                 ostream->seekp(file_ofs);
             }
             ostream->write(static_cast<const char *>(pBuf), n);
-            return n; // an exception throws if less than n
+            return utils::safe_int_cast<size_t>(ostream->tellp() - cur_pos);
         }
     }
     writer::writer(const fs::path& filename) :
@@ -345,7 +367,7 @@ namespace zip
             if (flags & MZ_ZIP_FLAG_WRITE_ALLOW_READING) ss << "MZ_ZIP_FLAG_WRITE_ALLOW_READING ";
             if (flags & MZ_ZIP_FLAG_ASCII_FILENAME) ss << "MZ_ZIP_FLAG_ASCII_FILENAME ";
             if (flags & MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE) ss << "MZ_ZIP_FLAG_WRITE_HEADER_SET_SIZE ";
-            log_verbose("File: ", filename, " Level: ", level, " Flags: 0x", std::hex, (flags & 0xF0), std::dec, " ", ss.view(),
+            log_verbose("File: ", filename, " Level: ", level, " Flags: 0x", std::hex, (flags & 0xF0), std::dec, " ", ss.str(),
                         " crc: ", std::hex, stat.m_crc32, std::dec, " comp_size: ", stat.m_comp_size, " uncomp_size: ", stat.m_uncomp_size,
                         " method: ", stat.m_method, " external_attr: ", std::hex, stat.m_external_attr, std::dec,
                         " modified: ", stat.m_time, " hex modified: ", std::hex, stat.m_time, std::dec);
@@ -398,6 +420,53 @@ namespace zip
             }
         } catch (std::system_error& e) {
             log_error("Exception: ", e.code(), ' ', e.what());
+            return e.code();
+        } catch (...) {
+            return outcome::error_from_exception();
+        }
+
+        return outcome::success();
+    }
+
+    result<void>
+    writer::add(const std::string& filename,
+                std::istream &in,
+                std::optional<mz_uint> compression_level,
+                std::optional<std::filesystem::file_time_type> modified)
+    {
+        try {
+            in.ignore(std::numeric_limits<std::streamsize>::max());
+            const auto max_size = in.gcount();
+            in.clear();
+            in.seekg(0, std::ios_base::beg);
+
+            const time_t file_time = modified.transform([](const auto &time) -> std::chrono::time_point<std::chrono::system_clock> {
+#if HAVE_CHRONO
+                return std::chrono::time_point_cast<std::chrono::system_clock::duration>(std::chrono::clock_cast<std::chrono::system_clock>(time));
+#else
+                return std::chrono::time_point_cast<std::chrono::system_clock::duration>(date::clock_cast<std::chrono::system_clock>(time));
+#endif
+            }).or_else([] {
+                return std::make_optional<std::chrono::time_point<std::chrono::system_clock>>(std::chrono::system_clock::now());
+            }).transform(&std::chrono::system_clock::to_time_t).value();
+
+            auto res = mz_zip_writer_add_read_buf_callback(&zip,
+                                                           filename.c_str(),
+                                                           _mz_file_read_func,
+                                                           &in,//void *callback_opaque,
+                                                           utils::safe_int_cast<mz_uint64>(max_size),
+                                                           &file_time, //const time_t *pFile_time,
+                                                           nullptr,//const void *pComment,
+                                                           0,//mz_uint16 comment_size,
+                                                           compression_level.value_or(0),//mz_uint level_and_flags,
+                                                           nullptr, //const char *user_extra_data_local,
+                                                           0, //mz_uint user_extra_data_local_len,
+                                                           nullptr, //const char *user_extra_data_central,
+                                                           0);//mz_uint user_extra_data_central_len)
+            if (MZ_FALSE == res) {
+                return mz_zip_get_last_error(&zip);
+            }
+        } catch (std::system_error &e) {
             return e.code();
         } catch (...) {
             return outcome::error_from_exception();

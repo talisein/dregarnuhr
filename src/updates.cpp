@@ -3,6 +3,7 @@
 #include <cctype>
 #include <charconv>
 
+#include <exception> /* Used by httplib.h */
 #include "httplib.h"
 #include "updates.h"
 #include "log.h"
@@ -19,7 +20,7 @@ namespace {
             auto quote_it = std::ranges::next(std::ranges::begin(quote_split), 1, std::ranges::end(quote_split));
             if (quote_it == std::ranges::end(quote_split)) continue;
             auto slug_r = *quote_it;
-            auto slug_sv = std::string_view(std::ranges::begin(slug_r), std::ranges::end(slug_r));
+            auto slug_sv = std::string_view(slug_r);
             std::ranges::advance(colon_it, 1, std::ranges::end(colon_split));
             if (colon_it == std::ranges::end(colon_split)) continue;
             auto no_ws = std::views::drop_while(*colon_it, [](unsigned char c) noexcept {return std::isspace(c);});

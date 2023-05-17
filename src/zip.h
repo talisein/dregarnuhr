@@ -116,6 +116,11 @@ namespace zip
                                const std::string& src_filename,
                                const std::string& dst_filename);
 
+        result<void> add(const std::string& filename,
+                         std::istream &in,
+                         std::optional<mz_uint> compression_level,
+                         std::optional<std::filesystem::file_time_type> modified);
+
         template <typename T>
         result<void> add(const std::string& filename,
                          std::span<const T> data,

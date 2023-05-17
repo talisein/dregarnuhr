@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <optional>
 #include <regex>
+#include <string>
+#include <expected>
 #include "outcome/result.hpp"
 #include "volumes.h"
 
@@ -12,7 +14,7 @@ using outcome::result;
 
 struct args
 {
-    enum class command
+    enum class command_e
     {
         NORMAL,
         DUMP,
@@ -40,7 +42,8 @@ struct args
     std::optional<unsigned int> compression_level;
 };
 
+std::ostream& operator<<(std::ostream& os, args::command_e c);
 
 const args* get_options();
 
-result<void> parse(int argc, char **argv);
+std::expected<void, std::error_code> parse(int argc, char **argv);

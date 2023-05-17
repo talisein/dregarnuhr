@@ -63,6 +63,35 @@ int main() {
 
     };
 
+    "find_opt"_test = [] {
+        using namespace std::string_view_literals;
+        const char *arr[] = {"this", "is", "a", "test"};
+        auto view = std::views::counted(arr, 4) | std::views::transform([](const char *p) { return std::string_view(p); });
+        auto sv = utils::find_opt(view, "test"sv);
+        expect(sv.has_value());
+        expect("test"sv == *sv);
+        sv = utils::find_opt(view, "meow"sv);
+        expect(!sv.has_value());
+    };
+
+    "find_if_opt"_test = [] {
+        using namespace std::string_view_literals;
+        constexpr std::array<std::string_view, 4> arr {"this"sv, "is"sv, "a"sv, "test"sv};
+        constexpr auto sv = utils::find_if_opt(arr, [](const auto &sv) { return sv.starts_with('t'); });
+        expect(sv.has_value());
+        expect(eq("this"sv, *sv));
+        auto ssv = utils::find_if_opt(arr, [](const auto&){return false;});
+        expect(!ssv.has_value());
+    };
+
+    "find_if_optarg"_test = [] {
+        using namespace std::string_view_literals;
+        constexpr std::array<std::string_view, 4> arr {"this"sv, "is=macaron"sv, "a"sv, "test"sv};
+        constexpr auto sv = utils::find_if_optarg(arr, "is="sv);
+        expect(sv.has_value());
+        expect(eq("macaron"sv, *sv));
+    };
+
     "import attr"_test = [] {
         xmlpp::Document doc { };
         auto root = doc.create_root_node("root");

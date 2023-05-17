@@ -251,6 +251,41 @@ namespace utils
         return res;
     }
 
+    template<typename R, typename T, typename Proj = std::identity>
+    constexpr auto find_opt(R&& r, const T& value, Proj proj = {}) -> std::optional<std::ranges::range_value_t<R>>
+    {
+        const auto end = std::ranges::end(r);
+        const auto it = std::ranges::find(std::forward<R>(r), value, std::ref(proj));
+        if (it == end) return std::nullopt;
+        return std::make_optional<std::ranges::range_value_t<R>>(*it);
+    }
+
+    template<typename R, typename Proj = std::identity, std::indirect_unary_predicate<std::projected<std::ranges::iterator_t<R>,Proj>> Pred>
+    constexpr auto find_if_opt(R&& r, Pred pred, Proj proj = {}) -> std::optional<std::ranges::range_value_t<R>>
+    {
+        const auto end = std::ranges::end(r);
+        const auto it = std::ranges::find_if(std::forward<R>(r), std::ref(pred), std::ref(proj));
+        if (it == end) return std::nullopt;
+        return std::make_optional<std::ranges::range_value_t<R>>(*it);
+    }
+
+    /* Looks for a string like arg=var, and returns an optional with var */
+    /* UB if value has no = */
+    template<typename Ret = std::string_view, typename R, typename Stringlike, typename Proj = std::identity>
+    constexpr auto find_if_optarg(R&& r, const Stringlike& value, Proj proj = {}) -> std::optional<Ret>
+    {
+        return utils::find_if_opt(std::forward<R>(r),
+                                  [&value](const auto &sv) constexpr -> bool {
+                                      return sv.starts_with(value);
+                                  },
+                                  std::ref(proj)
+            ).and_then([] (const auto &sv) constexpr {
+                const auto pos = sv.find('=');
+                return std::make_optional<Ret>(sv.substr(pos+1));
+            });
+
+    }
+
     template<std::integral To, std::integral From>
     [[nodiscard]] auto clamping_int_cast(From from) -> std::remove_cvref_t<To> {
         using UnrefTo = std::remove_cvref_t<To>;
