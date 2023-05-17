@@ -135,4 +135,13 @@ int main() {
     } | std::vector<std::pair<const char*, std::size_t>>{
         {"--filter=size=123", 123ULL}, {"--filter=size=456:name=[abc]", 456ULL}, {"--filter=name=wow:size=789", 789ULL},
     };
+
+    "basename"_test = [] (const auto& arg) {
+        const char *argv[] = {"dregarnuhr", arg.first, "..", "."};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
+        expect(eq(get_options()->basename, arg.second));
+    } | std::vector<std::pair<const char*, std::string>>{
+        {"--base=", "ascendence-of-a-bookworm"s}, {"--base=cutey", "cutey"s},
+    };
 }
