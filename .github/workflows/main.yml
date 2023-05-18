@@ -178,6 +178,11 @@ jobs:
           meson introspect --targets build | jq '.[] | select(.type == "executable" and .subproject == null) | .filename[]'  | xargs ldd
         continue-on-error: true
 
+      - if: ${{ matrix.flavor == 'ubuntu' }}
+        name: Verify valid json
+        run: |
+          jq . res/*.json
+
       - if: ${{ matrix.flavor == 'mac' }}
         name: ldd macos
         run: otool -L build/src/dregarnuhr
