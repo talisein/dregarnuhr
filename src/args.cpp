@@ -392,6 +392,16 @@ parse(int argc, char** argv)
         log_info("This executable works.");
         options.command = args::command_e::TEST;
     }
+
+    options.search_pattern = utils::find_if_optarg<std::string>(args_options, "--search="sv).and_then([](std::string&& pattern) -> std::optional<std::regex> {
+            return std::make_optional<std::regex>(std::move(pattern), std::regex_constants::icase);
+        });
+
+    if (options.search_pattern) {
+        options.command = args::command_e::SEARCH;
+    }
+
+    /* End of option checking, now set defaults */
     if (options.omnibus_type) {
         options.do_nested = true;
         if (find (args_options, "--no-nested"sv) != args_options.end()) {
@@ -450,6 +460,20 @@ parse(int argc, char** argv)
             return std::unexpected(res.error());
         }
         log_verbose("Verified output dir: ", options.output_dir.string());
+    }
+
+    if (args::command_e::SEARCH == options.command) {
+        if (std::distance(args_files.begin(), args_files.end()) != 1) {
+            usage(argv[0]);
+            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+        }
+
+        auto it = args_files.begin();
+        options.input_dir = *it;
+        if (auto res = verify_input_directory(options.input_dir); !res.has_value()) {
+            return res;
+        }
+        log_verbose("Verified input dir: ", options.input_dir.string());
     }
     return {};
 }

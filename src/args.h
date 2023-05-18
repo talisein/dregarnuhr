@@ -18,6 +18,7 @@ struct args
     {
         NORMAL,
         DUMP,
+        SEARCH,
         TEST
     } command;
 
@@ -40,6 +41,8 @@ struct args
     std::optional<int> jpg_scale;
     std::optional<omnibus> omnibus_type;
     std::optional<unsigned int> compression_level;
+    std::optional<std::regex> search_pattern;
+    std::optional<std::regex> search_antipattern;
 };
 
 std::ostream& operator<<(std::ostream& os, args::command_e c);

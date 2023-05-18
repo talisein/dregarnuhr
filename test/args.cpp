@@ -149,4 +149,18 @@ int main() {
     } | std::vector<std::pair<const char*, std::string>>{
         {"--base=", "ascendence-of-a-bookworm"s}, {"--base=cutey", "cutey"s},
     };
+
+    "search"_test = [] {
+        const char *argv[] = {"dregarnuhr", "--search=vantole", ".."};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
+        expect(get_options()->search_pattern.has_value());
+    };
+
+    "search no input"_test = [] {
+        const char *argv[] = {"dregarnuhr", "--search=vantole"};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(not res.has_value());
+    };
+
 }
