@@ -20,6 +20,7 @@ BuildRequires:  libpng-devel
 BuildRequires:  libjpeg-turbo-devel
 BuildRequires:  miniz-devel
 BuildRequires:  outcome-devel
+BuildRequires:  jsoncpp-devel
 BuildRequires:  libxml++50-devel >= 5.0.2
 BuildRequires:  boost-ext-ut-static
 BuildRequires:  ctre-static

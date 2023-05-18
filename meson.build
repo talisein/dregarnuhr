@@ -29,7 +29,7 @@ else
     cpp23_args += '-fexperimental-library'
     add_global_link_arguments('-stdlib=libc++', language: 'cpp')
 
-    if get_option('buildtype') == 'debug'
+    if get_option('buildtype') == 'debug' and cpp_compiler.get_linker_id() == 'ld.bfd'
       cpp23_args += '-gdwarf-4'
       add_global_arguments('-gdwarf-4', language: 'c')
     endif
@@ -50,8 +50,13 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_function
 cpp_compiler.has_header_symbol('version', '__cpp_lib_expected', required: true, args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_size_t_suffix', args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip', args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_enumerate', args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_to_container', args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_to', args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace', args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_spanstream', args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_print', args: cpp23_args)
+
 
 has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>', args: cpp23_args)
 
@@ -135,6 +140,9 @@ ctre_dep = dependency('ctre',
 
 magic_enum_dep = dependency('magic_enum',
                            fallback: ['magic_enum'])
+
+json_dep = dependency('jsoncpp',
+                      fallback: ['jsoncpp'])
 
 subdir('src')
 subdir('test')
