@@ -108,5 +108,7 @@ namespace epub
 
     };
 
+    using books_t = std::map<volume, const epub::book>;
+    using readers_t = std::map<volume, std::unique_ptr<epub::book_reader>>;
 
 }

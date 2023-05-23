@@ -1,14 +1,18 @@
+#include <algorithm>
+#include <cctype>
+#include <expected>
+#include <iostream>
+#include <locale>
 #include <ranges>
 #include <string>
-#include <locale>
-#include <vector>
-#include <algorithm>
-#include <iostream>
 #include <system_error>
-#include <cctype>
+#include <vector>
+
+#include <magic_enum.hpp>
+
+#include "args.h"
 #include "ctre.hpp"
 #include "config.h"
-#include "args.h"
 #include "log.h"
 #include "miniz.h"
 #include "updates.h"
@@ -160,7 +164,7 @@ namespace {
 } // anonymous namespace
 
 
-std::expected<void, std::error_code>
+outcome::result<void>
 parse(int argc, char** argv)
 {
     using namespace std::string_view_literals;
@@ -171,7 +175,7 @@ parse(int argc, char** argv)
     options.command = args::command_e::NORMAL;
     if (argc < 2) {
         usage(argv[0]);
-        return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+        return std::errc::invalid_argument;
     }
     auto args_options { views::filter(args_sv, [](const auto &sv) { return sv.starts_with("--"sv); }) };
     auto args_files { views::filter(args_sv, [](const auto &sv) { return !sv.starts_with("--"sv); }) };
@@ -208,7 +212,7 @@ parse(int argc, char** argv)
         log_info("Filename prefix set to ", std::quoted(*options.prefix));
         if (options.prefix->empty() && (!options.suffix || options.suffix->empty())) {
             log_error("No suffix and empty prefix defined. This would create files with the same name as the input; that will make things too confusing!");
-            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+            return std::errc::invalid_argument;
         }
     }
 
@@ -239,10 +243,10 @@ parse(int argc, char** argv)
                 });
         } catch (std::system_error &e) {
             log_error("Failed to prepare regex name filter: ", e.what());
-            return std::unexpected(e.code());
+            return e.code();
         } catch (std::exception &e) {
             log_error("Failed to prepare regex name filter: ", e.what());
-            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+            return std::errc::invalid_argument;
         }
     }
 
@@ -252,7 +256,7 @@ parse(int argc, char** argv)
         if (q.has_value()) {
             options.jpg_quality = std::clamp<int>(q.value(), 1, 100);
         } else {
-            return std::unexpected(q.error());
+            return q.error();
         }
     }
 
@@ -261,7 +265,7 @@ parse(int argc, char** argv)
         if (s.has_value()) {
             options.jpg_scale = std::clamp<int>(s.value(), 1, 16);
         } else {
-            return std::unexpected(s.error());
+            return s.error();
         }
     }
 
@@ -269,7 +273,7 @@ parse(int argc, char** argv)
     if (options.title) {
         if (options.title.value().size() == 0) {
             log_error("Can not set a blank title");
-            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+            return std::errc::invalid_argument;
         }
         log_info("Title set to ", std::quoted(options.title.value()));
     }
@@ -294,7 +298,7 @@ parse(int argc, char** argv)
                 options.omnibus_type = omnibus::ALL;
             } else {
                 log_error("Unrecognized omnibus value: ", type);
-                return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+                return std::errc::invalid_argument;
             }
             log_info("Omnibus ", *options.omnibus_type, " selected.");
         }
@@ -331,22 +335,22 @@ parse(int argc, char** argv)
         auto status = fs::status(path, ec);
         if (ec) {
             log_error("Cover ", path, " can't be read: ", ec);
-            return std::unexpected(ec);
+            return ec;
         }
 
         if (!fs::exists(status)) {
             log_error("Cover ", path, " doesn't exist.");
-            return std::unexpected(std::make_error_code(std::errc::no_such_file_or_directory));
+            return std::errc::no_such_file_or_directory;
         }
 
         if (!fs::is_regular_file(status)) {
             log_error("Cover ", path, " isn't a regular file.");
-            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+            return std::errc::invalid_argument;
         }
 
         if (!ctre::match<"[.]jpg", ctre::case_insensitive>(path.extension().string())) {
             log_error("Cover ", path, " isn't a .jpg");
-            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+            return std::errc::invalid_argument;
         }
         options.cover = path;
     }
@@ -362,13 +366,13 @@ parse(int argc, char** argv)
             if (ec == std::errc()) { // success
                 if (ptr != std::to_address(std::end(*level))) {
                     log_error("Compression level ", std::quoted(*level), " is invalid.");
-                    return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+                    return std::errc::invalid_argument;
                 }
                 options.compression_level = std::clamp<mz_uint>(l, MZ_NO_COMPRESSION, MZ_UBER_COMPRESSION);
                 log_info("Compression level set to ", *options.compression_level);
             } else {
                 log_error("Compression level ", std::quoted(*level), " is invalid: ", std::make_error_code(ec));
-                return std::unexpected(std::make_error_code(ec));
+                return std::make_error_code(ec);
             }
         }
     }
@@ -426,7 +430,7 @@ parse(int argc, char** argv)
         const auto num_files = std::distance(args_files.begin(), args_files.end());
         if (num_files == 0) {
             usage(argv[0]);
-            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+            return std::errc::invalid_argument;
         }
         auto it = args_files.begin();
 
@@ -438,14 +442,14 @@ parse(int argc, char** argv)
         }
 
         if (auto res = verify_input_file(options.input_file); !res.has_value()) {
-            return res;
+            return res.error();
         }
     }
 
     if (args::command_e::NORMAL == options.command) {
         if (std::distance(args_files.begin(), args_files.end()) != 2) {
             usage(argv[0]);
-            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+            return std::errc::invalid_argument;
         }
 
         auto it = args_files.begin();
@@ -453,11 +457,11 @@ parse(int argc, char** argv)
         options.output_dir = *it;
 
         if (auto res = verify_input_directory(options.input_dir); !res.has_value()) {
-            return res;
+            return res.error();
         }
         log_verbose("Verified input dir: ", options.input_dir.string());
         if (auto res = verify_output_directory(options.input_dir, options.output_dir); !res) {
-            return std::unexpected(res.error());
+            return res.error();
         }
         log_verbose("Verified output dir: ", options.output_dir.string());
     }
@@ -465,28 +469,21 @@ parse(int argc, char** argv)
     if (args::command_e::SEARCH == options.command) {
         if (std::distance(args_files.begin(), args_files.end()) != 1) {
             usage(argv[0]);
-            return std::unexpected(std::make_error_code(std::errc::invalid_argument));
+            return std::errc::invalid_argument;
         }
 
         auto it = args_files.begin();
         options.input_dir = *it;
         if (auto res = verify_input_directory(options.input_dir); !res.has_value()) {
-            return res;
+            return res.error();
         }
         log_verbose("Verified input dir: ", options.input_dir.string());
     }
-    return {};
+    return outcome::success();
 }
 
 std::ostream&
 operator<<(std::ostream& os, args::command_e c)
 {
-    switch (c) {
-        case args::command_e::DUMP: os << "Command::DUMP"; break;
-        case args::command_e::NORMAL: os << "Command::NORMAL"; break;
-        case args::command_e::TEST: os << "Command::TEST"; break;
-        default:
-            os << "Command:UNIMPLMENTED?"; break;
-    }
-    return os;
+    return magic_enum::ostream_operators::operator<<(os, c);
 }

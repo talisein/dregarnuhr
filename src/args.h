@@ -4,7 +4,6 @@
 #include <optional>
 #include <regex>
 #include <string>
-#include <expected>
 #include "outcome/result.hpp"
 #include "volumes.h"
 
@@ -49,4 +48,4 @@ std::ostream& operator<<(std::ostream& os, args::command_e c);
 
 const args* get_options();
 
-std::expected<void, std::error_code> parse(int argc, char **argv);
+outcome::result<void> parse(int argc, char **argv);

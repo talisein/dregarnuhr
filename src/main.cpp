@@ -1,3 +1,4 @@
+#include <expected>
 #include <filesystem>
 #include <iostream>
 #include <cstdlib>
@@ -18,6 +19,7 @@
 #include "config.h"
 #include "bookmaker.h"
 #include "updates.h"
+#include "book_searcher.h"
 
 #if HAVE_CHRONO
 #include <format>
@@ -29,7 +31,8 @@
 
 namespace fs = std::filesystem;
 
-result<void> print_books(const fs::path& input_dir)
+std::expected<std::pair<epub::readers_t, epub::books_t>, std::error_code>
+search_input_directory(const fs::path& input_dir)
 {
     const fs::path epub_ext{".epub"};
     epub::readers_t book_readers;
@@ -64,6 +67,34 @@ result<void> print_books(const fs::path& input_dir)
             books.emplace(vol.value(), std::move(book.value()));
         }
     }
+    if (!books.empty()) {
+        return std::make_pair(std::move(book_readers), std::move(books));
+    } else {
+        return std::unexpected(std::make_error_code(std::errc::no_such_file_or_directory));
+    }
+}
+
+result<void> search_books(const fs::path& input_dir)
+{
+    auto search_res = search_input_directory(input_dir);
+    if (!search_res.has_value()) {
+        return search_res.error();
+    }
+    auto&& [book_readers, books] = search_res.value();
+
+    book_searcher searcher {std::move(books), std::move(book_readers)};
+    OUTCOME_TRY(searcher.search());
+
+    return outcome::success();
+}
+
+result<void> print_books(const fs::path& input_dir)
+{
+    auto search_res = search_input_directory(input_dir);
+    if (!search_res.has_value()) {
+        return search_res.error();
+    }
+    auto&& [book_readers, books] = search_res.value();
 
     if (books.end() == books.find(volume::FB1)) {
         log_info("Couldn't find Fanbook 1, so those chapters will be skipped in the new epubs.");
@@ -163,33 +194,6 @@ void do_dump()
     }
 }
 
-namespace {
-    extern "C" {
-        void _xmlStructuredErrorFunc (void *, xmlErrorPtr error)
-        {
-            switch (error->level) {
-                case XML_ERR_NONE:
-                    log_info("libxml2: ", xmlpp::format_xml_error(error));
-                    break;
-                case XML_ERR_WARNING:
-                    log_info("Warning: libxml2: ", xmlpp::format_xml_error(error));
-                    break;
-                case XML_ERR_ERROR:
-                case XML_ERR_FATAL:
-                    log_error("libxml2: ", xmlpp::format_xml_error(error));
-                    break;
-                default:
-                    std::unreachable();
-            }
-        }
-    }
-}
-
-void init()
-{
-    xmlSetStructuredErrorFunc(nullptr, _xmlStructuredErrorFunc);
-}
-
 int main(int argc, char* argv[])
 {
     try {
@@ -209,8 +213,6 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
-    init();
-
     if (args::command_e::DUMP == get_options()->command) {
         do_dump();
     } else if (args::command_e::NORMAL == get_options()->command) {
@@ -228,6 +230,13 @@ int main(int argc, char* argv[])
                 }
             }
             return EXIT_SUCCESS;
+        }
+    } else if (args::command_e::SEARCH == get_options()->command) {
+        auto res = search_books(get_options()->input_dir);
+
+        if (res.has_error()) {
+            log_error("Failed to search books: ", res.error());
+            return EXIT_FAILURE;
         }
     }
 

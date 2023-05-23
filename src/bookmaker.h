@@ -11,8 +11,6 @@ namespace epub
     namespace fs = std::filesystem;
     using outcome::result;
     using definition_t = std::span<const volume_definition>;
-    using books_t = std::map<volume, const epub::book>;
-    using readers_t = std::map<volume, std::unique_ptr<epub::book_reader>>;
 
     class bookmaker
     {
