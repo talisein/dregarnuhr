@@ -20,7 +20,7 @@ namespace {
     static constexpr time_t ZIP_TIME_UNSET = 312796800;
 
     extern "C" {
-        size_t
+        static size_t
         _extract_to_std_string(void *opaque, mz_uint64, const void *buf, size_t n)
         {
             auto str = static_cast<std::string*>(opaque);
@@ -32,7 +32,7 @@ namespace {
             }
         }
 
-        size_t
+        static size_t
         _extract_to_std_basic_string_uchar(void *opaque, mz_uint64, const void *buf, size_t n)
         {
             auto str = static_cast<std::basic_string<unsigned char>*>(opaque);
@@ -44,7 +44,7 @@ namespace {
             }
         }
 
-        size_t
+        static size_t
         _mz_file_read_func(void *pOpaque, mz_uint64 file_ofs, void *pBuf, size_t n)
         {
             std::istream *in = static_cast<std::istream*>(pOpaque);

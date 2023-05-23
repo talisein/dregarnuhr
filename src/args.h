@@ -4,7 +4,6 @@
 #include <optional>
 #include <regex>
 #include <string>
-#include <expected>
 #include "outcome/result.hpp"
 #include "volumes.h"
 
@@ -18,6 +17,7 @@ struct args
     {
         NORMAL,
         DUMP,
+        SEARCH,
         TEST
     } command;
 
@@ -40,10 +40,12 @@ struct args
     std::optional<int> jpg_scale;
     std::optional<omnibus> omnibus_type;
     std::optional<unsigned int> compression_level;
+    std::optional<std::regex> search_pattern;
+    std::optional<std::regex> search_antipattern;
 };
 
 std::ostream& operator<<(std::ostream& os, args::command_e c);
 
 const args* get_options();
 
-std::expected<void, std::error_code> parse(int argc, char **argv);
+outcome::result<void> parse(int argc, char **argv);

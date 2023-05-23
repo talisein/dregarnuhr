@@ -12,3 +12,10 @@ test('utils', utils_test)
 args_test = executable('args_test', 'args.cpp',
                        dependencies: [boostut_dep, dep])
 test('args', args_test)
+
+jq = find_program('jq', required: false)
+
+if jq.found()
+  test('dieties', jq, args: ['.', '../res/dieties.json'])
+  test('retainers', jq, args: ['.', '../res/retainers.json'])
+endif

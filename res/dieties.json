@@ -1,0 +1,15 @@
+[
+    {
+    "name": "Angriff",
+    "text": "God of War, subordinate to Liedenshaft",
+    "subordinateTo": "Liedenshaft",
+    "spoilerUntil": "P3V3",
+    "pattern": "Angriff",
+    "antiPattern": "God of War Angriff"
+}, {
+    "name": "Vantole",
+    "text": "God of Alcohol",
+    "spoilerUntil": "P1V3",
+    "pattern": "Vantole"
+}
+]

@@ -17,7 +17,8 @@ Build-Depends: debhelper-compat (= 13),
 	       libctre-dev,
            libmagicenum-dev,
 	       libminiz3-dev,
-	       libxml++5.0-dev
+	       libxml++5.0-dev,
+           libjsoncpp-dev
 Standards-Version: 4.6.0
 Section: libs
 Homepage: https://github.com/talisein/dregarnuhr

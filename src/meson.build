@@ -4,7 +4,8 @@ conf_data = configuration_data()
 conf_data.set('IS_WINDOWS', host_machine.system() == 'windows' ? 'true' : 'false')
 conf_data.set10('HAVE_CHRONO', has_chrono)
 
-if cpp_compiler.has_header_symbol('ios', 'std::ios_base::noreplace', args: cpp23_args)
+
+if cpp_compiler.has_header_symbol('version', '__cpp_lib_ios_noreplace', args: cpp23_args) or cpp_compiler.has_header_symbol('ios', 'std::ios_base::noreplace', args: cpp23_args)
   conf_data.set('NOREPLACE', 'std::ios_base::noreplace')
 elif cpp_compiler.has_header_symbol('ios', 'std::ios_base::__noreplace', args: cpp23_args)
   conf_data.set('NOREPLACE', 'std::ios_base::__noreplace')
@@ -32,6 +33,7 @@ lib_srcs = ['zip.cpp',
        'chapter_type.cpp',
        'volume_definition.cpp',
        'book_writer.cpp',
+       'book_searcher.cpp',
        'bookmaker.cpp',
        'jpeg.cpp',
        'png_reader.cpp',

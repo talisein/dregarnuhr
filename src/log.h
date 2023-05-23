@@ -36,6 +36,14 @@ void _log_helper(std::ostream& out, bool autonl, T t)
             out << sv << '\n';
             return;
         }
+    } else if constexpr (std::is_same_v<std::remove_cvref_t<T>, std::string>) {
+        if ('\n' == t.back()) {
+            out << t;
+        } else {
+            out << t;
+            if (autonl)
+                out << '\n';
+        }
     } else {
         out << t;
         if (autonl)
