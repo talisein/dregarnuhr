@@ -279,12 +279,17 @@ constexpr std::array vol_3 = std::to_array<volume_definition>({
 { volume::P5V3, "Text/copyright.xhtml"sv, "application/xhtml+xml"sv, "Copyright"sv, true },
     });
 
+constexpr std::array vol_4 = std::to_array<volume_definition>({
+{ volume::P5V4, "Text/copyright.xhtml"sv, "application/xhtml+xml"sv, "Copyright"sv, true },
+
+    });
     constexpr definition_span_view_t vol_1_def { std::span<const volume_definition, std::dynamic_extent>(vol_1), volume::P5V1 };
     constexpr definition_span_view_t vol_2_def { std::span<const volume_definition, std::dynamic_extent>(vol_2), volume::P5V2 };
     constexpr definition_span_view_t vol_3_def { std::span<const volume_definition, std::dynamic_extent>(vol_3), volume::P5V3 };
+    constexpr definition_span_view_t vol_4_def { std::span<const volume_definition, std::dynamic_extent>(vol_4), volume::P5V4 };
 
     constexpr std::array part_5_arr { std::to_array<definition_span_view_t>({
-                vol_1_def, vol_2_def, vol_3_def,
+                vol_1_def, vol_2_def, vol_3_def, vol_4_def,
             }) };
 
     constexpr definition_view_t part_5_def { std::span<const definition_span_view_t, std::dynamic_extent>(part_5_arr), omnibus::PART5 };
