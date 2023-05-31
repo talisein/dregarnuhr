@@ -1,6 +1,6 @@
 project('dregarnuhr', ['c', 'cpp'],
         license : 'GPLv3+',
-        version : '1.0.13',
+        version : '1.0.14',
         default_options : ['c_std=gnu17',
                            'buildtype=release',
                            'default_library=static',
@@ -52,6 +52,8 @@ cpp_compiler.has_header_symbol('version', '__cpp_size_t_suffix', args: cpp23_arg
 cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip', args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace', args: cpp23_args)
 cpp_compiler.has_header_symbol('version', '__cpp_lib_spanstream', args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_flat_map', args: cpp23_args)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_format', args: cpp23_args)
 
 has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>', args: cpp23_args)
 

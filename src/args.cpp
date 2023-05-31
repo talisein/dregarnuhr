@@ -166,6 +166,7 @@ parse(int argc, char** argv)
     using namespace std::string_view_literals;
     using namespace std::string_literals;
     using namespace std::ranges;
+    options = args{};
     auto args_sv = std::views::counted(argv, argc) | std::views::drop(1) | std::views::transform([](const char *p) -> std::string_view { return std::string_view(p); });
 
     options.command = args::command_e::NORMAL;
@@ -202,7 +203,9 @@ parse(int argc, char** argv)
     options.suffix = utils::find_if_optarg<std::string>(args_options, "--suffix="sv, std::identity{});
     if (options.suffix) log_info("Filename suffix set to ", std::quoted(*options.suffix));
 
-    options.prefix = utils::find_if_optarg<std::string>(args_options, "--prefix="sv);
+    if (auto prefix = utils::find_if_optarg<std::string>(args_options, "--prefix="sv); prefix) {
+        options.prefix = prefix;
+    }
 
     if (options.prefix) {
         log_info("Filename prefix set to ", std::quoted(*options.prefix));
@@ -265,12 +268,12 @@ parse(int argc, char** argv)
         }
     }
 
-    options.title = utils::find_if_optarg(args_options, "--title="sv);
-    if (options.title) {
-        if (options.title.value().size() == 0) {
+    if (auto title = utils::find_if_optarg(args_options, "--title="sv)) {
+        if (title.value().size() == 0) {
             log_error("Can not set a blank title");
             return std::unexpected(std::make_error_code(std::errc::invalid_argument));
         }
+        options.title = title;
         log_info("Title set to ", std::quoted(options.title.value()));
     }
 
@@ -298,29 +301,30 @@ parse(int argc, char** argv)
             }
             log_info("Omnibus ", *options.omnibus_type, " selected.");
         }
-        if (!options.title) {
-            switch (options.omnibus_type.value()) {
-                case omnibus::PART1:
-                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART1_TITLE);
-                    break;
-                case omnibus::PART2:
-                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART2_TITLE);
-                    break;
-                case omnibus::PART3:
-                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART3_TITLE);
-                    break;
-                case omnibus::PART4:
-                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART4_TITLE);
-                    break;
-                case omnibus::PART5:
-                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART5_TITLE);
-                    break;
-                case omnibus::ALL:
-                    options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_TITLE);
-                    break;
-            }
-            log_info("Omnibus title defaulted to: ", options.title.value());
+    }
+
+    if (!options.title && options.omnibus_type) {
+        switch (options.omnibus_type.value()) {
+            case omnibus::PART1:
+                options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART1_TITLE);
+                break;
+            case omnibus::PART2:
+                options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART2_TITLE);
+                break;
+            case omnibus::PART3:
+                options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART3_TITLE);
+                break;
+            case omnibus::PART4:
+                options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART4_TITLE);
+                break;
+            case omnibus::PART5:
+                options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_PART5_TITLE);
+                break;
+            case omnibus::ALL:
+                options.title = std::make_optional<std::string>(DEFAULT_OMNIBUS_TITLE);
+                break;
         }
+        log_info("Omnibus title defaulted to: ", options.title.value());
     }
 
     options.cover = utils::find_if_optarg<fs::path>(args_options, "--cover="sv);

@@ -32,12 +32,12 @@ int main() {
 
 
     "omnibus all"_test = [] (const auto& arg) {
-        const char *argv[] = {"dregarnuhr", arg};
+        const char *argv[] = {"dregarnuhr", arg, "..", ".", "--verbose"};
         auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
-        expect(not res.has_value());
+        expect(res.has_value());
         expect(get_options()->omnibus_type.has_value());
-        expect(get_options()->omnibus_type.value() == omnibus::ALL);
-    } | std::vector<const char*>{"--omnibus", "--omnibus=", "--omnibus=all", "--omnibus=ALL", "--omnibus=AlL"};
+        expect(eq(get_options()->omnibus_type.value(), omnibus::ALL));
+    } | std::vector<const char*>{"--omnibus", "--omnibus=all", "--omnibus=ALL", "--omnibus=AlL", "--slim"};
 
 
     "omnibus part1"_test = [] (const auto& arg) {
@@ -85,7 +85,7 @@ int main() {
         auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
         expect(not res.has_value());
         expect(eq(res.error(), std::make_error_code(std::errc::invalid_argument)));
-    } | std::vector<const char*>{"--omnibus=part6", "--omnibus=garbage", "--omnibus=Part"};
+    } | std::vector<const char*>{"--omnibus=part6", "--omnibus=garbage", "--omnibus=Part", "--omnibus="};
 
     "compression level small"_test = [] (const auto& arg) {
         const char *argv[] = {"dregarnuhr", arg, "..", "."};
@@ -149,4 +149,29 @@ int main() {
     } | std::vector<std::pair<const char*, std::string>>{
         {"--base=", "ascendence-of-a-bookworm"s}, {"--base=cutey", "cutey"s},
     };
+
+    "title"_test = [] (const auto& arg) {
+        const char *argv[] = {"dregarnuhr", arg.first, "..", ".", "--verbose"};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
+        expect(get_options()->title.has_value());
+        expect(eq(get_options()->title.value(), arg.second));
+    } | std::vector<std::pair<const char*, std::string>>{
+        {"--title=just-a-title", "just-a-title"s},
+        {"--omnibus", "Ascendence of a Bookworm: Chronological Omnibus"s},
+        {"--slim", "Ascendence of a Bookworm: Chronological Omnibus"s},
+    };
+
+    "prefix"_test = [] (const auto& arg) {
+        const char *argv[] = {"dregarnuhr", arg.first, "..", ".", "--verbose"};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
+        expect(get_options()->prefix.has_value());
+        expect(eq(get_options()->prefix.value(), arg.second));
+    } | std::vector<std::pair<const char*, std::string>>{
+        {"--prefix=just-a-prefix", "just-a-prefix"s},
+        {"--omnibus", "chronological-"s},
+        {"--slim", "slim-"s},
+    };
+
 }
