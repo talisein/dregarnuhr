@@ -60,6 +60,7 @@ enum class volume
     M2V5,
     M2V6,
     M2V7,
+    M3V1,
     SSBDOVA1,    // Otto P1V3
     SSJBUNKO1,   // Benno P1V2
     SSTEASET,    // Ferdinand & Rozemyne P3V1
