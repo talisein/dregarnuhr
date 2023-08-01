@@ -83,7 +83,7 @@ jobs:
       - if: ${{ matrix.compiler == 'clang' && matrix.flavor == 'ubuntu' }}
         name: Install clang ubuntu
         run: |
-          sudo apt-get remove -y python3-lldb-x.y python3-lldb-14
+          sudo apt-get remove -y python3-lldb-x.y python3-lldb-14 libc++1-14 libc++abi1-14 libunwind-14 libunwind-14-dev
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 17
