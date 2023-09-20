@@ -499,23 +499,23 @@ constexpr std::array vol_4 = std::to_array<volume_definition>({
 { volume::P5V6, /* CHAPTER */ "Text/chapter6.xhtml", "application/xhtml+xml", "Magic Tools for Children", true },
 { volume::P5V6, /* CHAPTER */ "Text/insert3.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V6, /* CHAPTER */ "Text/chapter6_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+
+{ volume::P5V6, /* CHAPTER */ "Text/chapter18.xhtml", "application/xhtml+xml", "The Lanzenave Envoys", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert10.xhtml", "application/xhtml+xml", std::nullopt, true },
+
 { volume::P5V6, /* CHAPTER */ "Text/chapter7.xhtml", "application/xhtml+xml", "Preparing Fey Paper", true },
 { volume::P5V6, /* CHAPTER */ "Text/insert4.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V6, /* CHAPTER */ "Text/chapter7_1.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V6, /* CHAPTER */ "Text/chapter8.xhtml", "application/xhtml+xml", "Making Maximal-Quality Samples", true },
 { volume::P5V6, /* CHAPTER */ "Text/chapter9.xhtml", "application/xhtml+xml", "The Spring Coming-of-Age Ceremony and Sylvester’s Departure", true },
-
-{ volume::P5V6, /* CHAPTER */ "Text/chapter18.xhtml", "application/xhtml+xml", "The Lanzenave Envoys", true },
-{ volume::P5V6, /* CHAPTER */ "Text/insert10.xhtml", "application/xhtml+xml", std::nullopt, true },
-
 { volume::P5V6, /* CHAPTER */ "Text/chapter10.xhtml", "application/xhtml+xml", "Kids’ Tea Party", true },
 { volume::P5V6, /* CHAPTER */ "Text/insert5.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V6, /* CHAPTER */ "Text/chapter10_1.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V6, /* CHAPTER */ "Text/chapter11.xhtml", "application/xhtml+xml", "The Leisegang Elders", true },
-{ volume::P5V6, /* CHAPTER */ "Text/chapter12.xhtml", "application/xhtml+xml", "Sylvester Returns", true },
 
 { volume::P5V6, /* CHAPTER */ "Text/chapter20.xhtml", "application/xhtml+xml", "Inquiry into the Commotion", true },
 
+{ volume::P5V6, /* CHAPTER */ "Text/chapter12.xhtml", "application/xhtml+xml", "Sylvester Returns", true },
 { volume::P5V6, /* CHAPTER */ "Text/chapter13.xhtml", "application/xhtml+xml", "Letters from Ferdinand", true },
 { volume::P5V6, /* CHAPTER */ "Text/insert6.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V6, /* CHAPTER */ "Text/chapter13_1.xhtml", "application/xhtml+xml", std::nullopt, true },
