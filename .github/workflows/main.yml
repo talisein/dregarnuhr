@@ -78,7 +78,7 @@ jobs:
     continue-on-error: ${{ matrix.is-experimental }}
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - if: ${{ matrix.compiler == 'clang' && matrix.flavor == 'ubuntu' }}
         name: Install clang ubuntu
@@ -316,7 +316,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create Release
         id: create_release
