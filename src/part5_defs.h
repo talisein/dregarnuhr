@@ -450,14 +450,106 @@ constexpr std::array vol_4 = std::to_array<volume_definition>({
 
         });
 
+    constexpr std::array vol_6 = std::to_array<volume_definition>({
+{ volume::P5V6, /* NCX */ "toc.ncx", "application/x-dtbncx+xml", std::nullopt, false },
+{ volume::P5V6, /* STYLESHEET */ "Styles/stylesheet.css", "text/css", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/jnovelclubCMYK.png", "image/png", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Bonus1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Bonus2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Characters1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Characters2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Characters3.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Cover.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/FrontMatter1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/FrontMatter2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Insert1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Insert2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Insert3.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Insert4.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Insert5.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Insert6.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Insert7.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Insert8.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Insert9.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Insert10.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Manga1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Manga2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Map.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* IMAGE */ "Images/Map2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V6, /* COVER */ "Text/cover.xhtml", "application/xhtml+xml", "Cover", true },
+{ volume::P5V6, /* FRONTMATTER */ "Text/frontmatter1.xhtml", "application/xhtml+xml", "Color Illustrations", true },
+{ volume::P5V6, /* FRONTMATTER */ "Text/frontmatter2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHARACTERS */ "Text/characters1.xhtml", "application/xhtml+xml", "Characters", true },
+{ volume::P5V6, /* CHARACTERS */ "Text/characters2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHARACTERS */ "Text/characters3.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* TOC */ "Text/toc.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/prologue.xhtml", "application/xhtml+xml", "Prologue", true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter1.xhtml", "application/xhtml+xml", "Report on the Archduke Conference (Third Year)", true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter2.xhtml", "application/xhtml+xml", "The Canceled Engagement and a Choice for the Future", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter2_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter3.xhtml", "application/xhtml+xml", "My Retainers’ Choices", true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter4.xhtml", "application/xhtml+xml", "At Karstedt’s Estate", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter4_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter5.xhtml", "application/xhtml+xml", "Mother and Daughter", true },
+
+{ volume::P5V6, /* CHAPTER */ "Text/chapter19.xhtml", "application/xhtml+xml", "My Hopes and Their Problems", true },
+
+{ volume::P5V6, /* CHAPTER */ "Text/chapter6.xhtml", "application/xhtml+xml", "Magic Tools for Children", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert3.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter6_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter7.xhtml", "application/xhtml+xml", "Preparing Fey Paper", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert4.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter7_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter8.xhtml", "application/xhtml+xml", "Making Maximal-Quality Samples", true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter9.xhtml", "application/xhtml+xml", "The Spring Coming-of-Age Ceremony and Sylvester’s Departure", true },
+
+{ volume::P5V6, /* CHAPTER */ "Text/chapter18.xhtml", "application/xhtml+xml", "The Lanzenave Envoys", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert10.xhtml", "application/xhtml+xml", std::nullopt, true },
+
+{ volume::P5V6, /* CHAPTER */ "Text/chapter10.xhtml", "application/xhtml+xml", "Kids’ Tea Party", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert5.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter10_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter11.xhtml", "application/xhtml+xml", "The Leisegang Elders", true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter12.xhtml", "application/xhtml+xml", "Sylvester Returns", true },
+
+{ volume::P5V6, /* CHAPTER */ "Text/chapter20.xhtml", "application/xhtml+xml", "Inquiry into the Commotion", true },
+
+{ volume::P5V6, /* CHAPTER */ "Text/chapter13.xhtml", "application/xhtml+xml", "Letters from Ferdinand", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert6.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter13_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter14.xhtml", "application/xhtml+xml", "The Trombe Hunt and the Starbind Ceremony", true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter15.xhtml", "application/xhtml+xml", "Tuuli’s Coming-of-Age Ceremony", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert7.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter15_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter16.xhtml", "application/xhtml+xml", "Interviews with the Aub", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert8.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter16_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/chapter17.xhtml", "application/xhtml+xml", "The Harvest Festival and the Gutenbergs’ Choices", true },
+{ volume::P5V6, /* CHAPTER */ "Text/epilogue.xhtml", "application/xhtml+xml", "Epilogue", true },
+{ volume::P5V6, /* CHAPTER */ "Text/insert9.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* CHAPTER */ "Text/epilogue_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* AFTERWORD */ "Text/afterword.xhtml", "application/xhtml+xml", "Afterword", true },
+{ volume::P5V6, /* MAP_EHRENFEST_DUCHY */ "Text/map.xhtml", "application/xhtml+xml", "Map of Ehrenfest Duchy", true },
+{ volume::P5V6, /* MAP_YURGENSCHMIDT */ "Text/map2.xhtml", "application/xhtml+xml", "Map of Yurgenschmidt", true },
+{ volume::P5V6, /* MANGA */ "Text/manga1.xhtml", "application/xhtml+xml", "A Comfy Life with My Family by You Shiina", true },
+{ volume::P5V6, /* MANGA */ "Text/manga2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* BONUS */ "Text/bonus1.xhtml", "application/xhtml+xml", "Bonus High Resolution Illustrations", true },
+{ volume::P5V6, /* BONUS */ "Text/bonus2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V6, /* SIGNUP */ "Text/signup.xhtml", "application/xhtml+xml", "About J-Novel Club", true },
+{ volume::P5V6, /* COPYRIGHT */ "Text/copyright.xhtml", "application/xhtml+xml", "Copyright", true },
+        });
+
     constexpr definition_span_view_t vol_1_def { std::span<const volume_definition, std::dynamic_extent>(vol_1), volume::P5V1 };
     constexpr definition_span_view_t vol_2_def { std::span<const volume_definition, std::dynamic_extent>(vol_2), volume::P5V2 };
     constexpr definition_span_view_t vol_3_def { std::span<const volume_definition, std::dynamic_extent>(vol_3), volume::P5V3 };
     constexpr definition_span_view_t vol_4_def { std::span<const volume_definition, std::dynamic_extent>(vol_4), volume::P5V4 };
     constexpr definition_span_view_t vol_5_def { std::span<const volume_definition, std::dynamic_extent>(vol_5), volume::P5V5 };
+    constexpr definition_span_view_t vol_6_def { std::span<const volume_definition, std::dynamic_extent>(vol_6), volume::P5V6 };
 
     constexpr std::array part_5_arr { std::to_array<definition_span_view_t>({
-                vol_1_def, vol_2_def, vol_3_def, vol_4_def, vol_5_def,
+                vol_1_def, vol_2_def, vol_3_def, vol_4_def, vol_5_def, vol_6_def,
             }) };
 
     constexpr definition_view_t part_5_def { std::span<const definition_span_view_t, std::dynamic_extent>(part_5_arr), omnibus::PART5 };

@@ -420,10 +420,10 @@ namespace part_4_defs
 { volume::SSC1, "Styles/stylesheet.css"sv, "text/css"sv, std::nullopt, false },
 
 { volume::P4V4, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "Meeting the Scholars"sv, true },
+{ volume::P4V4, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Life in the Temple"sv, true },
 
 { volume::SSC1, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "Charlotte — My Task"sv, true },
 
-{ volume::P4V4, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Life in the Temple"sv, true },
 { volume::P4V4, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V4, "Text/chapter3_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P4V4, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Schwartz’s and Weiss’s Outfits"sv, true },
