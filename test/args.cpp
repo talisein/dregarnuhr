@@ -174,4 +174,23 @@ int main() {
         {"--slim", "slim-"s},
     };
 
+    "cover image"_test =  [] (const auto& arg) {
+        const char *argv[] = {"dregarnuhr", arg.first, "--omnibus", "..", ".", "--verbose"};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
+        expect(get_options()->cover.has_value());
+        expect(eq(get_options()->cover.value(), arg.second));
+    } | std::vector<std::pair<const char*, std::string>>{
+        {"--cover=../covers/omnibus.jpg", "../covers/omnibus.jpg"s},
+        {"--slim", "../covers/omnibus.jpg"s},
+    };
+
+    "slim with cover image"_test = [] {
+        const char *argv[] = {"dregarnuhr", "--slim", "--cover=../covers/../covers/omnibus.jpg", "..", ".", "--verbose"};
+        auto res = parse(sizeof(argv)/sizeof(argv[0]), const_cast<char**>(argv));
+        expect(res.has_value());
+        expect(get_options()->cover.has_value());
+        expect(eq(get_options()->cover.value(), "../covers/../covers/omnibus.jpg"s));
+    };
+
 }

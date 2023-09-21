@@ -327,7 +327,10 @@ parse(int argc, char** argv)
         log_info("Omnibus title defaulted to: ", options.title.value());
     }
 
-    options.cover = utils::find_if_optarg<fs::path>(args_options, "--cover="sv);
+    // options.cover may be set by --slim. Only overwrite it if --cover is
+    // actually set.
+    auto arg_cover = utils::find_if_optarg<fs::path>(args_options, "--cover="sv);
+    if (arg_cover) options.cover = arg_cover;
     if (options.cover) {
         const auto path = *options.cover;
         std::error_code ec;
