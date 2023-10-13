@@ -95,6 +95,7 @@ namespace {
         {"9781718338241"sv, volume::M2V6},
         {"9781718338265"sv, volume::M2V7},
         {"9781718338012"sv, volume::M3V1},
+        {"9781718338036"sv, volume::M3V2},
         {"96908895-C96B-4376-BBF8-6A25E96F72F3"sv, volume::SSBDOVA1},
         {"22BC23BD-BEB1-4F8F-9104-825FA616AD4C"sv, volume::SSJBUNKO1},
         {"DEB588FB-32EF-4512-8ADF-D8A5CB49D9CD"sv, volume::SSTEASET},
