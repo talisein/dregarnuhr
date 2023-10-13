@@ -116,7 +116,6 @@ namespace part_3_defs
 { volume::P3V1, "Text/chapter12_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/extra2.xhtml"sv, "application/xhtml+xml"sv, "One Stressed-Out Chef"sv, true },
 
-/* suffering */
 { volume::M3V2, /* CHAPTER */ "xhtml/p-155.xhtml", "application/xhtml+xml", "Extra: Benno and Gustav's Suffering", true },
 { volume::M3V2, /* CHAPTER */ "xhtml/p-156.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::M3V2, /* CHAPTER */ "xhtml/p-157.xhtml", "application/xhtml+xml", std::nullopt, true },
@@ -127,13 +126,11 @@ namespace part_3_defs
 { volume::M3V2, /* IMAGE */ "image/i-157.jpg", "image/jpeg", std::nullopt, false },
 { volume::M3V2, /* IMAGE */ "image/i-158.jpg", "image/jpeg", std::nullopt, false },
 
-
 { volume::P3V1, "Text/chapter13.xhtml"sv, "application/xhtml+xml"sv, "How to Gather Donations"sv, true },
 { volume::P3V1, "Text/insert6.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/chapter13_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/chapter14.xhtml"sv, "application/xhtml+xml"sv, "My First Magic Training Regimen"sv, true },
 
-/* SS */
 { volume::M3V2, /* CHAPTER */ "xhtml/p-160.xhtml", "application/xhtml+xml", "Changes at Home", true },
 { volume::M3V2, /* CHAPTER */ "xhtml/p-161.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::M3V2, /* CHAPTER */ "xhtml/p-162.xhtml", "application/xhtml+xml", std::nullopt, true },
@@ -143,7 +140,6 @@ namespace part_3_defs
 { volume::M3V2, /* CHAPTER */ "xhtml/p-166.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::M3V2, /* CHAPTER */ "xhtml/p-167.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::M3V2, /* CHAPTER */ "xhtml/p-168.xhtml", "application/xhtml+xml", std::nullopt, true },
-
 { volume::M3V2, /* IMAGE */ "image/i-160.jpg", "image/jpeg", std::nullopt, false },
 { volume::M3V2, /* IMAGE */ "image/i-161.jpg", "image/jpeg", std::nullopt, false },
 { volume::M3V2, /* IMAGE */ "image/i-162.jpg", "image/jpeg", std::nullopt, false },
@@ -153,7 +149,6 @@ namespace part_3_defs
 { volume::M3V2, /* IMAGE */ "image/i-166.jpg", "image/jpeg", std::nullopt, false },
 { volume::M3V2, /* IMAGE */ "image/i-167.jpg", "image/jpeg", std::nullopt, false },
 { volume::M3V2, /* IMAGE */ "image/i-168.jpg", "image/jpeg", std::nullopt, false },
-
 
 { volume::P3V1, "Text/chapter15.xhtml"sv, "application/xhtml+xml"sv, "Working Toward Wax Stencils"sv, true },
 { volume::P3V1, "Text/chapter16.xhtml"sv, "application/xhtml+xml"sv, "An Illustration of Ferdinand"sv, true },
