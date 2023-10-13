@@ -51,6 +51,9 @@ Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 
 %changelog
+* Thu Oct 12 2023 Andrew Potter <agpotter@gmail.com> - v1.0.18-1
+- M3V2
+
 * Tue Jul 1 2023 Andrew Potter <agpotter@gmail.com> - v1.0.17-1
 - Add P5V6
 - Fix --slim cover image bug
