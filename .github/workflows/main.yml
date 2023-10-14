@@ -69,6 +69,7 @@ jobs:
       actions: read
       contents: read
       security-events: write
+      checks: write
     env:
       CC: ${{ matrix.CC }}
       CXX: ${{ matrix.CXX }}
@@ -193,6 +194,16 @@ jobs:
         id: unittests
         run: meson test -C build --print-errorlogs
 
+      - name: Test Reporter
+        uses: dorny/test-reporter@v1.6.0
+        if: ${{ always() }}
+        continue-on-error: true
+        with:
+          name: Unit tests ${{ matrix.os }} ${{ matrix.compiler }}
+          path: 'build/meson-logs/testlog.junit.xml,build/*junit.xml'
+          reporter: java-junit
+          fail-on-error: false
+
       - if: ${{ steps.unittests.conclusion == 'failure' && failure() }}
         name: Test backtrace
         run: |
@@ -255,18 +266,14 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dregarnuhr-${{ matrix.os }}-${{ matrix.compiler }}
-          path: |
-            build/src/dregarnuhr
-            build/src/*_test
+          path: build/src/dregarnuhr
 
       - if: ${{ matrix.flavor == 'windows' && (success() || failure()) }}
         name: Binary Windows
         uses: actions/upload-artifact@v3
         with:
           name: dregarnuhr-${{ matrix.os }}
-          path: |
-            build/src/dregarnuhr.exe
-            build/src/*_test.exe
+          path: build/src/dregarnuhr.exe
 
   check-run-linux:
     needs: build
