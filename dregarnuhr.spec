@@ -1,5 +1,5 @@
 Name:           dregarnuhr
-Version:        1.0.16
+Version:        1.0.18
 Release:        1
 Summary:        Rearrange Ascendence of a Bookworm epubs into Chronological Order
 

@@ -3,7 +3,7 @@
 Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/talisein/dregarnuhr)
-[![CI](https://github.com/talisein/dregarnuhr/actions/workflows/main.yml/badge.svg)](https://github.com/talisein/dregarnuhr/actions/workflows/main.yml)
+[![CI](https://github.com/talisein/dregarnuhr/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/talisein/dregarnuhr/actions/workflows/main.yml)
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/talisein/dregarnuhr/package/dregarnuhr/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/talisein/dregarnuhr/package/dregarnuhr/)
 [![PPA](https://img.shields.io/badge/Ubuntu%20PPA-available-%23e9500e)](https://launchpad.net/~talisein/+archive/ubuntu/dregarnuhr)
 
