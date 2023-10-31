@@ -136,7 +136,8 @@ ctre_dep = dependency('ctre',
                       fallback: ['ctre'])
 
 magic_enum_dep = dependency('magic_enum',
-                           fallback: ['magic_enum'])
+			    version: '>=0.9.3',
+                            fallback: ['magic_enum'])
 
 subdir('src')
 subdir('test')
