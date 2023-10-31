@@ -3,7 +3,8 @@
 #include <map>
 #include <cassert>
 #include "outcome/result.hpp"
-#include "magic_enum.hpp"
+#include <magic_enum.hpp>
+#include <magic_enum_iostream.hpp>
 #include "volumes.h"
 #include "log.h"
 #include "utils.h"
