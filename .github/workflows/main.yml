@@ -109,7 +109,8 @@ jobs:
           sudo add-apt-repository -n ppa:talisein/outcome
           sudo add-apt-repository -n ppa:talisein/magic-enum
           sudo apt-get update
-          sudo apt-get install meson ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev jq findutils
+          sudo apt-get install ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev jq findutils
+          sudo pip3 install meson
 
       - if: ${{ matrix.flavor == 'mac' }}
         name: Install deps mac
