@@ -539,6 +539,100 @@ constexpr std::array vol_4 = std::to_array<volume_definition>({
 { volume::P5V6, /* BONUS */ "Text/bonus2.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V6, /* SIGNUP */ "Text/signup.xhtml", "application/xhtml+xml", "About J-Novel Club", true },
 { volume::P5V6, /* COPYRIGHT */ "Text/copyright.xhtml", "application/xhtml+xml", "Copyright", true },
+    });
+
+    constexpr std::array vol_7 = std::to_array<volume_definition>({
+       { volume::P5V7, /* NCX */ "toc.ncx", "application/x-dtbncx+xml", std::nullopt, false },
+{ volume::P5V7, /* STYLESHEET */ "Styles/stylesheet.css", "text/css", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/jnovelclubCMYK.png", "image/png", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Map2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Map.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Manga2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Manga1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Insert10.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Insert9.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Insert8.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Insert7.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Insert6.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Insert5.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Insert4.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Insert3.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Insert2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Insert1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/FrontMatter2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/FrontMatter1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Cover.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Characters3.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Characters2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Characters1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Bonus2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* IMAGE */ "Images/Bonus1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V7, /* COVER */ "Text/cover.xhtml", "application/xhtml+xml", "Cover", true },
+{ volume::P5V7, /* FRONTMATTER */ "Text/frontmatter1.xhtml", "application/xhtml+xml", "Color Illustrations", true },
+{ volume::P5V7, /* FRONTMATTER */ "Text/frontmatter2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHARACTERS */ "Text/characters1.xhtml", "application/xhtml+xml", "Characters", true },
+{ volume::P5V7, /* CHARACTERS */ "Text/characters2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHARACTERS */ "Text/characters3.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* TOC */ "Text/toc.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/prologue.xhtml", "application/xhtml+xml", "Prologue", true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter1.xhtml", "application/xhtml+xml", "Dirk’s and Bertram’s Baptisms", true },
+{ volume::P5V7, /* CHAPTER */ "Text/insert1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter1_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter2.xhtml", "application/xhtml+xml", "The Winter Playroom and Another New Term", true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter3.xhtml", "application/xhtml+xml", "The Fellowship Gatherings (Fourth Year)", true },
+{ volume::P5V7, /* CHAPTER */ "Text/insert2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter3_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter4.xhtml", "application/xhtml+xml", "The First Week of Classes", true },
+{ volume::P5V7, /* CHAPTER */ "Text/insert3.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter4_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter5.xhtml", "application/xhtml+xml", "The Royal Academy’s Dedication Rituals", true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter6.xhtml", "application/xhtml+xml", "Meeting Gramps", true },
+{ volume::P5V7, /* CHAPTER */ "Text/insert4.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter6_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter7.xhtml", "application/xhtml+xml", "The Book of Mestionora", true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter8.xhtml", "application/xhtml+xml", "I’m Back", true },
+{ volume::P5V7, /* CHAPTER */ "Text/insert5.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter8_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+
+{ volume::P5V7, /* CHAPTER */ "Text/chapter19.xhtml", "application/xhtml+xml", "Rozemyne’s Disappearance and Return", true },
+{ volume::P5V7, /* CHAPTER */ "Text/insert10.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter19_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+
+{ volume::P5V7, /* CHAPTER */ "Text/chapter20.xhtml", "application/xhtml+xml", "The Royal Academy without My Sister", true },
+
+{ volume::P5V7, /* CHAPTER */ "Text/chapter9.xhtml", "application/xhtml+xml", "The Foundational Magic", true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter10.xhtml", "application/xhtml+xml", "The Bible’s Key", true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter11.xhtml", "application/xhtml+xml", "Anxiety and the Measuring", true },
+{ volume::P5V7, /* CHAPTER */ "Text/insert6.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter11_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter12.xhtml", "application/xhtml+xml", "How to Protect Them", true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter13.xhtml", "application/xhtml+xml", "Preparing for War", true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter14.xhtml", "application/xhtml+xml", "Kamil’s Baptism", true },
+{ volume::P5V7, /* CHAPTER */ "Text/insert7.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter14_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter15.xhtml", "application/xhtml+xml", "Defense Meeting", true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter16.xhtml", "application/xhtml+xml", "Danger Beheld", true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter17.xhtml", "application/xhtml+xml", "Temptation", true },
+{ volume::P5V7, /* CHAPTER */ "Text/insert8.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/chapter17_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+
+{ volume::P5V7, /* CHAPTER */ "Text/chapter18.xhtml", "application/xhtml+xml", "Faster than Steifebrise", true },
+
+{ volume::P5V7, /* CHAPTER */ "Text/epilogue.xhtml", "application/xhtml+xml", "Epilogue", true },
+{ volume::P5V7, /* CHAPTER */ "Text/insert9.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* CHAPTER */ "Text/epilogue_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+
+{ volume::P5V7, /* CHAPTER */ "Text/chapter21.xhtml", "application/xhtml+xml", "Their Hopes and Dreams", true },
+
+{ volume::P5V7, /* AFTERWORD */ "Text/afterword.xhtml", "application/xhtml+xml", "Afterword", true },
+{ volume::P5V7, /* MAP_EHRENFEST_DUCHY */ "Text/map.xhtml", "application/xhtml+xml", "Map of Ehrenfest Duchy", true },
+{ volume::P5V7, /* MAP_YURGENSCHMIDT */ "Text/map2.xhtml", "application/xhtml+xml", "Map of Yurgenschmidt", true },
+{ volume::P5V7, /* MANGA */ "Text/manga1.xhtml", "application/xhtml+xml", "A Comfy Life with My Family by You Shiina", true },
+{ volume::P5V7, /* MANGA */ "Text/manga2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* BONUS */ "Text/bonus1.xhtml", "application/xhtml+xml", "Bonus High Resolution Illustrations", true },
+{ volume::P5V7, /* BONUS */ "Text/bonus2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V7, /* SIGNUP */ "Text/signup.xhtml", "application/xhtml+xml", "About J-Novel Club", true },
+{ volume::P5V7, /* COPYRIGHT */ "Text/copyright.xhtml", "application/xhtml+xml", "Copyright", true },
         });
 
     constexpr definition_span_view_t vol_1_def { std::span<const volume_definition, std::dynamic_extent>(vol_1), volume::P5V1 };
@@ -547,9 +641,10 @@ constexpr std::array vol_4 = std::to_array<volume_definition>({
     constexpr definition_span_view_t vol_4_def { std::span<const volume_definition, std::dynamic_extent>(vol_4), volume::P5V4 };
     constexpr definition_span_view_t vol_5_def { std::span<const volume_definition, std::dynamic_extent>(vol_5), volume::P5V5 };
     constexpr definition_span_view_t vol_6_def { std::span<const volume_definition, std::dynamic_extent>(vol_6), volume::P5V6 };
+    constexpr definition_span_view_t vol_7_def { std::span<const volume_definition, std::dynamic_extent>(vol_7), volume::P5V7 };
 
     constexpr std::array part_5_arr { std::to_array<definition_span_view_t>({
-                vol_1_def, vol_2_def, vol_3_def, vol_4_def, vol_5_def, vol_6_def,
+                vol_1_def, vol_2_def, vol_3_def, vol_4_def, vol_5_def, vol_6_def, vol_7_def,
             }) };
 
     constexpr definition_view_t part_5_def { std::span<const definition_span_view_t, std::dynamic_extent>(part_5_arr), omnibus::PART5 };
