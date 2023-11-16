@@ -197,7 +197,7 @@ parse(int argc, char** argv)
             options.cover = path;
             log_info("Defaulted cover to ", path);
         }
-        options.name_filter = std::make_optional<std::regex>("(bonus[0-9]|frontmatter[1-2]).(jpg|xhtml)"s, std::regex_constants::icase);
+        options.name_filter = std::make_optional<std::regex>("(bonus[0-9]|frontmatter[1-2]|UFTSS1/text/1[2-7]|UFTSS1/images/P2V._Tobooks_Manga).(png|jpg|xhtml)"s, std::regex_constants::icase);
     }
 
     options.suffix = utils::find_if_optarg<std::string>(args_options, "--suffix="sv, std::identity{});
