@@ -109,8 +109,7 @@ jobs:
           sudo add-apt-repository -n ppa:talisein/outcome
           sudo add-apt-repository -n ppa:talisein/magic-enum
           sudo apt-get update
-          sudo apt-get install ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev jq findutils
-          sudo pip3 install meson
+          sudo apt-get install ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev jq findutils meson
 
       - if: ${{ matrix.flavor == 'mac' }}
         name: Install deps mac
@@ -248,6 +247,7 @@ jobs:
 
       - if: ${{ matrix.flavor == 'ubuntu' && matrix.compiler == 'gcc' && startsWith(github.ref, 'refs/tags/v') }}
         name: Publish PPA Snapshot
+        continue-on-error: true
         env:
           LD_PRELOAD:
           GPG_PRIVATE_KEY: ${{ secrets.PPA_PGP_SECRET_KEY }}
