@@ -1,5 +1,5 @@
 Name:           dregarnuhr
-Version:        1.0.18
+Version:        1.5.7.0
 Release:        1
 Summary:        Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
@@ -51,6 +51,10 @@ Rearrange Ascendence of a Bookworm epubs into Chronological Order
 
 
 %changelog
+* Thu Nov 16 2023 Andrew Potter <agpotter@gmail.com> - 1.5.7.0-1
+- P5V7
+- --slim doesn't include TOBooks Manga anymore
+
 * Thu Oct 12 2023 Andrew Potter <agpotter@gmail.com> - v1.0.18-1
 - M3V2
 
