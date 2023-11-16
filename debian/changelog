@@ -1,3 +1,9 @@
+dregarnuhr (1.5.7.1-1) unstable; urgency=medium
+
+  * Lower meson version requirement
+
+ -- Andrew Potter <talisein@gmail.com>  Wed, 15 Nov 2023 18:41:17 -0800
+
 dregarnuhr (1.5.7.0-1) unstable; urgency=medium
 
   * P5V7
