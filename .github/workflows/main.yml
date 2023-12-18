@@ -127,7 +127,7 @@ jobs:
 
       - if: ${{ matrix.flavor == 'ubuntu' && matrix.compiler == 'gcc' && !startsWith(github.ref, 'refs/tags/v') }}
         name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
 
       - name: Cache subprojects
         id: meson-cache
@@ -224,7 +224,7 @@ jobs:
 
       - if: ${{ matrix.flavor == 'ubuntu' && matrix.compiler == 'gcc'  && !startsWith(github.ref, 'refs/tags/v') }}
         name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
 
       # Generate tarball for PPA
       - if: ${{ matrix.flavor == 'ubuntu' && matrix.compiler == 'gcc' && startsWith(github.ref, 'refs/tags/v') }}
