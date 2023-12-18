@@ -281,7 +281,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - run: |
           chmod u+x dregarnuhr-ubuntu-22.04-gcc/dregarnuhr
@@ -292,7 +292,7 @@ jobs:
     runs-on: macos-11
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - run: |
           chmod u+x dregarnuhr-macos-12-gcc/dregarnuhr
@@ -303,7 +303,7 @@ jobs:
     runs-on: macos-12
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - run: |
           chmod u+x dregarnuhr-macos-12-gcc/dregarnuhr
@@ -314,7 +314,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - run: dregarnuhr-windows-latest/dregarnuhr.exe --check --verbose
 
@@ -337,7 +337,7 @@ jobs:
           draft: true
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - id: myref
         env:
