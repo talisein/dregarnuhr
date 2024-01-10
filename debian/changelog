@@ -1,17 +1,23 @@
-dregarnuhr (1.5.8.0-1) unstable; urgency=medium
+dregarnuhr (1.5.8.1-1) jammy; urgency=medium
+
+  * Fix PPA Release
+
+ -- Andrew Potter <agpotter@gmail.com>  Tue, 09 Jan 2024 23:33:26 -0800
+
+dregarnuhr (1.5.8.0-1) jammy; urgency=medium
 
   * P5V9
   * --slim doesn't include manga anymore
 
  -- Andrew Potter <talisein@gmail.com>  Tue, 09 Jan 2024 22:55:30 -0800
 
-dregarnuhr (1.5.7.1-1) unstable; urgency=medium
+dregarnuhr (1.5.7.1-1) jammy; urgency=medium
 
   * Lower meson version requirement
 
  -- Andrew Potter <talisein@gmail.com>  Wed, 15 Nov 2023 18:41:17 -0800
 
-dregarnuhr (1.5.7.0-1) unstable; urgency=medium
+dregarnuhr (1.5.7.0-1) jammy; urgency=medium
 
   * P5V7
   * --slim doesn't include TOBook Manga anymore
