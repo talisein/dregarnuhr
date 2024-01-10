@@ -1,3 +1,10 @@
+dregarnuhr (1.5.8.0-1) unstable; urgency=medium
+
+  * P5V9
+  * --slim doesn't include manga anymore
+
+ -- Andrew Potter <talisein@gmail.com>  Tue, 09 Jan 2024 22:55:30 -0800
+
 dregarnuhr (1.5.7.1-1) unstable; urgency=medium
 
   * Lower meson version requirement
