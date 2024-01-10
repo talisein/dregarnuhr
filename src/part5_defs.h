@@ -683,6 +683,9 @@ constexpr std::array vol_4 = std::to_array<volume_definition>({
 { volume::P5V8, /* CHAPTER */ "Text/chapter7_1.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V8, /* CHAPTER */ "Text/chapter8.xhtml", "application/xhtml+xml", "My Geduldh", true },
 { volume::P5V8, /* CHAPTER */ "Text/chapter9.xhtml", "application/xhtml+xml", "The Zent and the Grutrissheit", true },
+
+{ volume::P5V8, /* CHAPTER */ "Text/side2.xhtml", "application/xhtml+xml", "Follow Your Heart", true },
+
 { volume::P5V8, /* CHAPTER */ "Text/chapter10.xhtml", "application/xhtml+xml", "The New Aub", true },
 { volume::P5V8, /* CHAPTER */ "Text/chapter11.xhtml", "application/xhtml+xml", "The Aub’s Protection", true },
 { volume::P5V8, /* CHAPTER */ "Text/insert4.xhtml", "application/xhtml+xml", std::nullopt, true },
@@ -699,15 +702,17 @@ constexpr std::array vol_4 = std::to_array<volume_definition>({
 { volume::P5V8, /* CHAPTER */ "Text/insert7.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V8, /* CHAPTER */ "Text/chapter17_1.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V8, /* CHAPTER */ "Text/chapter18.xhtml", "application/xhtml+xml", "Black Weapons and Chalices", true },
-{ volume::P5V8, /* CHAPTER */ "Text/epilogue.xhtml", "application/xhtml+xml", "Epilogue", true },
-{ volume::P5V8, /* CHAPTER */ "Text/insert8.xhtml", "application/xhtml+xml", std::nullopt, true },
-{ volume::P5V8, /* CHAPTER */ "Text/epilogue_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+
 { volume::P5V8, /* CHAPTER */ "Text/side1.xhtml", "application/xhtml+xml", "The Defense of Ehrenfest (First Half)", true },
 { volume::P5V8, /* CHAPTER */ "Text/insert9.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V8, /* CHAPTER */ "Text/side1_1.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V8, /* CHAPTER */ "Text/insert10.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V8, /* CHAPTER */ "Text/side1_2.xhtml", "application/xhtml+xml", std::nullopt, true },
-{ volume::P5V8, /* CHAPTER */ "Text/side2.xhtml", "application/xhtml+xml", "Follow Your Heart", true },
+
+{ volume::P5V8, /* CHAPTER */ "Text/epilogue.xhtml", "application/xhtml+xml", "Epilogue", true },
+{ volume::P5V8, /* CHAPTER */ "Text/insert8.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V8, /* CHAPTER */ "Text/epilogue_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+
 { volume::P5V8, /* AFTERWORD */ "Text/afterword.xhtml", "application/xhtml+xml", "Afterword", true },
 { volume::P5V8, /* MAP_EHRENFEST_DUCHY */ "Text/map.xhtml", "application/xhtml+xml", "Map of Ehrenfest Duchy", true },
 { volume::P5V8, /* MANGA */ "Text/manga1.xhtml", "application/xhtml+xml", "A Comfy Life with My Family by You Shiina", true },
@@ -725,9 +730,10 @@ constexpr std::array vol_4 = std::to_array<volume_definition>({
     constexpr definition_span_view_t vol_5_def { std::span<const volume_definition, std::dynamic_extent>(vol_5), volume::P5V5 };
     constexpr definition_span_view_t vol_6_def { std::span<const volume_definition, std::dynamic_extent>(vol_6), volume::P5V6 };
     constexpr definition_span_view_t vol_7_def { std::span<const volume_definition, std::dynamic_extent>(vol_7), volume::P5V7 };
+    constexpr definition_span_view_t vol_8_def { std::span<const volume_definition, std::dynamic_extent>(vol_8), volume::P5V8 };
 
     constexpr std::array part_5_arr { std::to_array<definition_span_view_t>({
-                vol_1_def, vol_2_def, vol_3_def, vol_4_def, vol_5_def, vol_6_def, vol_7_def,
+                vol_1_def, vol_2_def, vol_3_def, vol_4_def, vol_5_def, vol_6_def, vol_7_def, vol_8_def,
             }) };
 
     constexpr definition_view_t part_5_def { std::span<const definition_span_view_t, std::dynamic_extent>(part_5_arr), omnibus::PART5 };
