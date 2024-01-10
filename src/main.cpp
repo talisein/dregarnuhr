@@ -165,7 +165,7 @@ void do_dump()
 
 namespace {
     extern "C" {
-        void _xmlStructuredErrorFunc (void *, xmlErrorPtr error)
+        void _xmlStructuredErrorFunc (void *, const xmlErrorPtr error)
         {
             switch (error->level) {
                 case XML_ERR_NONE:
