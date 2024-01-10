@@ -197,7 +197,8 @@ parse(int argc, char** argv)
             options.cover = path;
             log_info("Defaulted cover to ", path);
         }
-        options.name_filter = std::make_optional<std::regex>("(bonus[0-9]|frontmatter[1-2]|UFTSS1/text/1[2-7]|UFTSS1/images/P2V._Tobooks_Manga).(png|jpg|xhtml)"s, std::regex_constants::icase);
+        /* TODO: filter on chapter type? Doesn't help the images tho */
+        options.name_filter = std::make_optional<std::regex>("(bonus[0-9]|frontmatter[1-2]|UFTSS1/text/1[2-7]|UFTSS1/images/P2V._Tobooks_Manga|UFTSS1/text/[5-9]|UFTSS1/images/Manga_0[1-5]|UFTSS1/text/10-[1-5]|UFTSS1/images/CD4_Manga_0[1-5]|[pP]oll[1-2]|[mM]anga[1-2]).(png|jpg|xhtml)"s, std::regex_constants::icase);
     }
 
     options.suffix = utils::find_if_optarg<std::string>(args_options, "--suffix="sv, std::identity{});
