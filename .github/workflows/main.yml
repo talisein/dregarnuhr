@@ -131,7 +131,7 @@ jobs:
 
       - name: Cache subprojects
         id: meson-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: subprojects/packagecache
           key: meson-build-cache-${{ runner.os }}-${{ github.run_id }}
