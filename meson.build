@@ -57,7 +57,7 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_format', args: cpp23_args)
 
 has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>', args: cpp23_args)
 
-zlib_dep = dependency('zlib', fallback: ['zlib'])
+#zlib_dep = dependency('zlib', fallback: ['zlib'])
 
 # Fedora libjpeg-turbo-devel, Ubuntu libjpeg-turbo8-dev
 png_dep = dependency('libpng', fallback: ['libpng'])
