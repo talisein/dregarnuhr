@@ -107,6 +107,7 @@ endif
 # Fedora libxml++-devel. Ubuntu doesn't have a -5.0 package.
 # Note: I submitted some patches upstream, so the wrap has better performance
 # until there is a 5.0.2 release
+if hots_machine.system() != 'windows'
 libxmlpp_dep = dependency('libxml++-5.0',
                           version : '>=5.0.2',
                           fallback: ['libxmlpp'],
@@ -114,7 +115,16 @@ libxmlpp_dep = dependency('libxml++-5.0',
                                             'build-examples=false',
                                             'validation=false',
                                             'maintainer-mode=false'])
-
+else
+libxmlpp_dep = dependency('libxml++-5.0',
+                          version : '>=5.0.2',
+                          fallback: ['libxmlpp'],
+                          default_options: ['build-deprecated-api=false',
+                                            'build-examples=false',
+                                            'validation=false',
+                                            'maintainer-mode=false',
+                                            'build-tests=false'])
+endif
 
 if not has_chrono
   # Fedora date-devel, Ubuntu libhowardhinnant-date-dev
