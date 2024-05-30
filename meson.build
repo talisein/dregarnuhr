@@ -57,6 +57,17 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_format', args: cpp23_args)
 
 has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>', args: cpp23_args)
 
+# Fedora libxml++-devel. Ubuntu doesn't have a -5.0 package.
+# Note: I submitted some patches upstream, so the wrap has better performance
+# until there is a 5.0.2 release
+libxmlpp_dep = dependency('libxml++-5.0',
+                          version : '>=5.0.2',
+                          fallback: ['libxmlpp'],
+                          default_options: ['build-deprecated-api=false',
+                                            'build-examples=false',
+                                            'validation=false',
+                                            'maintainer-mode=false'])
+
 #zlib_dep = dependency('zlib', fallback: ['zlib'])
 
 # Fedora libjpeg-turbo-devel, Ubuntu libjpeg-turbo8-dev
@@ -104,16 +115,7 @@ http_dep = dependency('httplib', 'cpp-httplib',
                       default_options: ['cpp-httplib_compile=true',
                                         'cpp-httplib_brotli=disabled'])
 endif
-# Fedora libxml++-devel. Ubuntu doesn't have a -5.0 package.
-# Note: I submitted some patches upstream, so the wrap has better performance
-# until there is a 5.0.2 release
-libxmlpp_dep = dependency('libxml++-5.0',
-                          version : '>=5.0.2',
-                          fallback: ['libxmlpp'],
-                          default_options: ['build-deprecated-api=false',
-                                            'build-examples=false',
-                                            'validation=false',
-                                            'maintainer-mode=false'])
+
 
 if not has_chrono
   # Fedora date-devel, Ubuntu libhowardhinnant-date-dev
