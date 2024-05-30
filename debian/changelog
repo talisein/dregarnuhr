@@ -1,3 +1,9 @@
+dregarnuhr (1.5.10.0-1) jammy; urgency=medium
+
+  * P5V9, P5V10, M2V8, M2V9
+
+ -- Andrew Potter <agpotter@gmail.com>  Thu, 30 May 2024 11:46:26 -0700
+
 dregarnuhr (1.5.8.1-1) jammy; urgency=medium
 
   * Fix PPA Release
