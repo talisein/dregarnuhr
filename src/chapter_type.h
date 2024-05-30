@@ -24,6 +24,7 @@ enum class chapter_type {
   MAP_EHRENFEST_CITY,
   MAP_EHRENFEST_DUCHY,
   MAP_YURGENSCHMIDT,
+  MAP_ROYAL_ACADEMY,
   TABLE_YURGENSCHMIDT_DUCHIES,
   AFTERWORD,
   RECORDING_REPORT,
@@ -50,6 +51,7 @@ get_uniqueness(chapter_type c) {
         case chapter_type::MAP_EHRENFEST_CITY:
         case chapter_type::MAP_EHRENFEST_DUCHY:
         case chapter_type::MAP_YURGENSCHMIDT:
+        case chapter_type::MAP_ROYAL_ACADEMY:
         case chapter_type::MAP_RA_LIBRARY:
         case chapter_type::TABLE_YURGENSCHMIDT_DUCHIES:
         case chapter_type::SIGNUP:
@@ -107,8 +109,10 @@ evaluate_chapter_type(volume vol,
     constexpr auto map_ehrenfest_city_label_regex  = ctre::search<"Map of Ehrenfest", ctre::case_insensitive>; // can also use toc_label but this works for now
     constexpr auto map_ehrenfest_duchy_label_regex = ctre::search<"Map of Ehrenfest Duchy", ctre::case_insensitive>; // can also use toc_label but this works for now
     constexpr auto map_yurgenschmidt_label_regex   = ctre::search<"Map of Yurgenschmidt", ctre::case_insensitive>;
+    constexpr auto map_royal_academy_label_regex   = ctre::search<"Map of the Royal Academy", ctre::case_insensitive>;
     constexpr auto map_ehrenfest_href_regex        = ctre::search<"map.xhtml", ctre::case_insensitive>; // can also use toc_label but this works for now
     constexpr auto map_yurgenschmidt_href_regex    = ctre::search<"map2.xhtml", ctre::case_insensitive>;
+    constexpr auto map_royal_academy_href_regex    = ctre::search<"map3.xhtml", ctre::case_insensitive>;
     constexpr auto family_tree_regex               = ctre::search<"tree.xhtml", ctre::case_insensitive>;
     constexpr auto afterword_regex                 = ctre::search<"afterword.xhtml", ctre::case_insensitive>;
     constexpr auto manga_regex                     = ctre::search<"text/manga", ctre::case_insensitive>;
@@ -118,7 +122,7 @@ evaluate_chapter_type(volume vol,
     constexpr auto ncx_regex                       = ctre::search<"dtbncx", ctre::case_insensitive>; // mediatype
     constexpr auto stylesheet_regex                = ctre::search<"css", ctre::case_insensitive>; // mediatype
     constexpr auto image_regex                     = ctre::search<"image/", ctre::case_insensitive>; // mediatype
-    constexpr auto toc_regex                       = ctre::search<"toc.xhtml", ctre::case_insensitive>;
+    constexpr auto toc_regex                       = ctre::search<"(toc|nav).xhtml", ctre::case_insensitive>;
     constexpr auto characters_regex                = ctre::search<"text/character", ctre::case_insensitive>;
     constexpr auto signup_regex                    = ctre::search<"text/signup", ctre::case_insensitive>;
 
@@ -177,12 +181,18 @@ evaluate_chapter_type(volume vol,
         if (map_ehrenfest_city_label_regex(*toc_label)) {
             return chapter_type::MAP_EHRENFEST_CITY;
         }
+        if (map_royal_academy_label_regex(*toc_label)) {
+            return chapter_type::MAP_ROYAL_ACADEMY;
+        }
     } else {
         if (map_ehrenfest_href_regex(href)) {
             return chapter_type::MAP_EHRENFEST_DUCHY;
         }
         if (map_yurgenschmidt_href_regex(href)) {
             return chapter_type::MAP_YURGENSCHMIDT;
+        }
+        if (map_royal_academy_href_regex(href)) {
+            return chapter_type::MAP_ROYAL_ACADEMY;
         }
     }
 
