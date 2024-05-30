@@ -811,6 +811,92 @@ constexpr std::array vol_4 = std::to_array<volume_definition>({
 { volume::P5V9, /* COPYRIGHT */ "Text/copyright.xhtml", "application/xhtml+xml", "Copyright", true },
         });
 
+    constexpr std::array vol_10 = std::to_array<volume_definition>({
+{ volume::P5V10, /* NCX */ "toc.ncx", "application/x-dtbncx+xml", std::nullopt, false },
+{ volume::P5V10, /* STYLESHEET */ "Styles/stylesheet.css", "text/css", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/jnovelclubCMYK.png", "image/png", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Map3.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Manga1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Map2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Map.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Manga2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Insert10.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Insert9.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Insert8.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Insert7.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Insert6.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Bonus1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Insert4.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Insert5.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Insert3.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Insert2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Insert1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/FrontMatter1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/FrontMatter2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Cover.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Characters3.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Characters2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Bonus2.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* IMAGE */ "Images/Characters1.jpg", "image/jpeg", std::nullopt, false },
+{ volume::P5V10, /* COVER */ "Text/cover.xhtml", "application/xhtml+xml", "Cover", true },
+{ volume::P5V10, /* FRONTMATTER */ "Text/frontmatter1.xhtml", "application/xhtml+xml", "Color Illustrations", true },
+{ volume::P5V10, /* FRONTMATTER */ "Text/frontmatter2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHARACTERS */ "Text/characters1.xhtml", "application/xhtml+xml", "Characters", true },
+{ volume::P5V10, /* CHARACTERS */ "Text/characters2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHARACTERS */ "Text/characters3.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* TOC */ "Text/toc.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/prologue.xhtml", "application/xhtml+xml", "Prologue", true },
+{ volume::P5V10, /* CHAPTER */ "Text/insert1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/prologue_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter1.xhtml", "application/xhtml+xml", "The Royal Academy at Night", true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter2.xhtml", "application/xhtml+xml", "The Adalgisa Villa", true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter3.xhtml", "application/xhtml+xml", "Collaborator", true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter4.xhtml", "application/xhtml+xml", "Alstede’s Side", true },
+{ volume::P5V10, /* CHAPTER */ "Text/insert2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter4_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter5.xhtml", "application/xhtml+xml", "Rescuing Solange", true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter6.xhtml", "application/xhtml+xml", "The Road to the Garden of Beginnings", true },
+{ volume::P5V10, /* CHAPTER */ "Text/insert3.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter6_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter7.xhtml", "application/xhtml+xml", "The Duty of a Zent", true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter8.xhtml", "application/xhtml+xml", "The Battle for the Auditorium", true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter9.xhtml", "application/xhtml+xml", "One Man’s Return from the Garden of Beginnings", true },
+{ volume::P5V10, /* CHAPTER */ "Text/insert4.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter9_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter10.xhtml", "application/xhtml+xml", "The Battle atop the Altar", true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter11.xhtml", "application/xhtml+xml", "In the Garden of Beginnings", true },
+{ volume::P5V10, /* CHAPTER */ "Text/insert5.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter11_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter12.xhtml", "application/xhtml+xml", "The Race to Become Zent", true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter13.xhtml", "application/xhtml+xml", "The Lord of Evil’s Machinations", true },
+
+{ volume::P5V10, /* CHAPTER */ "Text/chapter16.xhtml", "application/xhtml+xml", "The Battle for the Sovereignty", true },
+{ volume::P5V10, /* CHAPTER */ "Text/insert7.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter16_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/insert8.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter16_2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/insert9.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter16_3.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/insert10.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter16_4.xhtml", "application/xhtml+xml", std::nullopt, true },
+
+{ volume::P5V10, /* CHAPTER */ "Text/chapter14.xhtml", "application/xhtml+xml", "Machinations Complete", true },
+{ volume::P5V10, /* CHAPTER */ "Text/insert6.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter14_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* CHAPTER */ "Text/chapter15.xhtml", "application/xhtml+xml", "Epilogue", true },
+
+{ volume::P5V10, /* MAP_EHRENFEST_DUCHY */ "Text/map.xhtml", "application/xhtml+xml", "Map of Ehrenfest Duchy", true },
+{ volume::P5V10, /* MAP_YURGENSCHMIDT */ "Text/map2.xhtml", "application/xhtml+xml", "Map of Yurgenschmidt", true },
+{ volume::P5V10, /* MAP_ROYAL_ACADEMY */ "Text/map3.xhtml", "application/xhtml+xml", "Map of the Royal Academy", true },
+{ volume::P5V10, /* AFTERWORD */ "Text/afterword.xhtml", "application/xhtml+xml", "Afterword", true },
+{ volume::P5V10, /* MANGA */ "Text/manga1.xhtml", "application/xhtml+xml", "A Comfy Life with My Family by You Shiina", true },
+{ volume::P5V10, /* MANGA */ "Text/manga2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* BONUS */ "Text/bonus1.xhtml", "application/xhtml+xml", "Bonus High Resolution Illustrations", true },
+{ volume::P5V10, /* BONUS */ "Text/bonus2.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V10, /* SIGNUP */ "Text/signup.xhtml", "application/xhtml+xml", "About J-Novel Club", true },
+{ volume::P5V10, /* COPYRIGHT */ "Text/copyright.xhtml", "application/xhtml+xml", "Copyright", true },
+        });
+
 constexpr definition_span_view_t vol_1_def { std::span<const volume_definition, std::dynamic_extent>(vol_1), volume::P5V1 };
     constexpr definition_span_view_t vol_2_def { std::span<const volume_definition, std::dynamic_extent>(vol_2), volume::P5V2 };
     constexpr definition_span_view_t vol_3_def { std::span<const volume_definition, std::dynamic_extent>(vol_3), volume::P5V3 };
@@ -820,9 +906,10 @@ constexpr definition_span_view_t vol_1_def { std::span<const volume_definition, 
     constexpr definition_span_view_t vol_7_def { std::span<const volume_definition, std::dynamic_extent>(vol_7), volume::P5V7 };
     constexpr definition_span_view_t vol_8_def { std::span<const volume_definition, std::dynamic_extent>(vol_8), volume::P5V8 };
     constexpr definition_span_view_t vol_9_def { std::span<const volume_definition, std::dynamic_extent>(vol_9), volume::P5V9 };
+    constexpr definition_span_view_t vol_10_def { std::span<const volume_definition, std::dynamic_extent>(vol_10), volume::P5V10 };
 
     constexpr std::array part_5_arr { std::to_array<definition_span_view_t>({
-                vol_1_def, vol_2_def, vol_3_def, vol_4_def, vol_5_def, vol_6_def, vol_7_def, vol_8_def, vol_9_def,
+                vol_1_def, vol_2_def, vol_3_def, vol_4_def, vol_5_def, vol_6_def, vol_7_def, vol_8_def, vol_9_def, vol_10_def,
             }) };
 
     constexpr definition_view_t part_5_def { std::span<const definition_span_view_t, std::dynamic_extent>(part_5_arr), omnibus::PART5 };
