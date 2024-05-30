@@ -169,7 +169,7 @@ jobs:
       - if: ${{ matrix.flavor == 'windows' }}
         name: Configure Windows Latest
         run: |
-          meson setup  --warnlevel 3 --buildtype release -Dc_std=c17 -Dcpp_std=c++20 --default-library static -Dcpp_eh=a -Dlibxml2:warning_level=0 -Dminiz:warning_level=0 -Dlibjpeg-turbo:warning_level=0 -Dcpp-httplib:cpp-httplib_openssl=disabled -Dlibxmlpp:build-tests=false --force-fallback-for zlib,libpng,liblzma build
+          meson setup  --warnlevel 3 --buildtype release -Dc_std=c17 -Dcpp_std=c++20 --default-library static -Dcpp_eh=a -Dlibxml2:warning_level=0 -Dminiz:warning_level=0 -Dlibjpeg-turbo:warning_level=0 -Dcpp-httplib:cpp-httplib_openssl=disabled -Dlibxmlpp:build-tests=false --force-fallback-for zlib,libpng build
 
       - name: Compile
         run: ninja -C build
