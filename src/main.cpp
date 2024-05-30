@@ -187,7 +187,7 @@ namespace {
 
 void init()
 {
-    xmlSetStructuredErrorFunc(nullptr, _xmlStructuredErrorFunc);
+    xmlSetStructuredErrorFunc(nullptr, reinterpret_cast<xmlStructuredErrorFunc>(_xmlStructuredErrorFunc));
 }
 
 int main(int argc, char* argv[])
