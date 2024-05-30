@@ -45,6 +45,8 @@ enum class volume
     P5V6,
     P5V7,
     P5V8,
+    P5V9,
+    P5V10,
     FB1,
     FB2,
     FB3,
@@ -64,6 +66,8 @@ enum class volume
     M2V5,
     M2V6,
     M2V7,
+    M2V8,
+    M2V9,
     M3V1,
     M3V2,
     SSBDOVA1,    // Otto P1V3

@@ -47,6 +47,8 @@ namespace {
         {"ascendance-of-a-bookworm-part-5-volume-6"sv, volume::P5V6},
         {"ascendance-of-a-bookworm-part-5-volume-7"sv, volume::P5V7},
         {"ascendance-of-a-bookworm-part-5-volume-8"sv, volume::P5V8},
+        {"ascendance-of-a-bookworm-part-5-volume-9"sv, volume::P5V9},
+        {"ascendance-of-a-bookworm-part-5-volume-10"sv, volume::P5V10},
     };
 
     using namespace std::string_view_literals;
@@ -85,6 +87,8 @@ namespace {
         {"9781718346536"sv, volume::P5V6},
         {"9781718346550"sv, volume::P5V7},
         {"9781718346574"sv, volume::P5V8},
+        {"9781718346598"sv, volume::P5V9},
+        {"9781718346611"sv, volume::P5V10},
         {"9781718338005"sv, volume::M1V1},
         {"9781718338029"sv, volume::M1V2},
         {"9781718338043"sv, volume::M1V3},
@@ -99,6 +103,8 @@ namespace {
         {"9781718338227"sv, volume::M2V5},
         {"9781718338241"sv, volume::M2V6},
         {"9781718338265"sv, volume::M2V7},
+        {"9781718338272"sv, volume::M2V8},
+        {"9781718338289"sv, volume::M2V9},
         {"9781718338012"sv, volume::M3V1},
         {"9781718338036"sv, volume::M3V2},
         {"96908895-C96B-4376-BBF8-6A25E96F72F3"sv, volume::SSBDOVA1},
