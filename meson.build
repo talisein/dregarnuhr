@@ -86,7 +86,7 @@ endif
 lzma_dep = dependency('liblzma', fallback: ['liblzma'])
 
 # Fedora libxml2-devel, Ubuntu libxml2-dev
-libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
+#libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
 
 # Fedora cpp-httplib-devel, Ubuntu libcpp-httplib-dev
 # Note: Ubuntu is not header-only; it has a shared library. So for building
