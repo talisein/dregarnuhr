@@ -83,7 +83,7 @@ else
 endif
 
 # zlib is needed by libxml2. Specify fallback to our wrap to avoid strawberry perl on windows
-lzma_dep = dependency('liblzma', fallback: ['liblzma'])
+#lzma_dep = dependency('liblzma', fallback: ['liblzma'])
 
 # Fedora libxml2-devel, Ubuntu libxml2-dev
 #libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
