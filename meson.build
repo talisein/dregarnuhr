@@ -58,8 +58,6 @@ cpp_compiler.has_header_symbol('version', '__cpp_lib_format', args: cpp23_args)
 has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>', args: cpp23_args)
 
 # Fedora libxml++-devel. Ubuntu doesn't have a -5.0 package.
-# Note: I submitted some patches upstream, so the wrap has better performance
-# until there is a 5.0.2 release
 libxmlpp_dep = dependency('libxml++-5.0',
                           version : '>=5.0.2',
                           fallback: ['libxmlpp'],
@@ -67,8 +65,6 @@ libxmlpp_dep = dependency('libxml++-5.0',
                                             'build-examples=false',
                                             'validation=false',
                                             'maintainer-mode=false'])
-
-#zlib_dep = dependency('zlib', fallback: ['zlib'])
 
 # Fedora libjpeg-turbo-devel, Ubuntu libjpeg-turbo8-dev
 png_dep = dependency('libpng', fallback: ['libpng'])
@@ -92,12 +88,6 @@ if not cpp_compiler.has_header('outcome/outcome.hpp', args: cpp23_args)
 else
   outcome_dep = dependency('', required: false)
 endif
-
-# zlib is needed by libxml2. Specify fallback to our wrap to avoid strawberry perl on windows
-#lzma_dep = dependency('liblzma', fallback: ['liblzma'])
-
-# Fedora libxml2-devel, Ubuntu libxml2-dev
-#libxml_dep = dependency('libxml-2.0', fallback: ['libxml2'])
 
 # Fedora cpp-httplib-devel, Ubuntu libcpp-httplib-dev
 # Note: Ubuntu is not header-only; it has a shared library. So for building
