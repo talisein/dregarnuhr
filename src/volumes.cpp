@@ -49,6 +49,7 @@ namespace {
         {"ascendance-of-a-bookworm-part-5-volume-8"sv, volume::P5V8},
         {"ascendance-of-a-bookworm-part-5-volume-9"sv, volume::P5V9},
         {"ascendance-of-a-bookworm-part-5-volume-10"sv, volume::P5V10},
+        {"ascendance-of-a-bookworm-part-5-volume-11"sv, volume::P5V11},
     };
 
     using namespace std::string_view_literals;
@@ -89,6 +90,7 @@ namespace {
         {"9781718346574"sv, volume::P5V8},
         {"9781718346598"sv, volume::P5V9},
         {"9781718346611"sv, volume::P5V10},
+        {"9781718346635"sv, volume::P5V11},
         {"9781718338005"sv, volume::M1V1},
         {"9781718338029"sv, volume::M1V2},
         {"9781718338043"sv, volume::M1V3},
