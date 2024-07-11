@@ -164,7 +164,7 @@ jobs:
       - if: ${{ matrix.flavor == 'mac' }}
         name: Configure MacOS 12
         run: |
-          meson setup --warnlevel 3 --buildtype release --default-library static -Dcpp_link_args="-static-libstdc++ -static-libgcc" --force-fallback-for libjpeg,libpng build
+          meson setup --warnlevel 3 --buildtype release --default-library static -Dcpp_link_args="-static-libstdc++ -static-libgcc" --force-fallback-for libjpeg,libpng -Dcpp-httplib:cpp-httplib_openssl=disabled build
 
       - if: ${{ matrix.flavor == 'windows' }}
         name: Configure Windows Latest
