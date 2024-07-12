@@ -109,7 +109,8 @@ jobs:
           sudo add-apt-repository -n ppa:talisein/outcome
           sudo add-apt-repository -n ppa:talisein/magic-enum
           sudo apt-get update
-          sudo apt-get install ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev jq findutils meson
+          sudo apt-get install ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev jq findutils
+          python -m pip install meson
 
       - if: ${{ matrix.flavor == 'mac' }}
         name: Install deps mac
@@ -169,7 +170,7 @@ jobs:
       - if: ${{ matrix.flavor == 'windows' }}
         name: Configure Windows Latest
         run: |
-          meson setup  --warnlevel 3 --buildtype release --default-library static -Dcpp_eh=a -Dlibxml2:warning_level=0 -Dminiz:warning_level=0 -Dlibjpeg-turbo:warning_level=0 -Dcpp-httplib:cpp-httplib_openssl=disabled -Dlibxmlpp:build-tests=false -Dlibxml2:python=disabled -Dlibxml2:iconv=disabled --force-fallback-for libpng build
+          meson setup  --warnlevel 3 --buildtype release --default-library static -Dcpp_std=vc++latest -Dcpp_eh=a -Dlibxml2:warning_level=0 -Dminiz:warning_level=0 -Dlibjpeg-turbo:warning_level=0 -Dcpp-httplib:cpp-httplib_openssl=disabled -Dlibxmlpp:build-tests=false -Dlibxml2:python=disabled -Dlibxml2:iconv=disabled --force-fallback-for libpng build
 
       - name: Compile
         run: ninja -C build
