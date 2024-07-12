@@ -2,6 +2,7 @@ project('dregarnuhr', ['c', 'cpp'],
         license : 'GPLv3+',
         version : '1.5.10.0',
         default_options : ['c_std=gnu17',
+                           'cpp_std=c++23',
                            'buildtype=release',
                            'default_library=static',
                            'cpp_eh=a'])
@@ -12,18 +13,7 @@ endif
 
 cpp_compiler = meson.get_compiler('cpp')
 if cpp_compiler.get_argument_syntax() == 'msvc'
-  if cpp_compiler.has_argument('/std:c++23')
-    cpp23_args = ['/std:c++23']
-  else
-    cpp23_args = ['/std:c++latest']
-  endif
 else
-  if cpp_compiler.has_argument('-std=c++23')
-    cpp23_args = ['-std=c++23']
-  else
-    cpp23_args = ['-std=c++2b']
-  endif
-
   if cpp_compiler.get_id() == 'clang'
     cpp23_args += '-stdlib=libc++'
     cpp23_args += '-fexperimental-library'
@@ -37,25 +27,22 @@ else
 
 endif
 
-message('Adding cpp23 args: ', cpp23_args)
-add_global_arguments(cpp23_args, language: 'cpp')
+cpp_compiler.has_header_symbol('version', '__cpp_lib_filesystem', required: true)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_string_view', required: true)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges', required: true)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_source_location', required: true)
+cpp_compiler.has_header_symbol('version', '__cpp_concepts', required: true)
+cpp_compiler.compute_int('__cpp_concepts', prefix: '#include<version>')
+cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_functions', required: true)
+cpp_compiler.has_header_symbol('version', '__cpp_lib_expected', required: true)
+cpp_compiler.has_header_symbol('version', '__cpp_size_t_suffix')
+cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip')
+cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace')
+cpp_compiler.has_header_symbol('version', '__cpp_lib_spanstream')
+cpp_compiler.has_header_symbol('version', '__cpp_lib_flat_map')
+cpp_compiler.has_header_symbol('version', '__cpp_lib_format')
 
-cpp_compiler.has_header_symbol('version', '__cpp_lib_filesystem', required: true, args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_string_view', required: true, args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges', required: true, args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_source_location', required: true, args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_concepts', required: true, args: cpp23_args)
-cpp_compiler.compute_int('__cpp_concepts', prefix: '#include<version>', args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_integer_comparison_functions', required: true, args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_expected', required: true, args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_size_t_suffix', args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_ranges_zip', args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_stacktrace', args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_spanstream', args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_flat_map', args: cpp23_args)
-cpp_compiler.has_header_symbol('version', '__cpp_lib_format', args: cpp23_args)
-
-has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>', args: cpp23_args)
+has_chrono = 1 == cpp_compiler.compute_int('__cpp_lib_chrono >= 201907L', prefix: '#include<chrono>')
 
 # Fedora libxml++-devel. Ubuntu doesn't have a -5.0 package.
 libxmlpp_dep = dependency('libxml++-5.0',
@@ -83,7 +70,7 @@ if not miniz_dep.found()
 endif
 
 # Unpackaged
-if not cpp_compiler.has_header('outcome/outcome.hpp', args: cpp23_args)
+if not cpp_compiler.has_header('outcome/outcome.hpp')
   outcome_dep = dependency('outcome-2.0', fallback: ['outcome'])
 else
   outcome_dep = dependency('', required: false)
