@@ -240,7 +240,7 @@ namespace utils
     [[nodiscard]] auto safe_int_cast(From from) -> std::remove_cvref_t<To> {
         using namespace std::string_view_literals;
         auto res = static_cast<std::remove_cvref_t<To>>(from);
-        if (!std::in_range<To>(from)) {
+        if (std::cmp_not_equal(res, from)) [[unlikely]] {
             std::string error_message = utils::strcat("Trying to cast from ", from, " to a type that would become ", res);
             if (std::cmp_greater(from, res)) {
                 throw std::overflow_error(error_message);
