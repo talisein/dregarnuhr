@@ -1,6 +1,6 @@
 project('dregarnuhr', ['c', 'cpp'],
         license : 'GPLv3+',
-        version : '1.5.10.0',
+        version : '1.5.11.0',
         default_options : ['c_std=gnu17,c17',
                            'cpp_std=c++23',
                            'buildtype=release',
