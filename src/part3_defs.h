@@ -114,6 +114,17 @@ namespace part_3_defs
 { volume::P3V1, "Text/chapter12.xhtml"sv, "application/xhtml+xml"sv, "Making a Monastery"sv, true },
 { volume::P3V1, "Text/insert5.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P3V1, "Text/chapter12_1.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::FB4, /* CHAPTER */ "Text/47.xhtml", "application/xhtml+xml", "“Business Trips are Tough” by Ryo Namino", true },
+{ volume::FB4, /* CHAPTER */ "Text/48.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::FB4, /* CHAPTER */ "Text/49.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::FB4, /* CHAPTER */ "Text/50.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::FB4, /* IMAGE */ "Images/Image47.jpg", "image/jpeg", std::nullopt, false },
+{ volume::FB4, /* IMAGE */ "Images/Image48.jpg", "image/jpeg", std::nullopt, false },
+{ volume::FB4, /* IMAGE */ "Images/Image49.jpg", "image/jpeg", std::nullopt, false },
+{ volume::FB4, /* IMAGE */ "Images/Image50.jpg", "image/jpeg", std::nullopt, false },
+{ volume::FB4, /* STYLESHEET */ "Styles/stylesheet.css", "text/css", std::nullopt, false },
+
 { volume::P3V1, "Text/extra2.xhtml"sv, "application/xhtml+xml"sv, "One Stressed-Out Chef"sv, true },
 
 { volume::M3V2, /* CHAPTER */ "xhtml/p-155.xhtml", "application/xhtml+xml", "Extra: Benno and Gustav's Suffering", true },

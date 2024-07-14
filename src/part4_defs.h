@@ -710,6 +710,11 @@ namespace part_4_defs
 { volume::P4V7, "Text/chapter1.xhtml"sv, "application/xhtml+xml"sv, "Post-Return Discussion"sv, true },
 { volume::P4V7, "Text/chapter20.xhtml"sv, "application/xhtml+xml"sv, "Rendezvous at the Gazebo"sv, true },
 { volume::P4V7, "Text/chapter2.xhtml"sv, "application/xhtml+xml"sv, "Dinner and a Tea Party"sv, true },
+
+{ volume::FB4, /* CHAPTER */ "Text/side.xhtml", "application/xhtml+xml", "Mana-Sensing and Marriage Partners", true },
+{ volume::FB4, /* STYLESHEET */ "Styles/stylesheet.css", "text/css", std::nullopt, false },
+
+
 { volume::P4V7, "Text/chapter3.xhtml"sv, "application/xhtml+xml"sv, "Sylvester’s Order"sv, true },
 { volume::P4V7, "Text/chapter4.xhtml"sv, "application/xhtml+xml"sv, "Investigating the Bible"sv, true },
 { volume::P4V7, "Text/insert2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
