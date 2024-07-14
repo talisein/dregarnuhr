@@ -310,7 +310,7 @@ jobs:
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [check-run-linux, check-run-macos-11, check-run-macos-12, check-run-win]
+    needs: [check-run-linux, check-run-macos-12, check-run-win]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
