@@ -949,7 +949,15 @@ constexpr std::array vol_11 = std::to_array<volume_definition>({
 { volume::P5V11, /* CHAPTER */ "Text/chapter8_1.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V11, /* CHAPTER */ "Text/insert5.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V11, /* CHAPTER */ "Text/chapter8_2.xhtml", "application/xhtml+xml", std::nullopt, true },
+
+{ volume::P5V11, /* CHAPTER */ "Text/chapter17.xhtml", "application/xhtml+xml", "Vows and the Garden of Beginnings", true },
+
 { volume::P5V11, /* CHAPTER */ "Text/chapter9.xhtml", "application/xhtml+xml", "The Blessings’ Influence", true },
+
+{ volume::P5V11, /* CHAPTER */ "Text/chapter16.xhtml", "application/xhtml+xml", "The Transference Ceremony", true },
+{ volume::P5V11, /* CHAPTER */ "Text/insert10.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::P5V11, /* CHAPTER */ "Text/chapter16_1.xhtml", "application/xhtml+xml", std::nullopt, true },
+
 { volume::P5V11, /* CHAPTER */ "Text/chapter10.xhtml", "application/xhtml+xml", "Operation: Mana Drain", true },
 { volume::P5V11, /* CHAPTER */ "Text/insert6.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V11, /* CHAPTER */ "Text/chapter10_1.xhtml", "application/xhtml+xml", std::nullopt, true },
@@ -964,11 +972,9 @@ constexpr std::array vol_11 = std::to_array<volume_definition>({
 { volume::P5V11, /* CHAPTER */ "Text/chapter15.xhtml", "application/xhtml+xml", "Epilogue", true },
 { volume::P5V11, /* CHAPTER */ "Text/insert9.xhtml", "application/xhtml+xml", std::nullopt, true },
 { volume::P5V11, /* CHAPTER */ "Text/chapter15_1.xhtml", "application/xhtml+xml", std::nullopt, true },
-{ volume::P5V11, /* CHAPTER */ "Text/chapter16.xhtml", "application/xhtml+xml", "The Transference Ceremony", true },
-{ volume::P5V11, /* CHAPTER */ "Text/insert10.xhtml", "application/xhtml+xml", std::nullopt, true },
-{ volume::P5V11, /* CHAPTER */ "Text/chapter16_1.xhtml", "application/xhtml+xml", std::nullopt, true },
-{ volume::P5V11, /* CHAPTER */ "Text/chapter17.xhtml", "application/xhtml+xml", "Vows and the Garden of Beginnings", true },
+
 { volume::P5V11, /* CHAPTER */ "Text/chapter18.xhtml", "application/xhtml+xml", "The New Aub’s Awesome Magic", true },
+
 { volume::P5V11, /* MAP_EHRENFEST_DUCHY */ "Text/map.xhtml", "application/xhtml+xml", "Map of Ehrenfest Duchy", true },
 { volume::P5V11, /* MAP_YURGENSCHMIDT */ "Text/map2.xhtml", "application/xhtml+xml", "Map of Yurgenschmidt", true },
 { volume::P5V11, /* AFTERWORD */ "Text/afterword.xhtml", "application/xhtml+xml", "Afterword", true },
