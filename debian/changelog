@@ -1,3 +1,9 @@
+dregarnuhr (1.5.11.0-1) jammy; urgency=medium
+
+  * P5V11, FB4
+
+ -- Andrew Potter <agpotter@gmail.com>  Sat, 13 Jul 2024 18:18:00 -0700
+
 dregarnuhr (1.5.10.0-1) jammy; urgency=medium
 
   * P5V9, P5V10, M2V8, M2V9
