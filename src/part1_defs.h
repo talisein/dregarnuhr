@@ -43,6 +43,19 @@ namespace part_1_defs
 { volume::P1V1, "Text/frontmatter2.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
 { volume::P1V1, "Text/frontmatter3.xhtml"sv, "application/xhtml+xml"sv, "Map of Ehrenfest"sv, true },
 { volume::P1V1, "Text/toc.xhtml"sv, "application/xhtml+xml"sv, std::nullopt, true },
+
+{ volume::FB4, /* CHAPTER */ "Text/33.xhtml", "application/xhtml+xml", "“Liz’s Apprentice Selection” by Suzuka", true },
+{ volume::FB4, /* CHAPTER */ "Text/34.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::FB4, /* CHAPTER */ "Text/35.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::FB4, /* CHAPTER */ "Text/36.xhtml", "application/xhtml+xml", std::nullopt, true },
+{ volume::FB4, /* IMAGE */ "Images/Image33.jpg", "image/jpeg", std::nullopt, false },
+{ volume::FB4, /* IMAGE */ "Images/Image34.jpg", "image/jpeg", std::nullopt, false },
+{ volume::FB4, /* IMAGE */ "Images/Image35.jpg", "image/jpeg", std::nullopt, false },
+{ volume::FB4, /* IMAGE */ "Images/Image36.jpg", "image/jpeg", std::nullopt, false },
+
+{ volume::FB4, /* STYLESHEET */ "Styles/stylesheet.css", "text/css", std::nullopt, false },
+
+
 { volume::P1V1, "Text/prologue.xhtml"sv, "application/xhtml+xml"sv, "Prologue"sv, true },
 { volume::P1V1, "Text/extra2.xhtml"sv, "application/xhtml+xml"sv, "Unchanging Daily Life"sv, true },
 { volume::P1V1, "Text/chapter01.xhtml"sv, "application/xhtml+xml"sv, "A New Life"sv, true },
