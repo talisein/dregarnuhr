@@ -114,7 +114,7 @@ evaluate_chapter_type(volume vol,
     constexpr auto map_yurgenschmidt_href_regex    = ctre::search<"map2.xhtml", ctre::case_insensitive>;
     constexpr auto map_royal_academy_href_regex    = ctre::search<"map3.xhtml", ctre::case_insensitive>;
     constexpr auto family_tree_regex               = ctre::search<"tree.xhtml", ctre::case_insensitive>;
-    constexpr auto afterword_regex                 = ctre::search<"afterword.xhtml", ctre::case_insensitive>;
+    constexpr auto afterword_regex                 = ctre::search<"(afterword.xhtml|final[0-9][_]*[0-9]*)", ctre::case_insensitive>;
     constexpr auto manga_regex                     = ctre::search<"text/manga", ctre::case_insensitive>;
     constexpr auto poll_regex                      = ctre::search<"text/poll", ctre::case_insensitive>;
     constexpr auto bonus_regex                     = ctre::search<"text/bonus", ctre::case_insensitive>;
