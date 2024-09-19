@@ -33,7 +33,7 @@ jobs:
         include:
           # define operating systems
           - flavor: ubuntu
-            os: ubuntu-22.04
+            os: ubuntu-24.04
           - flavor: mac
             os: macos-12
           - flavor: windows
@@ -42,14 +42,14 @@ jobs:
           - compiler: msvc
             is-experimental: false
           - compiler: gcc
-            CC: gcc-12
-            CXX: g++-12
+            CC: gcc-14
+            CXX: g++-14
             is-experimental: false
           - compiler: clang
-            CC: clang-17
-            CXX: clang++-17
-            CC_LD: lld-17
-            CXX_LD: lld-17
+            CC: clang
+            CXX: clang++
+            CC_LD: lld
+            CXX_LD: lld
             is-experimental: true
           # Mac stuff
           - DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
@@ -84,22 +84,16 @@ jobs:
       - if: ${{ matrix.compiler == 'clang' && matrix.flavor == 'ubuntu' }}
         name: Install clang ubuntu
         run: |
-          sudo apt-get remove -y python3-lldb-x.y python3-lldb-14 libc++1-14 libc++abi1-14 libunwind-14 libunwind-14-dev
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh 17
-          # libc++-16 doesn't have std::views::join yet
-          sudo apt-get install libc++-17-dev libc++abi-17-dev
-          sudo apt-get install libstdc++-12-dev
+          sudo apt-get install clang libc++-dev libc++abi-dev libstdc++-14-dev
 
       - if: ${{ matrix.compiler == 'gcc' && matrix.flavor == 'ubuntu' }}
         name: Install gcc ubuntu
         run: |
-          sudo apt-get install g++-12 libstdc++-12-dev
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 12
-          sudo update-alternatives --set gcc /usr/bin/gcc-12
-          sudo update-alternatives --set g++ /usr/bin/g++-12
+          sudo apt-get install g++-14 libstdc++-14-dev
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 14
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 14
+          sudo update-alternatives --set gcc /usr/bin/gcc-14
+          sudo update-alternatives --set g++ /usr/bin/g++-14
 
       - if: ${{ matrix.flavor == 'ubuntu' }}
         name: Install deps ubuntu
@@ -107,16 +101,15 @@ jobs:
           sudo add-apt-repository -n ppa:talisein/ctre
           sudo add-apt-repository -n ppa:talisein/libboost-ext-ut
           sudo add-apt-repository -n ppa:talisein/outcome
-          sudo add-apt-repository -n ppa:talisein/magic-enum
           sudo apt-get update
-          sudo apt-get install ninja-build libhowardhinnant-date-dev liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev jq findutils
-          python -m pip install meson
+          sudo apt-get install ninja-build liboutcome-dev libboost-ext-ut-dev libctre-dev libmagicenum-dev jq findutils meson
+#          python -m pip install meson
 
       - if: ${{ matrix.flavor == 'mac' }}
         name: Install deps mac
         run: |
           brew search gcc@
-          brew install meson gcc@12 ninja
+          brew install meson gcc@14 ninja
 
       - if: ${{ matrix.flavor == 'windows' }}
         name: Install Meson/Ninja Windows
@@ -153,12 +146,12 @@ jobs:
         continue-on-error: true
 
       - if: ${{ matrix.flavor == 'ubuntu'  && !startsWith(github.ref, 'refs/tags/v') }}
-        name: Configure Ubuntu 22 (Debug)
+        name: Configure Ubuntu 24 (Debug)
         run: |
           meson setup  --warnlevel 3 --buildtype debug --default-library static --force-fallback-for libjpeg,libpng build
 
       - if: ${{ matrix.flavor == 'ubuntu'  && startsWith(github.ref, 'refs/tags/v') }}
-        name: Configure Ubuntu 22 (Release)
+        name: Configure Ubuntu 24 (Release)
         run: |
           meson setup  --warnlevel 3 --buildtype release --default-library static --force-fallback-for libjpeg,libpng build
 
@@ -279,14 +272,14 @@ jobs:
 
   check-run-linux:
     needs: build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
 
       - run: |
-          chmod u+x dregarnuhr-ubuntu-22.04-gcc/dregarnuhr
-          dregarnuhr-ubuntu-22.04-gcc/dregarnuhr --check --verbose
+          chmod u+x dregarnuhr-ubuntu-24.04-gcc/dregarnuhr
+          dregarnuhr-ubuntu-24.04-gcc/dregarnuhr --check --verbose
 
   check-run-macos-12:
     needs: build
@@ -334,8 +327,8 @@ jobs:
           REF: ${{ github.event.ref }}
         run: echo "::set-output name=MYREF::`echo $REF | cut -b 11-`"
 
-      - run: chmod u+x dregarnuhr-ubuntu-22.04-gcc/dregarnuhr
-      - run: tar -C ./dregarnuhr-ubuntu-22.04-gcc -cJvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz" dregarnuhr
+      - run: chmod u+x dregarnuhr-ubuntu-24.04-gcc/dregarnuhr
+      - run: tar -C ./dregarnuhr-ubuntu-24.04-gcc -cJvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz" dregarnuhr
       - run: chmod u+x dregarnuhr-macos-12-gcc/dregarnuhr
       - run: tar -C ./dregarnuhr-macos-12-gcc -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
       - run: zip -j "./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip" dregarnuhr-windows-latest/dregarnuhr.exe
@@ -347,7 +340,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz
-          asset_name: dregarnuhr-ubuntu22.04-${{ steps.myref.outputs.MYREF }}.tar.xz
+          asset_name: dregarnuhr-ubuntu24.04-${{ steps.myref.outputs.MYREF }}.tar.xz
           asset_content_type: application/x-xz
 
       - name: Release Mac Artifact

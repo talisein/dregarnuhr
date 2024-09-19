@@ -15,4 +15,4 @@
 	dh $@ -Smeson
 
 override_dh_auto_configure:
-	CC=gcc-12 CXX=g++-12 dh_auto_configure -Smeson
+	CC=gcc-14 CXX=g++-14 dh_auto_configure -Smeson
