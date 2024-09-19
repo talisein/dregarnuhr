@@ -1,3 +1,9 @@
+dregarnuhr (1.5.12.0-2) noble; urgency=medium
+
+  * rebuild for noble
+
+ -- Andrew Potter <agpotter@gmail.com>  Thu, 19 Sep 2024 16:03:10 -0700
+
 dregarnuhr (1.5.12.0-1) jammy; urgency=medium
 
   * P5V12

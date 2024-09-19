@@ -2,15 +2,14 @@ Source: dregarnuhr
 Priority: optional
 Maintainer: Andrew Potter <talisein@gmail.com>
 Build-Depends: debhelper-compat (= 13),
-	       g++-12,
+	       g++-14,
 	       meson,
-	       pkg-config,
+	       pkgconf,
 	       cmake,
 	       zlib1g-dev,
 	       libjpeg-turbo8-dev,
 	       libpng-dev,
 	       liblzma-dev,
-	       libhowardhinnant-date-dev,
 	       libcpp-httplib-dev,
 	       libboost-ext-ut-dev (>= 1.1.9-4),
 	       liboutcome-dev,
