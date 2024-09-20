@@ -35,7 +35,7 @@ jobs:
           - flavor: ubuntu
             os: ubuntu-24.04
           - flavor: mac
-            os: macos-12
+            os: macos-14
           - flavor: windows
             os: windows-latest
           # CC
@@ -52,7 +52,7 @@ jobs:
             CXX_LD: lld
             is-experimental: true
           # Mac stuff
-          - DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+          - DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
             flavor: mac
         exclude:
           - flavor: windows
@@ -84,7 +84,7 @@ jobs:
       - if: ${{ matrix.compiler == 'clang' && matrix.flavor == 'ubuntu' }}
         name: Install clang ubuntu
         run: |
-          sudo apt-get install clang libc++-dev libc++abi-dev libstdc++-14-dev
+          sudo apt-get install clang libc++-dev libc++abi-dev libstdc++-14-dev libhowardhinnant-date-dev
 
       - if: ${{ matrix.compiler == 'gcc' && matrix.flavor == 'ubuntu' }}
         name: Install gcc ubuntu
@@ -108,8 +108,13 @@ jobs:
       - if: ${{ matrix.flavor == 'mac' }}
         name: Install deps mac
         run: |
+          brew install meson ninja
+
+      - if: ${{ matrix.flavor == 'mac' && matrix.compiler == 'gcc' }}
+        name: Install gcc mac
+        run: |
           brew search gcc@
-          brew install meson gcc@14 ninja
+          brew install gcc@14
 
       - if: ${{ matrix.flavor == 'windows' }}
         name: Install Meson/Ninja Windows
@@ -155,10 +160,15 @@ jobs:
         run: |
           meson setup  --warnlevel 3 --buildtype release --default-library static --force-fallback-for libjpeg,libpng build
 
-      - if: ${{ matrix.flavor == 'mac' }}
-        name: Configure MacOS 12
+      - if: ${{ matrix.flavor == 'mac' && matrix.compiler == 'gcc' }}
+        name: Configure MacOS 14 GCC
         run: |
           meson setup --warnlevel 3 --buildtype release --default-library static -Dcpp_link_args="-static-libstdc++ -static-libgcc" --force-fallback-for libjpeg,libpng -Dcpp-httplib:cpp-httplib_openssl=disabled build
+
+      - if: ${{ matrix.flavor == 'mac' && matrix.compiler == 'clang' }}
+        name: Configure MacOS 14 clang
+        run: |
+          meson setup --warnlevel 3 --buildtype release --default-library static --force-fallback-for libjpeg,libpng -Dcpp-httplib:cpp-httplib_openssl=disabled build
 
       - if: ${{ matrix.flavor == 'windows' }}
         name: Configure Windows Latest
@@ -281,16 +291,27 @@ jobs:
           chmod u+x dregarnuhr-ubuntu-24.04-gcc/dregarnuhr
           dregarnuhr-ubuntu-24.04-gcc/dregarnuhr --check --verbose
 
-  check-run-macos-12:
+  check-run-macos-14:
     needs: build
-    runs-on: macos-12
+    runs-on: macos-14
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
 
       - run: |
-          chmod u+x dregarnuhr-macos-12-gcc/dregarnuhr
-          dregarnuhr-macos-12-gcc/dregarnuhr --check --verbose
+          chmod u+x dregarnuhr-macos-14-gcc/dregarnuhr
+          dregarnuhr-macos-14-gcc/dregarnuhr --check --verbose
+
+#  check-run-macos-14-clang:
+#    needs: build
+#    runs-on: macos-14
+#    steps:
+#      - name: Download Artifacts
+#        uses: actions/download-artifact@v4
+#
+#      - run: |
+#          chmod u+x dregarnuhr-macos-14-clang/dregarnuhr
+#          dregarnuhr-macos-14-clang/dregarnuhr --check --verbose
 
   check-run-win:
     needs: build
@@ -303,7 +324,7 @@ jobs:
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [check-run-linux, check-run-macos-12, check-run-win]
+    needs: [check-run-linux, check-run-macos-14, check-run-win]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
