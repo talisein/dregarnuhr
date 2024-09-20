@@ -237,7 +237,7 @@ jobs:
           sudo add-apt-repository -n ppa:talisein/libxml++5.0
           sudo add-apt-repository -n ppa:talisein/miniz
           sudo apt-get update
-          sudo apt-get install cmake libcpp-httplib-dev libxml++5.0-dev libminiz3-dev debmake debhelper devscripts equivs distro-info-data distro-info dpkg-dev git-buildpackage
+          sudo apt-get install cmake libcpp-httplib-dev libxml++5.0-dev libminiz3-dev debmake debhelper devscripts equivs distro-info-data distro-info dpkg-dev git-buildpackage libjpeg-turbo8-dev liblzma-dev libpng-dev
 
       - if: ${{ matrix.flavor == 'ubuntu' && matrix.compiler == 'gcc' && startsWith(github.ref, 'refs/tags/v') }}
         name: Generate PPA tarball
@@ -350,8 +350,8 @@ jobs:
 
       - run: chmod u+x dregarnuhr-ubuntu-24.04-gcc/dregarnuhr
       - run: tar -C ./dregarnuhr-ubuntu-24.04-gcc -cJvf "dregarnuhr-linux-${{ steps.myref.outputs.MYREF }}.tar.xz" dregarnuhr
-      - run: chmod u+x dregarnuhr-macos-12-gcc/dregarnuhr
-      - run: tar -C ./dregarnuhr-macos-12-gcc -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
+      - run: chmod u+x dregarnuhr-macos-14-gcc/dregarnuhr
+      - run: tar -C ./dregarnuhr-macos-14-gcc -czvf "dregarnuhr-mac-${{ steps.myref.outputs.MYREF }}.tar.gz" dregarnuhr
       - run: zip -j "./dregarnuhr-windows-${{ steps.myref.outputs.MYREF }}.zip" dregarnuhr-windows-latest/dregarnuhr.exe
       - run: ls
       - name: Release Linux Artifact
